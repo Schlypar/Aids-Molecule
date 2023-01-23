@@ -85,7 +85,7 @@ void structFree(Voter *array, size_t lines)
     for (int i = 0; i < lines; i++)
     {
         free(array[i].fullName);
-        free(array[i].idPolling);
+        //free(array[i].idPolling);
     }
     free(array);
 }
@@ -108,7 +108,7 @@ Voter *structReader(size_t *numberOfVoters)
     Voter *voterRegister = (Voter *)malloc(1 * sizeof(Voter ));
     while(fgets(tempString, MAX_LENGHT, file))
     {
-        voter.idPolling = malloc(8 * sizeof(char));
+        //voter.idPolling = malloc(8 * sizeof(char));
         voter.fullName = fullNameGiver(tempString, &end);
         if (!voter.fullName)
         {

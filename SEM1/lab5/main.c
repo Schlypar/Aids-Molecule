@@ -14,172 +14,62 @@ int main(int argc, char **argv) {
         return 1;
     }
     error = 0;
-    int option;
-    printf("\nMein menu:\n\t1 -> 6: odd-even sort\n\t7 -> 12: binary search with insertion sort\n\t13 -> 18: qsort from standart library\n\t0: print\n\n");
-    error = inputInt(&option);
-    while (1) 
-    {   
-        printf("\nMein menu:\n\t1 -> 6: odd-even sort\n\t7 -> 12: binary search with insertion sort\n\t13 -> 18: qsort from standart library\n\ts0: print\n\n");
-        error = inputInt(&option);
-        if (error) break;
-        switch (option) {
-            case 0:
-                error = votersPrint(voters, lines);
-                if (error) {
-                    structFree(voters, lines);
-                    return 1;
-                }
-                break;
-            case 1:
-                oddEvenSort(voters, lines, (int (*)(const Voter *, const Voter *))compareName);
-                error = votersPrint(voters, lines);
-                if (error) {
-                    structFree(voters, lines);
-                    return 1;
-                }
-                break;
-            case 2:
-                oddEvenSort(voters, lines, (int (*)(const Voter *, const Voter *))compareId);
-                error = votersPrint(voters, lines);
-                if (error) {
-                    structFree(voters, lines);
-                    return 1;
-                }
-                break;
-            case 3:
-                oddEvenSort(voters, lines, (int (*)(const Voter *, const Voter *))compareInt);
-                error = votersPrint(voters, lines);
-                if (error) {
-                    structFree(voters, lines);
-                    return 1;
-                }
-                break;
-            case 4:
-                oddEvenSort(voters, lines, (int (*)(const Voter *, const Voter *))reverseCompareName);
-                error = votersPrint(voters, lines);
-                if (error) {
-                    structFree(voters, lines);
-                    return 1;
-                }
-                break;
-            case 5:
-                oddEvenSort(voters, lines, (int (*)(const Voter *, const Voter *))reverseCompareId);
-                error = votersPrint(voters, lines);
-                if (error) {
-                    structFree(voters, lines);
-                    return 1;
-                }
-                break;
-            case 6:
-                oddEvenSort(voters, lines, (int (*)(const Voter *, const Voter *))reverseCompareInt);
-                error = votersPrint(voters, lines);
-                if (error) {
-                    structFree(voters, lines);
-                    return 1;
-                }
-                break;
-            case 7:
-                binarySearchInsertSort(voters, lines, (int (*)(const Voter *, const Voter *))compareName);
-                error = votersPrint(voters, lines);
-                if (error) {
-                    structFree(voters, lines);
-                    return 1;
-                }
-                break;
-            case 8:
-                binarySearchInsertSort(voters, lines, (int (*)(const Voter *, const Voter *))compareId);
-                error = votersPrint(voters, lines);
-                if (error) {
-                    structFree(voters, lines);
-                    return 1;
-                }
-                break;
-            case 9:
-                binarySearchInsertSort(voters, lines, (int (*)(const Voter *, const Voter *))compareInt);
-                error = votersPrint(voters, lines);
-                if (error) {
-                    structFree(voters, lines);
-                    return 1;
-                }
-                break;
-            case 10:
-                binarySearchInsertSort(voters, lines, (int (*)(const Voter *, const Voter *))reverseCompareName);
-                error = votersPrint(voters, lines);
-                if (error) {
-                    structFree(voters, lines);
-                    return 1;
-                }
-                break;
-            case 11:
-                binarySearchInsertSort(voters, lines, (int (*)(const Voter *, const Voter *))reverseCompareId);
-                error = votersPrint(voters, lines);
-                if (error) {
-                    structFree(voters, lines);
-                    return 1;
-                }
-                break;
-            case 12:
-                binarySearchInsertSort(voters, lines, (int (*)(const Voter *, const Voter *))reverseCompareInt);
-                error = votersPrint(voters, lines);
-                if (error) {
-                    structFree(voters, lines);
-                    return 1;
-                }
-                break;
-            case 13:
-                qsort(voters, sizeof(Voter), lines, (int (*)(const void *, const void *))compareName);
-                error = votersPrint(voters, lines);
-                if (error) {
-                    structFree(voters, lines);
-                    return 1;
-                }
-                break;
-            case 14:
-                qsort(voters, sizeof(Voter), lines, (int (*)(const void *, const void *))compareId);
-                error = votersPrint(voters, lines);
-                if (error) {
-                    structFree(voters, lines);
-                    return 1;
-                }
-                break;
-            case 15:
-                qsort(voters, sizeof(Voter), lines, (int (*)(const void *, const void *))compareInt);
-                error = votersPrint(voters, lines);
-                if (error) {
-                    structFree(voters, lines);
-                    return 1;
-                }
-                break;
-            case 16:
-                qsort(voters, sizeof(Voter), lines, (int (*)(const void *, const void *))reverseCompareName);
-                error = votersPrint(voters, lines);
-                if (error) {
-                    structFree(voters, lines);
-                    return 1;
-                }
-                break;
-            case 17:
-                qsort(voters, sizeof(Voter), lines, (int (*)(const void *, const void *))reverseCompareId);
-                error = votersPrint(voters, lines);
-                if (error) {
-                    structFree(voters, lines);
-                    return 1;
-                }
-                break;
-            case 18:
-                qsort(voters, sizeof(Voter), lines, (int (*)(const void *, const void *))reverseCompareInt);
-                error = votersPrint(voters, lines);
-                if (error) {
-                    structFree(voters, lines);
-                    return 1;
-                }
-                break;
-            default:
-                printf("Smert\n");
-                break;
-            }
-            
-    }
-  structFree(voters, lines);
-  return 0;
+
+    int menu, compar;
+//	(int(const Voter *, const Voter *)) *comparator;
+	void *comparator;
+	printf("Possible comparators: \n1 - name\n2 - name revesed\n");
+	printf("3 - id\n4 - id reversed\n");
+	printf("5 - age\n6 - age reversed\n");
+
+	inputInt(&compar);
+
+	switch(compar) {
+		case 1:
+			comparator = &compareName;
+			break;
+		case 2:
+			comparator = &reverseCompareName;
+			break;
+		case 3:
+			comparator = &compareId;
+			break;
+		case 4:
+			comparator = &reverseCompareId;
+			break;
+		case 5:
+			comparator = &compareInt;
+			break;
+		case 6:
+			comparator = &reverseCompareInt;
+			break;
+		default:
+			printf("Такого компаратора не существует\n");
+			return 1;
+	}
+	
+	printf("Possible sorts:\n1 - odd-even sort\n2 - binary search with insertion sort\n3 - qsort\n");
+
+	inputInt(&menu);
+
+	switch(menu) {
+		case 1:
+			oddEvenSort(voters, lines, comparator);
+			votersPrint(voters, lines);
+			break;
+		case 2:
+			binarySearchInsertSort(voters, lines, comparator);
+			votersPrint(voters, lines);
+			break;
+		case 3:
+			qsort(voters, lines, sizeof(Voter), comparator);
+			votersPrint(voters, lines);
+			break;
+		default:
+			printf("Такой сортировки не существует\n");
+			break;
+	}
+
+  	structFree(voters, lines);
+ 	 return 0;
 }

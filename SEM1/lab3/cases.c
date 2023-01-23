@@ -3,6 +3,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void memalloc(double **base, int *el, int *reallen) 
+{
+	 if (*reallen < 2*(*el)) {													
+	    *reallen = 2*(*el);														
+	    (*base) = (double *)realloc((*base), *reallen * sizeof(double));	
+	}																		
+	if (*reallen > 2*(*el)) {													
+		*reallen = 2*(*el);														
+		(*base) = (double *)realloc((*base), *reallen * sizeof(double));	
+    }																		
+}
+
 int menuInput(int *loop, int *el,  double **data, int *reallen) {
 	double value;
 	int error, len;
@@ -39,14 +51,7 @@ int menuInput(int *loop, int *el,  double **data, int *reallen) {
 			(*loop)++;
 		}
 	printf("=====================================================\n");
-    if (*reallen < 2*(*el)) {													//
-	    *reallen = 2*(*el);														//
-	    (*data) = (double *)realloc((*data), *reallen * sizeof(double));	//
-	}																		// Выделение памяти под элементы массива согласно условию 2*N
-	if (*reallen > 2*(*el)) {													// Где N - количество элементов, записанных в массив
-		*reallen = 2*(*el);														//
-		(*data) = (double *)realloc((*data), *reallen * sizeof(double));	//
-    }																		//
+    memalloc(data, el, reallen);						
 	return error;
 }
 
@@ -83,14 +88,7 @@ int menuInsert(int *loop, int *reallen, int *el, double **data) {
 		(*el)++;
 		printf("=====================================================\n");					// Рассматриваем 2 случая
 		(*loop)++;
-		if (*reallen < 2*(*el)) {													//
-	        *reallen = 2*(*el);														//
-	        (*data) = (double *)realloc((*data), *reallen * sizeof(double));	//
-		}																		// Выделение памяти под элементы массива согласно условию 2*N
-		if (*reallen >= 2*(*el)) {													// Где N - количество элементов, записанных в массив
-		    *reallen = 2*(*el);														//
-		    (*data) = (double *)realloc((*data), *reallen * sizeof(double));	//
-		}																		//
+		memalloc(data, el, reallen);
 		return 0;
 	}
 	else {
@@ -107,14 +105,7 @@ int menuInsert(int *loop, int *reallen, int *el, double **data) {
 		printf("=====================================================\n");
 		(*loop)++;
 	}
-    if (*reallen < 2*(*el)) {													//
-	    *reallen = 2*(*el);														//
-	    (*data) = (double *)realloc((*data), *reallen * sizeof(double));		//
-	}																			// Выделение памяти под элементы массива согласно условию 2*N
-	if (*reallen >= 2*(*el)) {													// Где N - количество элементов, записанных в массив
-		*reallen = 2*(*el);														//
-		(*data) = (double *)realloc((*data), *reallen * sizeof(double));		//
-    }																			//
+    memalloc(data, el, reallen);
 	return error;
 }
 
@@ -145,69 +136,42 @@ int menuRemove(int *loop, int *el, int *reallen, double **data) {
 		printf("Как мы удалим то чего нет? Попробуйте снова\n\n");								// Рассматриваем 2 случая
 		return -1;
 	}
-	else {
-		error = removeElementDouble(data, reallen, placeHolder);
-		if (error) {
-			printf("Программа закончена\n");
-			return error;
-		}
-		if (error == -1) {
-			return error;
-		}
-		(*reallen)++;
-		(*el)--;
-		(*loop)--;
+	error = removeElementDouble(data, reallen, placeHolder);
+	if (error) {
+		printf("Программа закончена\n");
+		return error;
 	}
+	if (error == -1) {
+		return error;
+	}
+	(*reallen)++;
+	(*el)--;
+	(*loop)--;
 	printf("=====================================================\n");
-    if (*reallen < 2*(*el)) {													//
-	    *reallen = 2*(*el);														//
-	    (*data) = (double *)realloc((*data), *reallen * sizeof(double));	//
-	}																		// Выделение памяти под элементы массива согласно условию 2*N
-	if (*reallen > 2*(*el)) {													// Где N - количество элементов, записанных в массив
-		*reallen = 2*(*el);														//
-		(*data) = (double *)realloc((*data), *reallen * sizeof(double));	//
-    }																		//
+    memalloc(data, el, reallen);
 	return error;
 }
 
 double *menuTask(int *loop, int *el, int *reallen, double **data, int *newEl) {
-	double mean;
-	int n, error, index;
-	if (*loop == 0) {
-		printf("Как же так? Тут пусто, так что попробуйте снова\n\n");
-		return NULL;
-	}
-	mean = 0;
-	n = 0;
-	for (int i = 0; i < *el; i++) {															// Считаем среднее значение
+	double mean = 0;
+	int error;
+
+	for (int i = 0; i < *el; i++)
+	{
 		mean += (*data)[i];
-		n = i + 1;
 	}
-	mean = mean/n;
-    double *newData = (double *)malloc(*reallen * sizeof(int));
-	for (int i = 0; i < (*reallen)/2 + 1; i++) {
+	mean = mean/(*el);
+
+	double *newData = (double *)malloc((*el) * sizeof(double));
+	for (int i = 0; i < *el; i++) 
+	{
 		newData[i] = (*data)[i] - mean;
 	}
-	for (int i = 0; i < (*reallen)/2; i++) {
-		if ((*data)[i] > mean) {
-		    error = removeElementDouble(data, reallen, i);
-			if (error) {
-				return NULL;
-			}
-			(*reallen)++;
-			(*el)--;
-			(*loop)--;
-			i--;
-		}
+	*newEl = *el;
+
+	for (int i = 0; i < (*newEl); i++)
+	{
+		if (newData[i] < 0) removeElementDouble(data, el, i);
 	}
-	printf("=====================================================\n");
-    if (*reallen < 2*(*el)) {													//
-	    *reallen = 2*(*el);														//
-	    (*data) = (double *)realloc((*data), *reallen * sizeof(double));		//
-	}																			// Выделение памяти под элементы массива согласно условию 2*N
-	if (*reallen > 2*(*el)) {													// Где N - количество элементов, записанных в массив
-		*reallen = 2*(*el);														//
-		(*data) = (double *)realloc((*data), *reallen * sizeof(double));		//
-    }																			//
 	return newData;
 }

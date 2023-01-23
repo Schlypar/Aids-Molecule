@@ -30,7 +30,7 @@ int main()
 	while(1)
 	{
 		text = readline(PROMT);
-		text = process(text);\
+		text = process(text);
 		if (!text) 
 		{
 			break;

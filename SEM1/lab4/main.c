@@ -1,11 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <readline/readline.h>
-#include <string.h>
+
 #include "holylib.h"
 #include "textProcessor.h"
-
-#define PROMT "---> "
 
 #define PROMT "---> "
 
@@ -31,7 +29,7 @@ int main()
 	while(1)
 	{
 		text = readline(PROMT);
-		text = process(text);\
+		text = process(text);
 		if (!text) 
 		{
 			break;

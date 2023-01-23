@@ -14,25 +14,16 @@ List *readline(const char *PROMT)
     int error = 0, symbol;
     char prev = '\0';
 
-    error = fscanf(stdin, "[^n]");
     if (error == EOF)
     {
         listDelete(list);
         return NULL;
     } 
-    printf("\"");
 
     while (((symbol = getchar()) != EOF))
     {
         if (symbol == '\n') break;
 
-        printf("%c", symbol);
-
-        if (symbol == '\t') symbol = ' ';
-
-        if ((prev == ' ') && (symbol == ' ')) continue;
-
-        prev = symbol;
         error = listPushBack(list, symbol);
         if (error)
         {
@@ -40,25 +31,11 @@ List *readline(const char *PROMT)
             return NULL;
         }
     }
-    printf("\"\n");
 
-    if (list->head->symbol == ' ') 
+    if (symbol == EOF) 
     {
-        Node *temp = list->head;
-        list->head = list->head->next;
-        free(temp);
-    }
-    if (list->tail-> symbol == ' ')
-    {
-        Node *ptr = list->head, *prev;
-        while (ptr != list->tail)
-        {
-            prev = ptr;
-            ptr = ptr->next;
-        }
-        list->tail = prev;
-        free(ptr);
-        list->tail->next = NULL;
+        free(list);
+        return NULL;
     }
     return list;
 }

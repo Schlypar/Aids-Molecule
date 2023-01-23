@@ -1,0 +1,15 @@
+{
+  "version": "0.2.1",
+  "tasks": [
+    {
+      "taskLabel": "task-main",
+      "appliesTo": "SEM1/lab6/main.c",
+      "type": "launch"
+    },
+    {
+      "taskLabel": "task-lab6",
+      "appliesTo": "SEM1/lab6/",
+      "type": "launch"
+    }
+  ]
+}

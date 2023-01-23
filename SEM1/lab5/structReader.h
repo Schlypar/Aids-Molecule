@@ -6,7 +6,7 @@
 typedef struct Voter
 {
     char *fullName;
-    char *idPolling;
+    char idPolling[8];
     int age;
 }Voter;
 

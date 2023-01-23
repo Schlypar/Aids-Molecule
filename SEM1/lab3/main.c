@@ -11,7 +11,7 @@ double *arrayInput() {
 	int error = 0;
 	int newEl, el = 0;
 	double *data = (double *)malloc(sizeof(double));
-	double *newData;
+	double *newData = NULL;
 	while (1){
 			printf("%d --- %d\n", el, reallen);
 		if (error == 1) {
@@ -38,6 +38,7 @@ double *arrayInput() {
 				error = menuRemove(&loop, &el, &reallen, &data);
 				break;
 			case 4:
+				if (newData) free(newData);
 				newData = menuTask(&loop, &el, &reallen, &data, &newEl);
 				break;
 			case 5:
@@ -46,7 +47,7 @@ double *arrayInput() {
 					break;
 				}
 				int choice;
-				printf("Какой из массивов хотите вывести?\n 1 - изнчачальный\n 2 - новый старый\n");
+				printf("Какой из массивов хотите вывести?\n 1 - изначачальный\n 2 - новый старый\n");
 				error = inputInt(&choice);
 				if (error) {
 				    printf("Программа закончена\n)");
@@ -60,7 +61,7 @@ double *arrayInput() {
 						printArrayDouble(newData, newEl);
 						printf("=====================================================\n");
 						break;
-				     deafault:
+				     default:
 						printf("Ни я ни вы не создавали столько массивов... Попробуйте снова\n");
 						break;
 				}

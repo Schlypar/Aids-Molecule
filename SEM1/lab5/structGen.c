@@ -85,8 +85,9 @@ Voter *voterGen(size_t size)
     Voter *array = malloc(size * sizeof(Voter));
     for (int k = 0; k < size; k++)
     {
-        voter.fullName = fullnameGen();   
-        voter.idPolling = idGen();
+        voter.fullName = fullnameGen();
+        char *temp = idGen();   
+        memcpy(voter.idPolling, temp, strlen(temp)+1);
         voter.age = rand() % 72 + 18;
         array[k] = voter;    
     }

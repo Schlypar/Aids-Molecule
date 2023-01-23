@@ -10,7 +10,7 @@ char *readline(const char *promt)
         printf("%s", promt);
     }
     char buffer[81] = {0};
-    char *result = (char *)calloc(1, sizeof(char));
+    char *result = NULL;
     int len = 0, n, chunkLen, strLen;
     do
     {
