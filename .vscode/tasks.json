@@ -1,0 +1,31 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "Build-debug current active file",
+            "command": "g++",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "-W",
+                "-Wall",
+                "-pedantic",
+                "-std=c++2a",
+                "${workspaceFolder}/SEM2/Lab2/src/main.cpp",
+                "-o",
+                "${workspaceFolder}/SEM2/Lab2/out/main.exe"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "${gdb}"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
