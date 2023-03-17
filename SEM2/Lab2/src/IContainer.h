@@ -12,7 +12,7 @@ typedef size_t Index;
 template <typename T> 
 class IContainer
 {
-	virtual T Get(const Index index) const = 0;
+	virtual T& Get(const Index index) const = 0;
 	virtual Size GetLength() const = 0;
 
 	virtual bool isEmpty() const = 0;

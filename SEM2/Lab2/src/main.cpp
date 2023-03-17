@@ -1,10 +1,6 @@
-#include <iostream>
-#include <ostream>
 
-#include "Tuple.h"
-#include "List.h"
-#include "Array.h"
-#include "SegmentedList.h"
+#include "ADT.h"
+#include <iostream>
 
 // #include "catch2"
 
@@ -12,40 +8,17 @@ int main()
 {
 	Logger::setPriority(ErrorPriority);
 
-	SegmentedList<int> list;
-	list.Prepend(375);
-	list.Append(250);
-	list.Prepend(125);
+	int data[] = { 1,2,3,4,5,6,7,8,9 };
 
-	print(list, "\n");
+	ArraySequence<int> array = ArraySequence<int>(data, sizeof(data)/sizeof(int));
 
-	int data[] = { 1,2,3,4,5,6,7,8,9,0 };	
-	SegmentedList<int>secondList = SegmentedList<int>(data, sizeof(data)/sizeof(int));
+	auto iter = array._Begin();
+	auto end = array._End();
 
-	print(list, " ---- ", secondList, '\n');
-
-	SegmentedList<int>concated = list.Concat(secondList);
-
-	print(concated, '\n');
-
-	for (int data : list)
-		print(data, ' ');
+	for (; !(iter->_isEquals(end)); iter->_Next())
+		std::cout << iter->_GetCurrent() << std::endl;
 	
-	print("\n");
-
-	Array<int> memTest;
-
-	Array<int> array = Array<int>(data, sizeof(data)/sizeof(int));
-
-	print('\n');
-
-	Array<int> govno = Array<int>(data, sizeof(data)/sizeof(int));
-
-	array.Clear();
-
-	array = govno;
-
-	print(array, '\n');
-
+	delete iter; delete end;
+	
 	return 0;
 }

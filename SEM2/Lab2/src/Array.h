@@ -13,6 +13,7 @@ private:
     Size size;
     Size capacity;
     T* data;
+
 public:
 
     class Iterator
@@ -124,6 +125,11 @@ public:
 
         data = newBlock;
     }
+    
+    Size GetCapacity()
+    {
+        return capacity;
+    }
 
     void Set(const Index index, T data)
     {
@@ -137,7 +143,7 @@ public:
         data[index] = data;
     }
 
-    T Get(const Index index) const override
+    T& Get(const Index index) const override
     {
         if (index < 0 || index >= size)
         {

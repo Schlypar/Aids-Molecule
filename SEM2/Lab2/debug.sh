@@ -1,4 +1,4 @@
-!#/bin/bash
+#!/bin/bash
 
 make -e PROGRAM=bin/debug.exe
 
