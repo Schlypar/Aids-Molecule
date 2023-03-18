@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Logger.h"
+
 template <typename T>
 class IIterator
 {
@@ -16,5 +18,9 @@ public:
 
     // virtual T& operator* () {}
 
-    // virtual ~IIterator() = 0;
+    // virtual ~IIterator()
+    // {
+    //     Logger::Info("Used destructor of IIterator");
+    //     operator delete (this);
+    // }
 };

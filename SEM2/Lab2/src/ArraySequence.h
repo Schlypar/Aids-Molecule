@@ -19,10 +19,17 @@ public:
     {
         T* current;
     public:
-        Iterator() {}
+        Iterator() { Logger::Info("Used default constructor of ArraySequence<T>::Iterator"); }
 
         Iterator(T* data)
-            : current(data) {}
+            : current(data) { Logger::Info("Used T* constructor of ArraySequence<T>::Iterator"); }
+        
+        Iterator(IIterator<T>* other)
+            : current(((Iterator*)other)->current) 
+            { 
+                Logger::Info("Used IIterator* constructor of ArraySequence<T>::Iterator"); 
+                delete other;
+            }
 
         Iterator& operator+ (int n) 
         {
@@ -46,10 +53,10 @@ public:
             return *this;
         }
 
-        ~Iterator()
-        {
-            delete (IIterator<T>*)this;
-        }
+        // ~Iterator()
+        // {
+        //     delete (IIterator<T>*)this;
+        // }
 
         Iterator operator++ () { this->_Next() ; return *this; }
 
@@ -86,8 +93,8 @@ public:
     IIterator<T>* _Begin() override { return (IIterator<T>*) new (Iterator)(GetFirstPointer()); }
     IIterator<T>* _End() override { return (IIterator<T>*) new (Iterator)(GetEndPointer()); }
 
-    // Iterator begin() { return (Iterator)(this->_Begin()); }
-    // Iterator end() { return (Iterator)(this->_End()); }
+    Iterator begin() { return (Iterator)(this->_Begin()); }
+    Iterator end() { return (Iterator)(this->_End()); }
 
     ArraySequence()
         : container() {}

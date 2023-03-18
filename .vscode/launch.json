@@ -8,7 +8,7 @@
             "name": "Debug Lab2",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/SEM2/Lab2/main.exe",
+            "program": "${workspaceFolder}/SEM2/Lab2/bin/main.exe",
             "args": ["valgrind"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

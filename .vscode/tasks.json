@@ -14,7 +14,7 @@
                 "-std=c++2a",
                 "${workspaceFolder}/SEM2/Lab2/src/main.cpp",
                 "-o",
-                "${workspaceFolder}/SEM2/Lab2/out/main.exe"
+                "${workspaceFolder}/SEM2/Lab2/bin/main.exe"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
