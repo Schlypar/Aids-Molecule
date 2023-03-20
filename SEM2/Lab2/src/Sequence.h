@@ -10,23 +10,19 @@
 #include "Logger.h"
 
 
+
+// typedef Sequence<T>* (*Allocator)();
+
 template <typename T>
 class Sequence
 {
 public:
-    virtual T* GetFirstPointer() = 0; //{ return (IIterator<T>)(GetFirst()); }
-    virtual T* GetEndPointer() = 0; //{ return (IIterator<T>)(Get(GetLength()));}
+    
+    virtual T* GetFirstPointer() = 0; 
+    virtual T* GetEndPointer() = 0;
 
-    virtual IIterator<T>* _Begin() = 0;// { return GetFirstPointer(); }
-    virtual IIterator<T>* _End() = 0;// { return GetEndPointer(); }
-
-    // Sequence();
-
-    // Sequence(T* data, Size count);
-
-    // Sequence(const Sequence<T>& other);
-
-    // Sequence(Sequence<T>&& other);
+    virtual IIterator<T>* _Begin() = 0;
+    virtual IIterator<T>* _End() = 0;
 
     virtual T& GetFirst() const = 0;
     virtual T& GetLast() const = 0;
@@ -47,7 +43,7 @@ public:
 
     virtual bool isEmpty() const noexcept { return GetLength() == 0; }
 
-    // Sequence<T>& CreateCopy() = 0;
+    virtual Sequence<T>* Copy() = 0;
 };
 
 
@@ -55,7 +51,7 @@ public:
 template<typename T>
 Sequence<T>* Sequence<T>::GetSubsequence(const Index start, const Index end)
 {
-    Sequence<T>* result = this;
+    Sequence<T>* result = this->Copy();
 
     if (this->isEmpty() || start > end || end >= this->GetLength())
     {
@@ -73,7 +69,7 @@ Sequence<T>* Sequence<T>::GetSubsequence(const Index start, const Index end)
 template <typename T>
 Sequence<T>* Sequence<T>::Concat(Sequence<T>* other)
 {
-    Sequence<T>* result = this;
+    Sequence<T>* result = this->Copy();
 
     if (this->isEmpty() || other->isEmpty())
     {
@@ -87,6 +83,8 @@ Sequence<T>* Sequence<T>::Concat(Sequence<T>* other)
 
     for (iter; !(iter->_isEquals(end)); iter->_Next())
         result->Append(iter->_GetCurrent());
+    
+    delete iter; delete end;
     
     return result;
 }

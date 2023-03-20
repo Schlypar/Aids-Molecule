@@ -2,8 +2,9 @@
 
 #include "ADT.h"
 
+
 template <typename T>
-class ArraySequence : Sequence<T>
+class ArraySequence : public Sequence<T>
 {
 private:
     Array<T> container;
@@ -23,6 +24,9 @@ public:
 
         Iterator(T* data)
             : current(data) {}
+        
+        Iterator(IIterator<T>* other)
+            : current(other->_GetPointer()) {}
 
         Iterator& operator+ (int n) 
         {
@@ -46,17 +50,18 @@ public:
             return *this;
         }
 
-        ~Iterator()
-        {
-            delete (IIterator<T>*)this;
-        }
+        // ~Iterator()
+        // {
+        //     delete (IIterator<T>*)this;
+        // }
 
         Iterator operator++ () { this->_Next() ; return *this; }
 
         Iterator operator-- () { this->_Prev() ; return *this; }
 
-        bool operator!= (const Iterator& other) const { return this->current != other.current; }
-		bool operator== (const Iterator& other) const { return this->current == other.current; }
+        bool operator!= (Iterator& other) const { return this->current != other.current; }
+
+		bool operator== (Iterator& other) const { return this->current == other.current; }
 
         T& operator* () { return *(this->current); }
 
@@ -77,6 +82,11 @@ public:
             return *(this->current);
         }
 
+        T* _GetPointer() override
+        {
+            return this->current;
+        }
+
         bool _isEquals(IIterator<T>* other) override
         {
             return this->current == ((Iterator*)other)->current;
@@ -86,8 +96,8 @@ public:
     IIterator<T>* _Begin() override { return (IIterator<T>*) new (Iterator)(GetFirstPointer()); }
     IIterator<T>* _End() override { return (IIterator<T>*) new (Iterator)(GetEndPointer()); }
 
-    // Iterator begin() { return (Iterator)(this->_Begin()); }
-    // Iterator end() { return (Iterator)(this->_End()); }
+    Iterator begin() { return (Iterator)(this->_Begin()); }
+    Iterator end() { return (Iterator)(this->_End()); }
 
     ArraySequence()
         : container() {}
@@ -101,6 +111,8 @@ public:
     ArraySequence(Sequence<T>&& other)
         : container(other) {}
     
+    ~ArraySequence() {}
+
     T& GetFirst() const  override
     {
         if (isEmpty())
@@ -141,10 +153,11 @@ public:
     {
         if (container.GetCapacity() - container.GetLength() < 1)
         {
-            Resize(container.GetLength() * CAPACITY_TO_REAL_SIZE);
+            (container.GetCapacity() == 0) ? Resize(2) : Resize(container.GetLength() * CAPACITY_TO_REAL_SIZE);
         }
 
         container[GetLength()] = data;
+        container.SetSize(GetLength() + 1);
     }
 
     void Append(T&& data) override
@@ -155,6 +168,7 @@ public:
         }
 
         container[GetLength()] = data;
+        container.SetSize(GetLength() + 1);
     }
 
     void Prepend(const T& data) override
@@ -170,6 +184,7 @@ public:
         }
 
         container[0] = data;
+        container.SetSize(GetLength() + 1);
     }
 
     void Prepend(T&& data) override
@@ -185,6 +200,7 @@ public:
         }
 
         container[0] = data;
+        container.SetSize(GetLength() + 1);
     }
 
     void InsertAt(const Index index, const T& data) override
@@ -200,6 +216,7 @@ public:
         }
 
         container[index] = data;
+        container.SetSize(GetLength() + 1);
     }
 
     Size GetLength() const noexcept override { return container.GetLength(); }
@@ -215,6 +232,11 @@ public:
     T* GetEndPointer() override
     {
         return (&(GetLast()) + 1);
+    }
+
+    Sequence<T>* Copy() override
+    {
+        return (Sequence<T>*) new ArraySequence<T>(*this);
     }
 
     T& operator[] (const Index index) { return container[index]; }

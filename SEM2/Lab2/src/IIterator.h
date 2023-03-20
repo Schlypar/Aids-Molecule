@@ -10,6 +10,7 @@ public:
     virtual IIterator<T>* _Prev() {}
 
     virtual T& _GetCurrent() {}
+    virtual T* _GetPointer() {}
     // virtual void SetCurrent(const T& data) = 0;
 
     virtual bool _isEquals(IIterator<T>* other) {}

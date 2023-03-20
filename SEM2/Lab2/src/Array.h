@@ -64,7 +64,11 @@ public:
     Iterator end() { return Iterator(data + size); }
 
     Array()
-        : size(0), capacity(0), data(nullptr) {}
+        : size(0)
+    {
+        capacity = 2;
+        data = new int[2];
+    }
 
     Array(T* other, Size count)
         : size(count), capacity(count), data(new T[count])
@@ -77,12 +81,14 @@ public:
 
     //copying constructor
     Array(const Array<T>& other)
-        : size(other.size)
+        : size(0)
     {
-        Realloc(other.size);
+        Realloc(other.size * CAPACITY_TO_REAL_SIZE);
 
         for (Index i = 0; i < other.GetLength(); i++)
             data[i] = other.data[i];
+        
+        size = other.size;
     }
 
     //moving constructor
@@ -129,6 +135,11 @@ public:
     Size GetCapacity()
     {
         return capacity;
+    }
+
+    void SetSize(Size newSize)
+    {
+        size= newSize;
     }
 
     void Set(const Index index, T data)

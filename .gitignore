@@ -2,5 +2,12 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/SEM2/Source.cpp
-/SEM2/Source.cpp
+*.exe
+
+*.o
+
+*/bin
+
+*/obj
+
+SEM1/
