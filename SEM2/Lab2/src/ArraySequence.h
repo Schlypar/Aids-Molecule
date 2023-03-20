@@ -20,13 +20,17 @@ public:
     {
         T* current;
     public:
-        Iterator() {}
+        Iterator() { Logger::Info("Used default constructor of ArraySequence<T>::Iterator"); }
 
         Iterator(T* data)
-            : current(data) {}
+            : current(data) { Logger::Info("Used T* constructor of ArraySequence<T>::Iterator"); }
         
         Iterator(IIterator<T>* other)
-            : current(other->_GetPointer()) {}
+            : current(((Iterator*)other)->current) 
+            { 
+                Logger::Info("Used IIterator* constructor of ArraySequence<T>::Iterator"); 
+                delete other;
+            }
 
         Iterator& operator+ (int n) 
         {

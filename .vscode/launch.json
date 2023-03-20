@@ -9,7 +9,11 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/SEM2/Lab2/bin/main.exe",
+<<<<<<< HEAD
             "args": [],
+=======
+            "args": ["valgrind"],
+>>>>>>> 60eeaf228a0b4d854ace1988e152b4d10b9faae5
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
