@@ -41,16 +41,13 @@ public:
 
     T Reduce(T (*reducer)(T, T), T base);
 
-    template<typename Head, typename... Args>
-    auto Zip(Head head, Args... args);
-
     virtual Size GetLength() const noexcept = 0;
 
-    virtual void Append(const T& data) = 0;
-    virtual void Append(T&& data) = 0;
+    virtual Sequence<T>* Append(const T& data) = 0;
+    virtual Sequence<T>* Append(T&& data) = 0;
 
-    virtual void Prepend(const T& data) = 0;
-    virtual void Prepend(T&& data) = 0;
+    virtual Sequence<T>* Prepend(const T& data) = 0;
+    virtual Sequence<T>* Prepend(T&& data) = 0;
 
     virtual void InsertAt(const Index index, const T& data) = 0;
 
@@ -58,9 +55,11 @@ public:
 
     virtual Sequence<T>* Create() = 0;
     virtual Sequence<T>* Copy() = 0;
-
-    
 };
+
+/*
+Imagine you are vrilliant programmer and you wanted to realize in C++ zip/unzip methods for this abstract class: ""
+*/
 
 template <typename T>
 Sequence<T>* Sequence<T>::Map(Func<T> func)
@@ -160,11 +159,4 @@ T Sequence<T>::Reduce(Reducer<T> reducer, T base)
     base = reducer(this->GetFirst(), base);
 
     return base;
-}
-
-template<typename T>
-template <typename Head, typename... Args>
-auto Sequence<T>::Zip(Head head, Args... args)
-{
-    
 }

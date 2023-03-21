@@ -9,6 +9,7 @@
 #include "SegmentedList.h"
 #include "Array.h"
 #include "ArraySequence.h"
+#include "ListSequence.h"
 #include "Logger.h"
 
 template <typename T>

@@ -4,6 +4,8 @@
 
 // #include "catch2"
 
+#define LINE "\n<==================================================>\n"
+
 int PlusTwo(int& number)
 {
 	return number + 2;
@@ -25,13 +27,13 @@ int main()
 
 	int data[] = { 1,2,3,4,5,6,7,8,9 };
 
-	ArraySequence<int>* array = new ArraySequence<int>(data, sizeof(data)/sizeof(int));
+	ListSequence<int>* array = new ListSequence<int>(data, sizeof(data)/sizeof(int));
 
 	int anotherData[] = { 0,9,8,7,6,5,4,3,2,1 };
 
-	ArraySequence<int>* anotherArray = new ArraySequence<int>(anotherData, sizeof(anotherData)/sizeof(int));
+	ListSequence<int>* anotherArray = new ListSequence<int>(anotherData, sizeof(anotherData)/sizeof(int));
 
-	ArraySequence<int>* concated = (ArraySequence<int>*)array->Concat(anotherArray);
+	ListSequence<int>* concated = (ListSequence<int>*)array->Concat(anotherArray);
 
 	for (auto data : *concated)
 		print(data, " ");
@@ -40,15 +42,15 @@ int main()
 
 	std::cout << concated << std::endl;
 
-	ArraySequence<int>* subArray = (ArraySequence<int>*)array->GetSubsequence(1, 8);
+	ListSequence<int>* subArray = (ListSequence<int>*)array->GetSubsequence(1, 8);
 
 	print(subArray, "\n");
 
-	ArraySequence<int>* mappedArray = (ArraySequence<int>*)array->Map(PlusTwo);
+	ListSequence<int>* mappedArray = (ListSequence<int>*)array->Map(PlusTwo);
 
 	print("Map ------> ", mappedArray, "\n");
 
-	ArraySequence<int>* wheredArray = (ArraySequence<int>*)array->Where(LessThanFive);
+	ListSequence<int>* wheredArray = (ListSequence<int>*)array->Where(LessThanFive);
 
 	print("Where ----> ",wheredArray, "\n");
 

@@ -540,309 +540,211 @@ public:
 		size = 0;
 	}
 
-	T GetFirst() const
+	T& GetFirst() const
 	{
-		try
-		{
-			if (isEmpty())
-			{
-				throw EXCEPTION_INDEX_OUT_OF_RANGE;
-			}
-			return this->head->head->data;
-		}
-		catch (Exception e)
+		if (isEmpty())
 		{
 			Logger::Trace("At GetFirst() at SegmentedList.h");
-			logException(e);
-			return 0;
+			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+			throw EXCEPTION_INDEX_OUT_OF_RANGE;
 		}
+		return this->head->head->data;
 	}
 
-	T GetLast() const
+	T& GetLast() const
 	{
-		try
-		{
-			if (isEmpty())
-			{
-				throw EXCEPTION_INDEX_OUT_OF_RANGE;
-			}
-			return this->tail->tail->data;
-		}
-		catch (Exception e)
+		if (isEmpty())
 		{
 			Logger::Trace("At GetLast() at SegmentedList.h");
-			logException(e);
-			return 0;
+			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+			throw EXCEPTION_INDEX_OUT_OF_RANGE;
 		}
+		return this->tail->tail->data;
 	}
 
-	T Get(const Index index) const override
+	T& Get(const Index index) const override
 	{
-		try
-		{
-			if (isEmpty())
-			{
-				throw EXCEPTION_INDEX_OUT_OF_RANGE;
-			}
-
-			if (index < 0 || index > this->size)
-			{
-				throw EXCEPTION_INDEX_OUT_OF_RANGE;
-			}
-
-			Segment<T>* segment = this->head;
-			Index indexFromStart = 0;
-			const Index maxIndex = size;
-
-			while (segment)
-			{
-				Index indexLengthOfSegment = segment->size;
-
-				if ((index >= maxIndex - indexFromStart && index <= indexFromStart + indexLengthOfSegment - 1) || (index < this->head->size))
-				{
-					Node<T>* current = segment->head;
-					Index indexWithinSegment = index - indexFromStart;
-
-					for (Index i = 0; i < indexWithinSegment; i++)
-					{
-						current = current->next;
-					}
-					return current->data;
-				}
-				indexFromStart += indexLengthOfSegment;
-				segment = segment->next;
-			}
-			return GetFirst();
-		}
-		catch (Exception e)
+		if (isEmpty())
 		{
 			Logger::Trace("At Get() at SegmentedList.h");
-			logException(e);
-			return GetFirst();
+			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+			throw EXCEPTION_INDEX_OUT_OF_RANGE;
 		}
+
+		if (index < 0 || index > this->size)
+		{
+			Logger::Trace("At Get() at SegmentedList.h");
+			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+			throw EXCEPTION_INDEX_OUT_OF_RANGE;
+		}
+
+		Segment<T>* segment = this->head;
+		Index indexFromStart = 0;
+		const Index maxIndex = size;
+
+		while (segment)
+		{
+			Index indexLengthOfSegment = segment->size;
+
+			if ((index >= maxIndex - indexFromStart && index <= indexFromStart + indexLengthOfSegment - 1) || (index < this->head->size))
+			{
+				Node<T>* current = segment->head;
+				Index indexWithinSegment = index - indexFromStart;
+
+				for (Index i = 0; i < indexWithinSegment; i++)
+					current = current->next;
+
+				return current->data;
+			}
+			indexFromStart += indexLengthOfSegment;
+			segment = segment->next;
+		}
+		return GetFirst();
 	}
 
 	Size GetLength() const override { return this->size; }
 
-	//from an array of conditions
-	Tuple<SegmentedList<T>, SegmentedList<T>> Split(const T* condition)
-	{
-		try
-		{
-			if (!condition)
-			{
-				throw EXCEPTION_BAD_POINTER;
-			}
-
-			Index index = 0;
-			for (auto data : *this)
-			{
-				for (auto other : condition)
-				{
-					if (data == other && index != 0 && index != size - 1)
-						return Tuple<SegmentedList<T>, SegmentedList<T>>(GetSublist(0, index - 1), GetSublist(index + 1, GetLength() - 1));
-				}
-				index++;
-			}
-			return Tuple<SegmentedList<T>, SegmentedList<T>>(*this, SegmentedList<T>());
-		}
-		catch (Exception e)
-		{
-			Logger::Trace("At Split(const T*) at SegmentedList.h");
-			logException(e);
-			return Tuple<SegmentedList<T>, SegmentedList<T>>(*this, SegmentedList<T>());
-		}
-	}
-
-	//from one single condition
-	Tuple<SegmentedList<T>, SegmentedList<T>> Split(const T& condition)
-	{
-		try
-		{
-			Index index = 0;
-			for (auto data : *this)
-			{
-				if (data == condition && index != 0 && index != size - 1)
-					return Tuple<SegmentedList<T>, SegmentedList<T>>(GetSublist(0, index), GetSublist(index + 1, GetLength()));
-
-				index++;
-			}
-
-			return Tuple<SegmentedList<T>, SegmentedList<T>>(*this, SegmentedList<T>());
-		}
-		catch (Exception e)
-		{
-			Logger::Trace("At Split(const T&) at SegmentedList.h");
-			logException(e);
-			return Tuple<SegmentedList<T>, SegmentedList<T>>(*this, SegmentedList<T>());
-		}
-	}
-
 	Node<T>* GetHead()
 	{
-		try
-		{
-			if (isEmpty())
-			{
-				throw EXCEPTION_INDEX_OUT_OF_RANGE;
-			}
-
-			return this->head->head;
-		}
-		catch (Exception e)
+		if (isEmpty())
 		{
 			Logger::Trace("At GetHead() at SegmentedList.h");
-			logException(e);
+			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+			throw EXCEPTION_INDEX_OUT_OF_RANGE;
 		}
+
+		return this->head->head;
 	}
 
 	Node<T>* GetTail()
 	{
-		try
-		{
-			if (isEmpty())
-			{
-				throw EXCEPTION_INDEX_OUT_OF_RANGE;
-			}
-
-			return this->tail->tail;
-		}
-		catch (Exception e)
+		if (isEmpty())
 		{
 			Logger::Trace("At GetTail() at SegmentedList.h");
-			logException(e);
+			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+			throw EXCEPTION_INDEX_OUT_OF_RANGE;
 		}
+
+		return this->tail->tail;
 	}
 
 	//by copying
 	void insertAt(const Index index, const T& data)
 	{
-		try
-		{
-			if (index < 0 || index > this->size)
-			{
-				throw EXCEPTION_INDEX_OUT_OF_RANGE;
-			}
-
-			Node<T>* node = new Node<T>;
-			node->data = data;
-			node->next = nullptr;
-			node->prev = nullptr;
-
-			Segment<T>* segment = this->head;
-			Index indexFromStart = 0;
-			const Index maxIndex = size;
-
-			while (segment)
-			{
-				Index indexLengthOfSegment = segment->size;
-
-				if ((index >= maxIndex - indexFromStart && index <= indexFromStart + indexLengthOfSegment - 1) || (index < this->head->size))
-				{
-					Node<T>* current = segment->head;
-					Index indexWithinSegment = index - indexFromStart;
-
-					for (Index i = 0; i < indexWithinSegment; i++)
-					{
-						current = current->next;
-					}
-
-					if (current == segment->head)
-					{
-						segment->head = node;
-					}
-
-					if (current == segment->tail)
-					{
-						segment->tail = node;
-					}
-
-					current->prev->next = node;
-					node->prev = current->prev;
-
-					node->next = current;
-					current->prev = node;
-
-					segment->size += 1;
-					size++;
-
-					ResizeSegments();
-					return;
-				}
-				indexFromStart += indexLengthOfSegment;
-				segment = segment->next;
-			}
-		}
-		catch (Exception e)
+		if (index < 0 || index > this->size)
 		{
 			Logger::Trace("At InsertAt(const Index, const T&) at SegmentedList.h");
-			logException(e);
+			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+			throw EXCEPTION_INDEX_OUT_OF_RANGE;
+		}
+
+		Node<T>* node = new Node<T>;
+		node->data = data;
+		node->next = nullptr;
+		node->prev = nullptr;
+
+		Segment<T>* segment = this->head;
+		Index indexFromStart = 0;
+		const Index maxIndex = size;
+
+		while (segment)
+		{
+			Index indexLengthOfSegment = segment->size;
+
+			if ((index >= maxIndex - indexFromStart && index <= indexFromStart + indexLengthOfSegment - 1) || (index < this->head->size))
+			{
+				Node<T>* current = segment->head;
+				Index indexWithinSegment = index - indexFromStart;
+
+				for (Index i = 0; i < indexWithinSegment; i++)
+				{
+					current = current->next;
+				}
+
+				if (current == segment->head)
+				{
+					segment->head = node;
+				}
+
+				if (current == segment->tail)
+				{
+					segment->tail = node;
+				}
+
+				current->prev->next = node;
+				node->prev = current->prev;
+
+				node->next = current;
+				current->prev = node;
+
+				segment->size += 1;
+				size++;
+
+				ResizeSegments();
+				return;
+			}
+			indexFromStart += indexLengthOfSegment;
+			segment = segment->next;
 		}
 	}
 
 	//by moving
 	void insertAt(const Index index, T&& data)
 	{
-		try
+		if (index < 0 || index > this->size)
 		{
-			if (index < 0 || index > this->size)
-			{
-				throw EXCEPTION_INDEX_OUT_OF_RANGE;
-			}
-
-			Node<T>* node = new Node<T>;
-			node->data = data;
-			node->next = nullptr;
-			node->prev = nullptr;
-
-			Segment<T>* segment = this->head;
-			Index indexFromStart = 0;
-			const Index maxIndex = size;
-
-			while (segment)
-			{
-				Index indexLengthOfSegment = segment->size;
-
-				if ((index >= maxIndex - indexFromStart && index <= indexFromStart + indexLengthOfSegment - 1) || (index < this->head->size))
-				{
-					Node<T>* current = segment->head;
-					Index indexWithinSegment = index - indexFromStart;
-
-					for (Index i = 0; i < indexWithinSegment; i++)
-					{
-						current = current->next;
-					}
-
-					if (current == segment->head)
-					{
-						segment->head = node;
-					}
-
-					if (current == segment->tail)
-					{
-						segment->tail = node;
-					}
-
-					current->prev->next = node;
-					node->prev = current->prev;
-
-					node->next = current;
-					current->prev = node;
-
-					segment->size += 1;
-					size++;
-
-					ResizeSegments();
-					return;
-				}
-				indexFromStart += indexLengthOfSegment;
-				segment = segment->next;
-			}
+			Logger::Trace("At InsertAt(const Index, const T&) at SegmentedList.h");
+			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+			throw EXCEPTION_INDEX_OUT_OF_RANGE;
 		}
-		catch (Exception e)
+
+		Node<T>* node = new Node<T>;
+		node->data = data;
+		node->next = nullptr;
+		node->prev = nullptr;
+
+		Segment<T>* segment = this->head;
+		Index indexFromStart = 0;
+		const Index maxIndex = size;
+
+		while (segment)
 		{
-			Logger::Trace("At InsertAt(const Index, T&&) at SegmentedList.h");
-			logException(e);
+			Index indexLengthOfSegment = segment->size;
+
+			if ((index >= maxIndex - indexFromStart && index <= indexFromStart + indexLengthOfSegment - 1) || (index < this->head->size))
+			{
+				Node<T>* current = segment->head;
+				Index indexWithinSegment = index - indexFromStart;
+
+				for (Index i = 0; i < indexWithinSegment; i++)
+				{
+					current = current->next;
+				}
+
+				if (current == segment->head)
+				{
+					segment->head = node;
+				}
+
+				if (current == segment->tail)
+				{
+					segment->tail = node;
+				}
+
+				current->prev->next = node;
+				node->prev = current->prev;
+
+				node->next = current;
+				current->prev = node;
+
+				segment->size += 1;
+				size++;
+
+				ResizeSegments();
+				return;
+			}
+			indexFromStart += indexLengthOfSegment;
+			segment = segment->next;
 		}
 	}
 
@@ -851,347 +753,241 @@ public:
 	//append by copying
 	void Append(const T& data)
 	{
-		try
+		Node<T>* pointer = new Node<T>;
+
+		pointer->data = data;
+		pointer->next = nullptr;
+		pointer->prev = nullptr;
+
+		if (isEmpty())
 		{
-			if (!this)
-			{
-				throw EXCEPTION_BAD_POINTER;
-			}
+			Segment<T>* segment = new Segment<T>;
 
-			Node<T>* pointer = new Node<T>;
+			segment->prev = nullptr;
+			segment->next = nullptr;
 
-			pointer->data = data;
-			pointer->next = nullptr;
-			pointer->prev = nullptr;
+			segment->head = pointer;
+			segment->tail = pointer;
 
-			if (isEmpty())
-			{
-				Segment<T>* segment = new Segment<T>;
+			this->head = segment;
+			this->tail = segment;
 
-				segment->prev = nullptr;
-				segment->next = nullptr;
-
-				segment->head = pointer;
-				segment->tail = pointer;
-
-				this->head = segment;
-				this->tail = segment;
-
-				segment->size = 1;
-				size++;
-			}
-			else if (this->tail->size < SEGMENT_NORM_SIZE)
-			{
-				Node<T>* segmentTail = this->tail->tail;
-
-				segmentTail->next = pointer;
-				pointer->prev = segmentTail;
-
-				this->tail->tail = pointer;
-
-				this->tail->size += 1;
-				size++;
-			}
-			else
-			{
-				Segment<T>* segment = new Segment<T>;
-				this->tail->next = segment;
-
-				segment->prev = this->tail;
-				segment->next = nullptr;
-
-				segment->head = pointer;
-				segment->tail = pointer;
-
-				this->tail->tail->next = pointer;
-				pointer->prev = this->tail->tail;
-
-				this->tail = segment;
-
-				segment->size = 1;
-				size++;
-			}
-
-			ResizeSegments();
+			segment->size = 1;
+			size++;
 		}
-		catch (Exception e)
+		else if (this->tail->size < SEGMENT_NORM_SIZE)
 		{
-			Logger::Trace("At Append(const T&) at SegmentedList.h");
-			logException(e);
+			Node<T>* segmentTail = this->tail->tail;
+
+			segmentTail->next = pointer;
+			pointer->prev = segmentTail;
+
+			this->tail->tail = pointer;
+
+			this->tail->size += 1;
+			size++;
 		}
+		else
+		{
+			Segment<T>* segment = new Segment<T>;
+			this->tail->next = segment;
+
+			segment->prev = this->tail;
+			segment->next = nullptr;
+
+			segment->head = pointer;
+			segment->tail = pointer;
+
+			this->tail->tail->next = pointer;
+			pointer->prev = this->tail->tail;
+
+			this->tail = segment;
+
+			segment->size = 1;
+			size++;
+		}
+
+		ResizeSegments();
 	}
 
 	//append by moving
 	void Append(T&& data)
 	{
-		try
+		Node<T>* pointer = new Node<T>;
+
+		pointer->data = data;
+		pointer->next = nullptr;
+		pointer->prev = nullptr;
+
+		if (isEmpty())
 		{
-			if (!this)
-			{
-				throw EXCEPTION_BAD_POINTER;
-			}
+			Segment<T>* segment = new Segment<T>;
 
-			Node<T>* pointer = new Node<T>;
+			segment->prev = nullptr;
+			segment->next = nullptr;
 
-			pointer->data = data;
-			pointer->next = nullptr;
-			pointer->prev = nullptr;
+			segment->head = pointer;
+			segment->tail = pointer;
 
-			if (isEmpty())
-			{
-				Segment<T>* segment = new Segment<T>;
+			this->head = segment;
+			this->tail = segment;
 
-				segment->prev = nullptr;
-				segment->next = nullptr;
-
-				segment->head = pointer;
-				segment->tail = pointer;
-
-				this->head = segment;
-				this->tail = segment;
-
-				segment->size = 1;
-				size++;
-			}
-			else if (this->tail->size < SEGMENT_NORM_SIZE)
-			{
-				Node<T>* segmentTail = this->tail->tail;
-
-				segmentTail->next = pointer;
-				pointer->prev = segmentTail;
-
-				this->tail->tail = pointer;
-
-				this->tail->size += 1;
-				size++;
-			}
-			else
-			{
-				Segment<T>* segment = new Segment<T>;
-				this->tail->next = segment;
-
-				segment->prev = this->tail;
-				segment->next = nullptr;
-
-				segment->head = pointer;
-				segment->tail = pointer;
-
-				this->tail->tail->next = pointer;
-				pointer->prev = this->tail->tail;
-
-				this->tail = segment;
-
-				segment->size = 1;
-				size++;
-			}
-
-			ResizeSegments();
+			segment->size = 1;
+			size++;
 		}
-		catch (Exception e)
+		else if (this->tail->size < SEGMENT_NORM_SIZE)
 		{
-			Logger::Trace("At Append(T&&) at SegmentedList.h");
-			logException(e);
+			Node<T>* segmentTail = this->tail->tail;
+
+			segmentTail->next = pointer;
+			pointer->prev = segmentTail;
+
+			this->tail->tail = pointer;
+
+			this->tail->size += 1;
+			size++;
 		}
+		else
+		{
+			Segment<T>* segment = new Segment<T>;
+			this->tail->next = segment;
+
+			segment->prev = this->tail;
+			segment->next = nullptr;
+
+			segment->head = pointer;
+			segment->tail = pointer;
+
+			this->tail->tail->next = pointer;
+			pointer->prev = this->tail->tail;
+
+			this->tail = segment;
+
+			segment->size = 1;
+			size++;
+		}
+
+		ResizeSegments();
 	}
 
 	//prepend by copying
 	void Prepend(const T& data)
 	{
-		try
+		Node<T>* pointer = new Node<T>;
+
+		pointer->data = data;
+		pointer->next = nullptr;
+		pointer->prev = nullptr;
+
+		if (isEmpty())
 		{
-			if (!this)
-			{
-				throw EXCEPTION_BAD_POINTER;
-			}
+			Segment<T>* segment = new Segment<T>;
 
-			Node<T>* pointer = new Node<T>;
+			segment->prev = nullptr;
+			segment->next = nullptr;
 
-			pointer->data = data;
-			pointer->next = nullptr;
-			pointer->prev = nullptr;
+			segment->head = pointer;
+			segment->tail = pointer;
 
-			if (isEmpty())
-			{
-				Segment<T>* segment = new Segment<T>;
+			this->head = segment;
+			this->tail = segment;
 
-				segment->prev = nullptr;
-				segment->next = nullptr;
-
-				segment->head = pointer;
-				segment->tail = pointer;
-
-				this->head = segment;
-				this->tail = segment;
-
-				segment->size = 1;
-				size++;
-			}
-			else if (this->head->size < SEGMENT_NORM_SIZE)
-			{
-				Node<T>* segmentHead = this->head->head;
-
-				segmentHead->prev = pointer;
-				pointer->next = segmentHead;
-
-				this->head->head = pointer;
-
-				this->head->size += 1;
-				size++;
-			}
-			else
-			{
-				Segment<T>* segment = new Segment<T>;
-				this->head->prev = segment;
-
-				segment->prev = nullptr;
-				segment->next = this->head;
-
-				segment->head = pointer;
-				segment->tail = pointer;
-
-				this->head->head->prev = pointer;
-				pointer->next = this->head->head;
-
-				this->head = segment;
-
-				segment->size = 1;
-				size++;
-			}
-
-			ResizeSegments();
+			segment->size = 1;
+			size++;
 		}
-		catch (Exception e)
+		else if (this->head->size < SEGMENT_NORM_SIZE)
 		{
-			Logger::Trace("At Prepend(const T&) at SegmentedList.h");
-			logException(e);
+			Node<T>* segmentHead = this->head->head;
+
+			segmentHead->prev = pointer;
+			pointer->next = segmentHead;
+
+			this->head->head = pointer;
+
+			this->head->size += 1;
+			size++;
 		}
+		else
+		{
+			Segment<T>* segment = new Segment<T>;
+			this->head->prev = segment;
+
+			segment->prev = nullptr;
+			segment->next = this->head;
+
+			segment->head = pointer;
+			segment->tail = pointer;
+
+			this->head->head->prev = pointer;
+			pointer->next = this->head->head;
+
+			this->head = segment;
+
+			segment->size = 1;
+			size++;
+		}
+
+		ResizeSegments();
 	}
 
 	//prepend by moving
 	void Prepend(T&& data)
 	{
-		try
+		Node<T>* pointer = new Node<T>;
+
+		pointer->data = data;
+		pointer->next = nullptr;
+		pointer->prev = nullptr;
+
+		if (isEmpty())
 		{
-			if (!this)
-			{
-				throw EXCEPTION_BAD_POINTER;
-			}
+			Segment<T>* segment = new Segment<T>;
 
-			Node<T>* pointer = new Node<T>;
+			segment->prev = nullptr;
+			segment->next = nullptr;
 
-			pointer->data = data;
-			pointer->next = nullptr;
-			pointer->prev = nullptr;
+			segment->head = pointer;
+			segment->tail = pointer;
 
-			if (isEmpty())
-			{
-				Segment<T>* segment = new Segment<T>;
+			this->head = segment;
+			this->tail = segment;
 
-				segment->prev = nullptr;
-				segment->next = nullptr;
-
-				segment->head = pointer;
-				segment->tail = pointer;
-
-				this->head = segment;
-				this->tail = segment;
-
-				segment->size = 1;
-				size++;
-			}
-			else if (this->head->size < SEGMENT_NORM_SIZE)
-			{
-				Node<T>* segmentHead = this->head->head;
-
-				segmentHead->prev = pointer;
-				pointer->next = segmentHead;
-
-				this->head->head = pointer;
-
-				this->head->size += 1;
-				size++;
-			}
-			else
-			{
-				Segment<T>* segment = new Segment<T>;
-				this->head->prev = segment;
-
-				segment->prev = nullptr;
-				segment->next = this->head;
-
-				segment->head = pointer;
-				segment->tail = pointer;
-
-				this->head->head->prev = pointer;
-				pointer->next = this->head->head;
-
-				this->head = segment;
-
-				segment->size = 1;
-				size++;
-			}
-
-			ResizeSegments();
+			segment->size = 1;
+			size++;
 		}
-		catch (Exception e)
+		else if (this->head->size < SEGMENT_NORM_SIZE)
 		{
-			Logger::Trace("At Prepend(T&&) at SegmentedList.h");
-			logException(e);
-		}
-	}
+			Node<T>* segmentHead = this->head->head;
 
-	SegmentedList<T> Concat(SegmentedList<T>& other)
-	{
-		try
+			segmentHead->prev = pointer;
+			pointer->next = segmentHead;
+
+			this->head->head = pointer;
+
+			this->head->size += 1;
+			size++;
+		}
+		else
 		{
-			if (other.isEmpty())
-			{
-				throw EXCEPTION_INDEX_OUT_OF_RANGE;
-			}
-			SegmentedList<T> list = SegmentedList(*this);
+			Segment<T>* segment = new Segment<T>;
+			this->head->prev = segment;
 
-			for (auto data : other)
-				list.Append(data);
+			segment->prev = nullptr;
+			segment->next = this->head;
 
-			return list;
+			segment->head = pointer;
+			segment->tail = pointer;
+
+			this->head->head->prev = pointer;
+			pointer->next = this->head->head;
+
+			this->head = segment;
+
+			segment->size = 1;
+			size++;
 		}
-		catch (Exception e)
-		{
-			Logger::Trace("At Concat() at SegmentedList.h");
-			logException(e);
-			return SegmentedList();
-		}
-	}
 
-	SegmentedList<T> GetSublist(Index start, Index end)
-	{
-		try
-		{
-			if (start < 0 || start > this->GetLength())
-			{
-				throw EXCEPTION_INDEX_OUT_OF_RANGE;
-			}
-
-			if (end < 0 || end > this->GetLength())
-			{
-				throw EXCEPTION_INDEX_OUT_OF_RANGE;
-			}
-
-			SegmentedList<T> list = SegmentedList();
-
-			for (Size i = start; i < end; i++)
-			{
-				list.Append(Get(i));
-			}
-
-			return list;
-		}
-		catch (Exception e)
-		{
-			Logger::Trace("At GetSublist() at SegmentedList.h");
-			logException(e);
-			return SegmentedList();
-		}
+		ResizeSegments();
 	}
 
 	T operator[] (const Index index) { return Get(index); }
@@ -1226,22 +1022,14 @@ public:
 
 	friend std::ostream& operator<< (std::ostream& stream, const SegmentedList<T>& list)
 	{
-		try
-		{
-			stream << "[ ";
+		stream << "[ ";
 
-			for (Index i = 0; i < list.GetLength(); i++)
-			{
-				stream << list.Get(i) << " ";
-			}
-
-			stream << "]";
-		}
-		catch (Exception e)
+		for (Index i = 0; i < list.GetLength(); i++)
 		{
-			Logger::Trace("At operator overload<< at SegmentedList.h");
-			logException(e);
+			stream << list.Get(i) << " ";
 		}
+
+		stream << "]";
 
 		return stream;
 	}

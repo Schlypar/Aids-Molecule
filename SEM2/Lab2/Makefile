@@ -1,11 +1,11 @@
 
-# -fsanitize=address
+# -fsanitize=address -Wall -Wextra -pedantic
 
 CC = clang++
 
 # <==========================> #
 CFLAGS_DEBUG_A = -g -std=c++20 -Wall -Wextra -pedantic
-CFLAGS_DEBUG_B = -g -std=c++20 -Wall -Wextra -pedantic -fsanitize=address
+CFLAGS_DEBUG_B = -g -std=c++20 -fsanitize=address -Wall -Wextra -pedantic
 CFLAGS_LAUNCH = -std=c++20
 CFLAGS_RELEASE = -O3 -std=c++20
 # <==========================> #
@@ -20,7 +20,7 @@ OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 # PROGRAM = $(BIN_DIR)/debug.exe
 
 ifeq (${PROGRAM}, $(BIN_DIR)/debug.exe)
-  CFLAGS = ${CFLAGS_DEBUG_a}
+  CFLAGS = ${CFLAGS_DEBUG_A}
 else ifeq (${PROGRAM}, $(BIN_DIR)/main.exe)
   CFLAGS = ${CFLAGS_LAUNCH}
 else

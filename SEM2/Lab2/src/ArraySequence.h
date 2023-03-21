@@ -82,10 +82,10 @@ public:
             return *(this->current);
         }
 
-        T* _GetPointer() override
-        {
-            return this->current;
-        }
+        // T* _GetPointer() override
+        // {
+        //     return this->current;
+        // }
 
         bool _isEquals(IIterator<T>* other) override
         {
@@ -149,7 +149,7 @@ public:
         return container.Get(index);
     }
 
-    void Append(const T& data) override
+    Sequence<T>* Append(const T& data) override
     {
         if (container.GetCapacity() - container.GetLength() < 1)
         {
@@ -158,9 +158,11 @@ public:
 
         container[GetLength()] = data;
         container.SetSize(GetLength() + 1);
+
+        return this;
     }
 
-    void Append(T&& data) override
+    Sequence<T>* Append(T&& data) override
     {
         if (container.GetCapacity() - container.GetLength() < 1)
         {
@@ -169,9 +171,11 @@ public:
 
         container[GetLength()] = data;
         container.SetSize(GetLength() + 1);
+
+        return this;
     }
 
-    void Prepend(const T& data) override
+    Sequence<T>* Prepend(const T& data) override
     {
         if (container.GetCapacity() - container.GetLength() < 1)
         {
@@ -185,9 +189,11 @@ public:
 
         container[0] = data;
         container.SetSize(GetLength() + 1);
+
+        return this;
     }
 
-    void Prepend(T&& data) override
+    Sequence<T>* Prepend(T&& data) override
     {
         if (container.GetCapacity() - container.GetLength() < 1)
         {
@@ -201,10 +207,19 @@ public:
 
         container[0] = data;
         container.SetSize(GetLength() + 1);
+
+        return this;
     }
 
     void InsertAt(const Index index, const T& data) override
     {
+        if (index >= GetLength())
+        {
+            Logger::Trace("At InsertAt() at ArraySequence.h");
+            logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+            throw EXCEPTION_INDEX_OUT_OF_RANGE;
+        }
+
         if (container.GetCapacity() - container.GetLength() < 1)
         {
             Resize(container.GetLength() * CAPACITY_TO_REAL_SIZE);
