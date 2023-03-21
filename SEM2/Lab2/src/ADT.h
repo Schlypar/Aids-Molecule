@@ -10,3 +10,6 @@
 #include "Array.h"
 #include "ArraySequence.h"
 #include "Logger.h"
+
+template <typename T>
+using Allocator = Sequence<T>*(*)();

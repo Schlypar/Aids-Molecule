@@ -11,7 +11,7 @@ void print(T& data, Args... args)
 	if (sizeof...(args) == 0)
 		std::cout << data;
 	else 
-		std::cout << data << " ";
+		std::cout << data;
 
 	print(args...);
 }

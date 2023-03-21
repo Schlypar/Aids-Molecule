@@ -29,6 +29,7 @@ public:
             : current(((Iterator*)other)->current) 
             { 
                 Logger::Info("Used IIterator* constructor of ArraySequence<T>::Iterator"); 
+                Logger::Info("Deleted heap pointer of IIterator<T>*");
                 delete other;
             }
 
@@ -53,11 +54,6 @@ public:
 
             return *this;
         }
-
-        // ~Iterator()
-        // {
-        //     delete (IIterator<T>*)this;
-        // }
 
         Iterator operator++ () { this->_Next() ; return *this; }
 
@@ -238,10 +234,43 @@ public:
         return (&(GetLast()) + 1);
     }
 
+    Sequence<T>* Create() override
+    {
+        return (Sequence<T>*) new ArraySequence<T>();
+    }
+
     Sequence<T>* Copy() override
     {
         return (Sequence<T>*) new ArraySequence<T>(*this);
     }
 
     T& operator[] (const Index index) { return container[index]; }
+
+    friend std::ostream& operator<< (std::ostream& stream, ArraySequence<T>& array)
+    {
+        if (array.isEmpty())
+        {
+            Logger::Trace("At operator<< overload at Array.h");
+            logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+            return stream;
+        }
+
+        stream << array.container;
+
+        return stream;
+    }
+
+    friend std::ostream& operator<< (std::ostream& stream, ArraySequence<T>* array)
+    {
+        if (array->isEmpty())
+        {
+            Logger::Trace("At operator<< overload at Array.h");
+            logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+            return stream;
+        }
+
+        stream << array->container;
+
+        return stream;
+    }
 };
