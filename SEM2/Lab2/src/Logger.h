@@ -93,9 +93,9 @@ public:
 	}
 };
 
-LogPriority Logger::priority = TracePriority;
 
-void logException(Exception e)
+
+inline void logException(Exception e)
 {
 	switch (e)
 	{

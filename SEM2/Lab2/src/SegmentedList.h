@@ -490,9 +490,7 @@ public:
 	{
 		Logger::Info("Moved SegmentedList<T> from List<T>");
 		for (Size i = 0; i < other.GetLength(); i++)
-		{
-			Append(other.Get(i));
-		}
+			Append(std::move(other.Get(i)));
 	}
 
 	~SegmentedList()
@@ -571,7 +569,7 @@ public:
 			throw EXCEPTION_INDEX_OUT_OF_RANGE;
 		}
 
-		if (index < 0 || index > this->size)
+		if (index < 0 || index >= this->size)
 		{
 			Logger::Trace("At Get() at SegmentedList.h");
 			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
@@ -631,7 +629,7 @@ public:
 	//by copying
 	void insertAt(const Index index, const T& data)
 	{
-		if (index < 0 || index > this->size)
+		if (index <= 0 || index > this->size)
 		{
 			Logger::Trace("At InsertAt(const Index, const T&) at SegmentedList.h");
 			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
@@ -691,7 +689,7 @@ public:
 	//by moving
 	void insertAt(const Index index, T&& data)
 	{
-		if (index < 0 || index > this->size)
+		if (index <= 0 || index > this->size)
 		{
 			Logger::Trace("At InsertAt(const Index, const T&) at SegmentedList.h");
 			logException(EXCEPTION_INDEX_OUT_OF_RANGE);

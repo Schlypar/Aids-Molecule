@@ -13,6 +13,7 @@
                 "-pedantic",
                 "-std=c++2a",
                 "${workspaceFolder}/SEM2/Lab2/src/main.cpp",
+                "${workspaceFolder}/SEM2/Lab2/src/moduleTest.cpp",
                 "-o",
                 "${workspaceFolder}/SEM2/Lab2/bin/main.exe"
             ],

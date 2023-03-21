@@ -1,10 +1,9 @@
-
 #include "ADT.h"
-// #include <iostream>
-
-// #include "catch2"
+#include "moduleTest.h"
 
 #define LINE "\n<==================================================>\n"
+
+LogPriority Logger::priority = TracePriority;
 
 int PlusTwo(int& number)
 {
@@ -23,47 +22,49 @@ int reduceBySum(int first, int second)
 
 int main()
 {
-	Logger::setPriority(ErrorPriority);
+	// Logger::setPriority(ErrorPriority);
 
-	int data[] = { 1,2,3,4,5,6,7,8,9 };
+	// int data[] = { 1,2,3,4,5,6,7,8,9 };
 
-	ListSequence<int>* array = new ListSequence<int>(data, sizeof(data)/sizeof(int));
+	// ListSequence<int>* array = new ListSequence<int>(data, sizeof(data)/sizeof(int));
 
-	int anotherData[] = { 0,9,8,7,6,5,4,3,2,1 };
+	// int anotherData[] = { 0,9,8,7,6,5,4,3,2,1 };
 
-	ListSequence<int>* anotherArray = new ListSequence<int>(anotherData, sizeof(anotherData)/sizeof(int));
+	// ListSequence<int>* anotherArray = new ListSequence<int>(anotherData, sizeof(anotherData)/sizeof(int));
 
-	ListSequence<int>* concated = (ListSequence<int>*)array->Concat(anotherArray);
+	// ListSequence<int>* concated = (ListSequence<int>*)array->Concat(anotherArray);
 
-	for (auto data : *concated)
-		print(data, " ");
+	// for (auto data : *concated)
+	// 	print(data, " ");
 	
-	print("\n");
+	// print("\n");
 
-	std::cout << concated << std::endl;
+	// std::cout << concated << std::endl;
 
-	ListSequence<int>* subArray = (ListSequence<int>*)array->GetSubsequence(1, 8);
+	// ListSequence<int>* subArray = (ListSequence<int>*)array->GetSubsequence(1, 8);
 
-	print(subArray, "\n");
+	// print(subArray, "\n");
 
-	ListSequence<int>* mappedArray = (ListSequence<int>*)array->Map(PlusTwo);
+	// ListSequence<int>* mappedArray = (ListSequence<int>*)array->Map(PlusTwo);
 
-	print("Map ------> ", mappedArray, "\n");
+	// print("Map ------> ", mappedArray, "\n");
 
-	ListSequence<int>* wheredArray = (ListSequence<int>*)array->Where(LessThanFive);
+	// ListSequence<int>* wheredArray = (ListSequence<int>*)array->Where(LessThanFive);
 
-	print("Where ----> ",wheredArray, "\n");
+	// print("Where ----> ",wheredArray, "\n");
 
-	int reducedArray = array->Reduce(reduceBySum, 0);
+	// int reducedArray = array->Reduce(reduceBySum, 0);
 
-	print("Array to be reduced: ", array, "\n", "Reducer ----> ", reducedArray, "\n");
+	// print("Array to be reduced: ", array, "\n", "Reducer ----> ", reducedArray, "\n");
 
-	delete array;
-	delete anotherArray;
-	delete concated;
-	delete subArray;
-	delete mappedArray;
-	delete wheredArray;
+	// delete array;
+	// delete anotherArray;
+	// delete concated;
+	// delete subArray;
+	// delete mappedArray;
+	// delete wheredArray;
+
+	TestSegmentList();
 
 	return 0;
 }
