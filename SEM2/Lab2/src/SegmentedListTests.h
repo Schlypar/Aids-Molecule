@@ -2,7 +2,63 @@
 
 #include <cassert>
 
-#include "ListSequence.h"
+#include "SegmentedList.h"
+
+inline void TestSegmentedListConstructors()
+{
+    // Test default constructor
+    SegmentedList<int> list;
+    assert(list.GetLength() == 0);
+
+    // Test copying constructor
+    SegmentedList<int> list1;
+    list1.Append(10);
+    list1.Append(20);
+    SegmentedList<int> list2(list1);
+    assert(list2.GetLength() == 2);
+    assert(list2.Get(0) == 10);
+    assert(list2.Get(1) == 20);
+
+    // Test moving constructor
+    SegmentedList<int> list3(std::move(list1));
+    assert(list3.GetLength() == 2);
+    assert(list3.Get(0) == 10);
+    assert(list3.Get(1) == 20);
+    assert(list1.GetLength() == 0);
+
+    // Test copying from array constructor
+    int arr[5] = { 1, 2, 3, 4, 5 };
+    SegmentedList<int> list4(arr, 5);
+    assert(list4.GetLength() == 5);
+    assert(list4.Get(0) == 1);
+    assert(list4.Get(1) == 2);
+    assert(list4.Get(2) == 3);
+    assert(list4.Get(3) == 4);
+    assert(list4.Get(4) == 5);
+
+    // Test copying from List constructor
+    List<int> l;
+    l.Append(1);
+    l.Append(2);
+    l.Append(3);
+    SegmentedList<int> list5(l);
+    assert(list5.GetLength() == 3);
+    assert(list5.Get(0) == 1);
+    assert(list5.Get(1) == 2);
+    assert(list5.Get(2) == 3);
+
+    // Test moving from List constructor
+    List<int> l1;
+    l1.Append(10);
+    l1.Append(20);
+    l1.Append(30);
+    SegmentedList<int> list6(std::move(l1));
+    assert(list6.GetLength() == 3);
+    assert(list6.Get(0) == 10);
+    assert(list6.Get(1) == 20);
+    assert(list6.Get(2) == 30);
+    assert(l1.GetLength() == 0);
+}
 
 inline void TestSegmentedListGet()
 {
@@ -187,7 +243,7 @@ inline void TestSegmentedListPrepend()
     }
 }
 
-inline void TestSegmentedListCopyingOperator()
+inline void TestSegmentedListAssignment()
 {
     // Create an original list with elements
     SegmentedList<int> originalList;
@@ -216,4 +272,29 @@ inline void TestSegmentedListCopyingOperator()
     {
         assert(copiedList.Get(i) == i);
     }
+}
+
+inline void TestSegmentedListMoveAssignment()
+{
+    SegmentedList<int> list1;
+    list1.Append(1);
+    list1.Append(2);
+    list1.Append(3);
+
+    SegmentedList<int> list2;
+    list2.Append(4);
+    list2.Append(5);
+    list2.Append(6);
+
+    list1 = std::move(list2);
+
+    assert(list1.GetLength() == 3);
+    assert(list1.Get(0) == 4);
+    assert(list1.Get(1) == 5);
+    assert(list1.Get(2) == 6);
+
+    // Check that the move left the source object in a valid but unspecified state
+    assert(list2.GetLength() == 0);
+    assert(list2.GetHead() == nullptr);
+    assert(list2.GetTail() == nullptr);
 }

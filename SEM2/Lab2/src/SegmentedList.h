@@ -460,6 +460,7 @@ public:
 	{
 		Logger::Info("Moved SegmentedList<T>");
 		other.head = nullptr;
+		other.size = 0;
 	}
 
 	//copying from array constructor
@@ -491,6 +492,8 @@ public:
 		Logger::Info("Moved SegmentedList<T> from List<T>");
 		for (Size i = 0; i < other.GetLength(); i++)
 			Append(std::move(other.Get(i)));
+		
+		other.Clear();
 	}
 
 	~SegmentedList()
@@ -604,26 +607,12 @@ public:
 
 	Node<T>* GetHead()
 	{
-		if (isEmpty())
-		{
-			Logger::Trace("At GetHead() at SegmentedList.h");
-			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-			throw EXCEPTION_INDEX_OUT_OF_RANGE;
-		}
-
-		return this->head->head;
+		return (this->head) ? this->head->head : nullptr;
 	}
 
 	Node<T>* GetTail()
 	{
-		if (isEmpty())
-		{
-			Logger::Trace("At GetTail() at SegmentedList.h");
-			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-			throw EXCEPTION_INDEX_OUT_OF_RANGE;
-		}
-
-		return this->tail->tail;
+		return (this->tail) ? this->tail->tail : nullptr;
 	}
 
 	//by copying
@@ -1013,6 +1002,8 @@ public:
 		this->size = other.size;
 
 		other.head = nullptr;
+		other.tail = nullptr;
+		other.size = 0;
 
 		return *this;
 	}

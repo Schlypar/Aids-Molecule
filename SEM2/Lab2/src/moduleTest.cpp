@@ -3,12 +3,22 @@
 #include "moduleTest.h"
 #include "ArraySequence.h"
 
-void TestSegmentList()
+void TestSegmentedList()
 {
+    TestSegmentedListConstructors();
     TestSegmentedListGet();
     TestSegmentedListInsertAt();
     TestSegmentedListAppend();
     TestSegmentedListPrepend();
-    TestSegmentedListCopyingOperator();
+    TestSegmentedListMoveAssignment();
 }
 
+void TestArray()
+{
+    TestArrayConstructors();
+    TestArrayRealloc();
+    TestArraySet();
+    TestArrayGet();
+    TestArrayAssignmentOperator();
+    TestArrayMoveAssignmentOperator();
+}

@@ -66,6 +66,7 @@ public:
     Array()
         : size(0)
     {
+        Logger::Info("Default constructor of Array<T>");
         capacity = 2;
         data = new int[2];
     }
@@ -73,18 +74,18 @@ public:
     Array(T* other, Size count)
         : size(count), capacity(count), data(new T[count])
     {
+        Logger::Info("Copied Array<T> from array");
         std::copy(other, other + count, data);
     }
 
     Array(Size size)
-        : size(size), capacity(size), data(size ? new T[size]() : nullptr) {}
+        : size(size), capacity(size), data(size ? new T[size]() : nullptr) { Logger::Info("Allocated Array<T>"); }
 
     //copying constructor
     Array(const Array<T>& other)
-        : size(0)
+        : size(0), capacity(other.capacity), data(new T[capacity])
     {
-        Realloc(other.size * CAPACITY_TO_REAL_SIZE);
-
+        Logger::Info("Copied Array<T>");
         for (Index i = 0; i < other.GetLength(); i++)
             data[i] = other.data[i];
         
@@ -93,7 +94,13 @@ public:
 
     //moving constructor
     Array(Array<T>&& other)
-        : size(other.size), capacity(other.capacity), data(other.data) {}
+        : size(other.size), capacity(other.capacity), data(other.data)
+    {
+        Logger::Info("Moved SegmentedList<T>");
+        other.size = 0;
+        other.capacity = 0;
+        other.data = nullptr;
+    }
 
     ~Array()
     {
@@ -110,16 +117,16 @@ public:
             data[i].~T();
     }
 
-    void Realloc(Size newCapacity)
+    void Realloc(int newCapacity)
     {
         if (newCapacity < 0)
         {
             Logger::Trace("At Realloc() at Array.h");
             logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-            return;
+            throw EXCEPTION_INDEX_OUT_OF_RANGE;
         }
 
-        size = std::min(size, newCapacity);
+        size = std::min((int)size, newCapacity);
         T* newBlock = new T[newCapacity];
 
         for (Index i = 0; i < size; i++)
@@ -148,10 +155,10 @@ public:
         {
             Logger::Trace("At Set() at Array.h");
             logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-            return;
+            throw EXCEPTION_INDEX_OUT_OF_RANGE;
         }
 
-        data[index] = data;
+        this->data[index] = data;
     }
 
     T& Get(const Index index) const override
@@ -160,7 +167,7 @@ public:
         {
             Logger::Trace("At Get() at Array.h");
             logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-            return data[0];
+            throw EXCEPTION_INDEX_OUT_OF_RANGE;
         }
         
         return data[index];
@@ -178,11 +185,14 @@ public:
         Logger::Info("Used copying operator = of Array<T>");
         Clear();
 
-        for (Index i = 0; i < other.GetLength(); i++)
-            data[i] = other.Get(i);
-        
         size = other.size;
         capacity = other.capacity;
+
+        delete[] data;
+        data = new T[capacity];
+
+        for (Index i = 0; i < size; i++)
+            data[i] = other.Get(i);
 
         return *this;
     }
@@ -191,6 +201,9 @@ public:
     {
         Logger::Info("Used moving operator = of Array<T>");
         
+        Clear();
+        delete[] data;
+
         data = other.data;
         size = other.size;
         capacity = other.capacity;

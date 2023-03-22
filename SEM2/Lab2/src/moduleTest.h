@@ -1,5 +1,8 @@
 #pragma once
 
 #include "SegmentedListTests.h"
+#include "ArrayTests.h"
 
-void TestSegmentList();
+void TestSegmentedList();
+
+void TestArray();
