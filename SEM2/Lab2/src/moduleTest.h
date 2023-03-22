@@ -1,9 +1,5 @@
 #pragma once
 
+#include "SegmentedListTests.h"
+
 void TestSegmentList();
-
-void TestSegmentedListGet();
-
-void TestSegmentedListInsertAt();
-
-void TestSegmentedListAppend();

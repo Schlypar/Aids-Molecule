@@ -283,7 +283,7 @@ private:
 	{
 		if (isEmpty()) return;
 
-		Size segmentMeanNormalised = (size / SEGMENT_NORM_SIZE < 2) ? SEGMENT_MIN_SIZE : SEGMENT_NORM_SIZE;
+		Size segmentMeanNormalised = (size / SEGMENT_NORM_SIZE < 2) ? SEGMENT_MIN_SIZE : SEGMENT_NORM_SIZE - SEGMENT_MIN_SIZE;
 
 		Segment<T>* current = this->head;
 		while (current)
@@ -584,7 +584,7 @@ public:
 		{
 			Index indexLengthOfSegment = segment->size;
 
-			if ((index >= maxIndex - indexFromStart && index <= indexFromStart + indexLengthOfSegment - 1) || (index < this->head->size))
+			if ((index >= indexFromStart && index <= indexFromStart + indexLengthOfSegment - 1) || (index < this->head->size))
 			{
 				Node<T>* current = segment->head;
 				Index indexWithinSegment = index - indexFromStart;
@@ -996,9 +996,8 @@ public:
 		Logger::Info("Used copying operator = of SegmentedList<T>");
 		this->Clear();
 
-		this->head = other.head;
-		this->tail = other.tail;
-		this->size = other.size;
+		for (Index i = 0; i < other.GetLength(); i++)
+			Append(other.Get(i));
 
 		return *this;
 	}
@@ -1030,5 +1029,22 @@ public:
 		stream << "]";
 
 		return stream;
+	}
+
+	bool operator== (const SegmentedList<T>& other)
+	{
+		if (isEmpty() && other.isEmpty())
+			return true;
+		
+		if (GetLength() != other.GetLength())
+			return false;
+		
+		for (Index i = 0; i < GetLength(); i++)
+		{
+			if (Get(i) != other.Get(i))
+				return false;
+		}
+
+		return true;
 	}
 };

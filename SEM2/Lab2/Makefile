@@ -4,8 +4,7 @@
 CC = clang++
 
 # <==========================> #
-CFLAGS_DEBUG_A = -g -std=c++20 -Wall -Wextra -pedantic
-CFLAGS_DEBUG_B = -g -std=c++20 -fsanitize=address -Wall -Wextra -pedantic
+CFLAGS_DEBUG = -std=c++20 -Wall -Wextra -pedantic -g
 CFLAGS_LAUNCH = -std=c++20
 CFLAGS_RELEASE = -O3 -std=c++20
 # <==========================> #
@@ -20,7 +19,7 @@ OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 # PROGRAM = $(BIN_DIR)/debug.exe
 
 ifeq (${PROGRAM}, $(BIN_DIR)/debug.exe)
-  CFLAGS = ${CFLAGS_DEBUG_A}
+  CFLAGS = ${CFLAGS_DEBUG}
 else ifeq (${PROGRAM}, $(BIN_DIR)/main.exe)
   CFLAGS = ${CFLAGS_LAUNCH}
 else
@@ -29,11 +28,11 @@ endif
 
 $(PROGRAM):$(OBJS)
 	@mkdir -p "$(BIN_DIR)"
-	@$(CC) $(CFLAGS) $(OBJS) -o $@
+	$(CC) $(CFLAGS) $(OBJS) -o $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p "$(OBJ_DIR)"
-	@$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) -c $< -o $@
 
 clean:
 	rm -rf $(OBJ_DIR) $(BIN_DIR)
