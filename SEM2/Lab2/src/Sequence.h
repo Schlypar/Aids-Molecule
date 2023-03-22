@@ -37,7 +37,8 @@ public:
     Sequence<T>* Where(bool (*condition)(T&));
 
     virtual Sequence<T>* GetSubsequence(const Index start, const Index end);
-    virtual Sequence<T>* Concat(Sequence<T>* other) ;
+    virtual Sequence<T>* Concat(Sequence<T>* other);
+    virtual Sequence<T>* Slice(const Index index, Size size, Sequence<T>* other);
 
     T Reduce(T (*reducer)(T, T), T base);
 
@@ -57,10 +58,6 @@ public:
     virtual Sequence<T>* Copy() = 0;
 };
 
-/*
-Imagine you are vrilliant programmer and you wanted to realize in C++ zip/unzip methods for this abstract class: ""
-*/
-
 template <typename T>
 Sequence<T>* Sequence<T>::Map(Func<T> func)
 {
@@ -68,7 +65,7 @@ Sequence<T>* Sequence<T>::Map(Func<T> func)
     {
         Logger::Trace("At GetSubsequence() at Sequence.h");
         logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-        return NULL;
+        throw(EXCEPTION_INDEX_OUT_OF_RANGE);
     }
 
     Sequence<T>* result = this->Create();
@@ -86,7 +83,7 @@ Sequence<T>* Sequence<T>::Where(Condition<T> condition)
     {
         Logger::Trace("At GetSubsequence() at Sequence.h");
         logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-        return NULL;
+        throw(EXCEPTION_INDEX_OUT_OF_RANGE);
     }
 
     Sequence<T>* result = this->Create();
@@ -107,7 +104,7 @@ Sequence<T>* Sequence<T>::GetSubsequence(const Index start, const Index end)
     {
         Logger::Trace("At GetSubsequence() at Sequence.h");
         logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-        return NULL;
+        throw(EXCEPTION_INDEX_OUT_OF_RANGE);
     }
 
     Sequence<T>* result = this->Create();
@@ -125,7 +122,7 @@ Sequence<T>* Sequence<T>::Concat(Sequence<T>* other)
     {
         Logger::Trace("At GetSubsequence() at Sequence.h");
         logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-        return NULL;
+        throw(EXCEPTION_INDEX_OUT_OF_RANGE);
     }
 
     Sequence<T>* result = this->Copy();
@@ -142,13 +139,33 @@ Sequence<T>* Sequence<T>::Concat(Sequence<T>* other)
 }
 
 template <typename T>
+Sequence<T>* Sequence<T>::Slice(const Index index, Size size, Sequence<T>* other)
+{
+    if (this->isEmpty() || index >= this->GetLength() || size > other->GetLength() || index + size > this->GetLength())
+    {
+        Logger::Trace("At GetSubsequence() at Sequence.h");
+        logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+        throw(EXCEPTION_INDEX_OUT_OF_RANGE);
+    }
+
+    Sequence<T>* result = this->Copy();
+
+    for (Index i = 0; i < size; i++)
+    {
+        result->Get(i + index) = other->Get(i);
+    }
+    
+    return result;
+}
+
+template <typename T>
 T Sequence<T>::Reduce(Reducer<T> reducer, T base)
 {
     if (this->isEmpty())
     {
         Logger::Trace("At GetSubsequence() at Sequence.h");
         logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-        return NULL;
+        throw(EXCEPTION_INDEX_OUT_OF_RANGE);
     }
 
     for (Index i = this->GetLength() - 1; i > 0; i--)

@@ -80,7 +80,8 @@ inline void TestSegmentedListGet()
     {
         list.Get(-1);
     } 
-    catch (Exception exception) {
+    catch (Exception exception) 
+    {
         exceptionThrown = true;
         assert(exception == EXCEPTION_INDEX_OUT_OF_RANGE);
     }
@@ -91,7 +92,8 @@ inline void TestSegmentedListGet()
     {
         list.Get(3);
     } 
-    catch (Exception exception) {
+    catch (Exception exception) 
+    {
         exceptionThrown = true;
         assert(exception == EXCEPTION_INDEX_OUT_OF_RANGE);
     }
@@ -104,7 +106,8 @@ inline void TestSegmentedListGet()
     {
         emptyList.Get(0);
     } 
-    catch (Exception exception) {
+    catch (Exception exception) 
+    {
         exceptionThrown = true;
         assert(exception == EXCEPTION_INDEX_OUT_OF_RANGE);
     }
@@ -138,7 +141,8 @@ inline void TestSegmentedListInsertAt()
     {
         list.insertAt(-1, 5);
     } 
-    catch (Exception exception) {
+    catch (Exception exception) 
+    {
         exceptionThrown = true;
         assert(exception == EXCEPTION_INDEX_OUT_OF_RANGE);
     }
@@ -149,7 +153,8 @@ inline void TestSegmentedListInsertAt()
     {
         list.insertAt(5, 40);
     } 
-    catch (Exception exception) {
+    catch (Exception exception) 
+    {
         exceptionThrown = true;
         assert(exception == EXCEPTION_INDEX_OUT_OF_RANGE);
     }
@@ -162,7 +167,8 @@ inline void TestSegmentedListInsertAt()
     {
         emptyList.insertAt(0, 1.0f);
     } 
-    catch (Exception exception) {
+    catch (Exception exception) 
+    {
         exceptionThrown = true;
         assert(exception == EXCEPTION_INDEX_OUT_OF_RANGE);
     }

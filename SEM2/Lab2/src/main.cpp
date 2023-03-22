@@ -22,8 +22,10 @@ int reduceBySum(int first, int second)
 
 int main()
 {
+	// Logger::setPriority(ErrorPriority);
 	TestSegmentedList();
 	TestArray();
+	TestSequence();
 
 	return 0;
 }

@@ -1,7 +1,6 @@
 #include <cassert>
 
 #include "moduleTest.h"
-#include "ArraySequence.h"
 
 void TestSegmentedList()
 {
@@ -10,6 +9,7 @@ void TestSegmentedList()
     TestSegmentedListInsertAt();
     TestSegmentedListAppend();
     TestSegmentedListPrepend();
+    TestSegmentedListAssignment();
     TestSegmentedListMoveAssignment();
 }
 
@@ -21,4 +21,14 @@ void TestArray()
     TestArrayGet();
     TestArrayAssignmentOperator();
     TestArrayMoveAssignmentOperator();
+}
+
+void TestSequence()
+{
+    TestSequenceMap();
+    TestSequenceWhere();
+    TestSequenceGetSubsequence();
+    TestSequenceConcat();
+    TestSequenceSlice();
+    TestSequenceReduce();
 }

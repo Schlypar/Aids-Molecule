@@ -68,7 +68,7 @@ public:
     {
         Logger::Info("Default constructor of Array<T>");
         capacity = 2;
-        data = new int[2];
+        data = new T[2];
     }
 
     Array(T* other, Size count)
