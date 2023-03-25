@@ -11,3 +11,19 @@
 */obj
 
 SEM1/
+
+*.json
+
+*.cmake
+
+*.log
+
+build/
+
+.cache/
+
+bindings/
+
+.json
+
+.vscode/

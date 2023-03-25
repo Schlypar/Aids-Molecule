@@ -27,6 +27,21 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "build-debug Lab2 with CMake",
+            "type": "shell",
+            "command": "cmake -DCMAKE_BUILD_TYPE=Debug SEM2/Lab2/build/",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "${gdb}"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }

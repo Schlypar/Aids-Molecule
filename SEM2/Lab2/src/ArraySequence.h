@@ -113,6 +113,11 @@ public:
     
     ~ArraySequence() {}
 
+    Sequence<T>* ArrayAllocator()
+    {
+        return (Sequence<T>*) new ArraySequence<T>(); 
+    }
+
     T& GetFirst() const  override
     {
         if (isEmpty())

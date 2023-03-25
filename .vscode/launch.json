@@ -8,18 +8,35 @@
             "name": "Debug Lab2",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/SEM2/Lab2/bin/main.exe",
-<<<<<<< HEAD
+            "program": "${workspaceFolder}/SEM2/Lab2/bin/Debug.exe",
             "args": [],
-=======
-            "args": ["valgrind"],
->>>>>>> 60eeaf228a0b4d854ace1988e152b4d10b9faae5
-            "stopAtEntry": false,
+            "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
-            "preLaunchTask": "Build-debug current active file"
+            // "preLaunchTask": "Build-debug current active file"
+        },
+        {
+            "name": "Debug Lab2 CMake",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/SEM2/Lab2/build/src/Lab2",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "miDebuggerPath": "/usr/bin/lldb-15",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "build-debug Lab2 with CMake"
         }
     ]
 }

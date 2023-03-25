@@ -1,31 +1,25 @@
 #include "ADT.h"
+#include "ArraySequence.h"
+#include "Sequence.h"
 #include "moduleTest.h"
 
 #define LINE "\n<==================================================>\n"
 
 LogPriority Logger::priority = TracePriority;
 
-int PlusTwo(int& number)
+void Test()
 {
-	return number + 2;
-}
-
-bool LessThanFive(int& number)
-{
-	return (number < 5) ? true : false;
-}
-
-int reduceBySum(int first, int second)
-{
-	return first + second;
+	TestSegmentedList();
+	TestArray();
+	TestSequence();
 }
 
 int main()
 {
-	// Logger::setPriority(ErrorPriority);
-	TestSegmentedList();
-	TestArray();
-	TestSequence();
+	Logger::setPriority(ErrorPriority);
+	Test();
 
+	Sequence<int>* seq = (Sequence<int>*) new ArraySequence<int>;
+	 
 	return 0;
 }

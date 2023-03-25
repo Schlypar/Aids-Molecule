@@ -1,4 +1,3 @@
-
 # -fsanitize=address -Wall -Wextra -pedantic
 
 CC = clang++
@@ -19,11 +18,11 @@ OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 # PROGRAM = $(BIN_DIR)/debug.exe
 
 ifeq (${PROGRAM}, $(BIN_DIR)/debug.exe)
-  CFLAGS = ${CFLAGS_DEBUG}
+	CFLAGS = ${CFLAGS_DEBUG}
 else ifeq (${PROGRAM}, $(BIN_DIR)/main.exe)
-  CFLAGS = ${CFLAGS_LAUNCH}
+	CFLAGS = ${CFLAGS_LAUNCH}
 else
-  CFLAGS = ${CFLAGS_RELEASE}
+	CFLAGS = ${CFLAGS_RELEASE}
 endif
 
 $(PROGRAM):$(OBJS)

@@ -6,11 +6,11 @@ template <typename T>
 class IIterator
 {
 public:
-    virtual IIterator<T>* _Next() {}
-    virtual IIterator<T>* _Prev() {}
+    virtual IIterator<T>* _Next() { return NULL; }
+    virtual IIterator<T>* _Prev() { return NULL; }
 
-    virtual T& _GetCurrent() {}
-    virtual T* _GetPointer() {}
+    virtual T& _GetCurrent() = 0;
+    virtual T* _GetPointer() { return NULL; }
 
-    virtual bool _isEquals(IIterator<T>* other) {}
+    virtual bool _isEquals(IIterator<T>* other) { return true; }
 };
