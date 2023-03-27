@@ -7,6 +7,10 @@
 
 LogPriority Logger::priority = TracePriority;
 
+/*
+! Just pasted all this stuff from ImGui examples
+*/
+
 #include <imgui.h>
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"

@@ -4,10 +4,8 @@
 # Using package manager called Conan (version 1.59.0)
 
 # Conan does almost all the work but still I cannot do this cleanly
-# So I copied Dear ImGui's and glad's repos in mine
-
-# Also there a some other libs besides listed below like GLFW to make openGL work
-# They are out of this project scope to not make this project even bigger mess
+# But there is still some libs outside of this project scope
+# So that you can see ../../../ 
 
 
 cmake_minimum_required(VERSION 3.22.1)
@@ -24,7 +22,7 @@ set(xorg_DIR "build/")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include)
 file(GLOB BUTTERFLIES_SOURCES_C ${CMAKE_CURRENT_SOURCE_DIR} *.c glad/src/gl.c)
 
-set(GLAD_SOURCES_DIR "${PROJECT_SOURCE_DIR}/external/glad/")
+set(GLAD_SOURCES_DIR "${PROJECT_SOURCE_DIR}/../../../glad/")
 
 add_subdirectory("${GLAD_SOURCES_DIR}/cmake" glad_cmake)
 
@@ -37,7 +35,7 @@ set(SOURCES
 )
 
 # setting dependency on ImGui library
-set(IMGUI "external/imgui")
+set(IMGUI "../../../imgui")
 set(IMGUI_SRC
         ${IMGUI}/backends/imgui_impl_opengl3.h
         ${IMGUI}/backends/imgui_impl_opengl3.cpp

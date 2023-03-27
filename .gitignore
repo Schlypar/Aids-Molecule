@@ -27,3 +27,5 @@ bindings/
 .json
 
 .vscode/
+
+external/
