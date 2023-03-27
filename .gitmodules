@@ -4,3 +4,6 @@
 [submodule "SEM2/Lab2/ext/imgui"]
 	path = SEM2/Lab2/ext/imgui
 	url = https://github.com/onurpaca/imgui-cmake
+[submodule "SEM2/Lab2/external/glad"]
+	path = SEM2/Lab2/external/glad
+	url = https://github.com/Dav1dde/glad

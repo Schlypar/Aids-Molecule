@@ -94,7 +94,6 @@ public:
 };
 
 
-
 inline void logException(Exception e)
 {
 	switch (e)
