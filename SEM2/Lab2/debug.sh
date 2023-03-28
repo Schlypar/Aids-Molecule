@@ -1,5 +1,14 @@
+
 #!/bin/bash
 
-make -e PROGRAM=bin/debug.exe
+cd build/
 
-valgrind ./bin/debug.exe
+conan install . build_type=Debug --build missing
+
+cmake .. -DCMAKE_BUILD_TYPE=Debug
+
+cmake --build .
+
+cd ../
+
+./build/Lab2

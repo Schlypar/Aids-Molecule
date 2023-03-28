@@ -1,12 +1,14 @@
 # Big note: I am using WLS (Ubuntu distro) so I don't
 # know if it will run on windows systems.
 
-# Using package manager called Conan (version 1.59.0)
+# Using package manager called vckpg
 
-# Conan does almost all the work but still I cannot do this cleanly
-# But there is still some libs outside of this project scope
-# So that you can see ../../../ 
+# To build this project we go into build directory
+# And then run "cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release" command or "cmake -S .. -B . -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake" to debug (did not checked thiss yet)
+# Then "cmake --build ." to actually compile our project
+# And finally run our exec file with our case being Lab2
 
+# If you are using Unix-like OS you can use launch.sh to configure, compile and run this project for you
 
 cmake_minimum_required(VERSION 3.22.1)
 
@@ -17,8 +19,9 @@ set(opengl_system_DIR "build/")
 set(glfw3_DIR "build/")
 set(imgui_DIR "build/")
 set(xorg_DIR "build/")
+set(glad_DIR "build/")
 
-# did everything as it was said in tutorial
+# # did everything as it was said in tutorial
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include)
 file(GLOB BUTTERFLIES_SOURCES_C ${CMAKE_CURRENT_SOURCE_DIR} *.c glad/src/gl.c)
 
@@ -28,14 +31,21 @@ add_subdirectory("${GLAD_SOURCES_DIR}/cmake" glad_cmake)
 
 glad_add_library(glad_gl_core_33 REPRODUCIBLE API gl:core=3.3)
 
+
+
 # setting my files
 set(SOURCES
         src/main.cpp
         src/moduleTest.cpp 
 )
 
+find_package(glfw3 REQUIRED)
+find_package(glad REQUIRED)
+find_package(imgui REQUIRED)
+
 # setting dependency on ImGui library
 set(IMGUI "../../../imgui")
+set(GLFW "../../../glfw-3.3.8")
 set(IMGUI_SRC
         ${IMGUI}/backends/imgui_impl_opengl3.h
         ${IMGUI}/backends/imgui_impl_opengl3.cpp
@@ -50,20 +60,33 @@ set(IMGUI_SRC
         ${IMGUI}/imgui_demo.cpp
 )
 
-# compiling a project
 add_executable(${PROJECT_NAME} ${SOURCES} ${IMGUI_SRC})
+
+target_link_libraries(
+  ${PROJECT_NAME}
+    glfw
+    glad_gl_core_33
+    glad::glad
+    imgui::imgui
+)
+
+
+
 
 # adding inlude paths to make sure I can include them in my code
 target_include_directories(${PROJECT_NAME} PRIVATE ${IMGUI})
-include_directories(../../../glfw-3.3.8/GLFW/include/GLFW/)
+target_include_directories(${PROJECT_NAME} PRIVATE ${GLFW}/include/)
+# # compiling a project
+# add_executable(${PROJECT_NAME} ${SOURCES})
 
-# using conan to find installed packages
-find_package(glfw3 REQUIRED)
-find_package(OpenGL REQUIRED)
 
-# linking itself
-target_link_libraries(
-    ${PROJECT_NAME}
-    glad_gl_core_33
-    glfw
-)
+# # using conan to find installed packages
+# find_package(glfw3 REQUIRED)
+# find_package(OpenGL REQUIRED)
+
+# # linking itself
+# target_link_libraries(
+#     ${PROJECT_NAME}
+#     glad_gl_core_33
+#     glfw
+# )
