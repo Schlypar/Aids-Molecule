@@ -10,6 +10,21 @@
 
 # If you are using Unix-like OS you can use launch.sh to configure, compile and run this project for you
 
+# To install dependencies you need to create file named vckpg.json and fill it with
+
+# {
+#   "name": "Lab2",
+#   "version": "0.1.0",
+#   "dependencies": [
+#     "glfw3",
+#     "glad",
+#     {
+#       "name": "imgui",
+#       "features": ["glfw-binding", "opengl3-glad-binding"]
+#     }
+#   ]
+# }
+
 cmake_minimum_required(VERSION 3.22.1)
 
 project(Lab2)
@@ -43,9 +58,11 @@ find_package(glfw3 REQUIRED)
 find_package(glad REQUIRED)
 find_package(imgui REQUIRED)
 
-# setting dependency on ImGui library
+# will use later to make script more concise (contains actual relative paths to git cloned repos)
 set(IMGUI "../../../imgui")
 set(GLFW "../../../glfw-3.3.8")
+
+# we will need this as this wont add by itself (headers needed to be included as well)
 set(IMGUI_SRC
         ${IMGUI}/backends/imgui_impl_opengl3.h
         ${IMGUI}/backends/imgui_impl_opengl3.cpp
@@ -60,8 +77,10 @@ set(IMGUI_SRC
         ${IMGUI}/imgui_demo.cpp
 )
 
+# compiling our project together including ImGui stuff
 add_executable(${PROJECT_NAME} ${SOURCES} ${IMGUI_SRC})
 
+# linking our project together
 target_link_libraries(
   ${PROJECT_NAME}
     glfw
@@ -70,23 +89,6 @@ target_link_libraries(
     imgui::imgui
 )
 
-
-
-
 # adding inlude paths to make sure I can include them in my code
 target_include_directories(${PROJECT_NAME} PRIVATE ${IMGUI})
 target_include_directories(${PROJECT_NAME} PRIVATE ${GLFW}/include/)
-# # compiling a project
-# add_executable(${PROJECT_NAME} ${SOURCES})
-
-
-# # using conan to find installed packages
-# find_package(glfw3 REQUIRED)
-# find_package(OpenGL REQUIRED)
-
-# # linking itself
-# target_link_libraries(
-#     ${PROJECT_NAME}
-#     glad_gl_core_33
-#     glfw
-# )

@@ -24,8 +24,6 @@ build/
 
 bindings/
 
-.json
-
 .vscode/
 
 external/
