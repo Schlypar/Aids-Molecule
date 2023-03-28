@@ -4,7 +4,7 @@ cd build/
 
 conan install . --build missing
 
-cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release 
+cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release
 
 cmake --build .
 

@@ -3,27 +3,13 @@
 
 # Using package manager called vckpg
 
-# To build this project we go into build directory
-# And then run "cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release" command or "cmake -S .. -B . -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake" to debug (did not checked thiss yet)
+# To build this project we go into build directory (cd build/)
+# And then run "cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release" command
 # Then "cmake --build ." to actually compile our project
 # And finally run our exec file with our case being Lab2
 
 # If you are using Unix-like OS you can use launch.sh to configure, compile and run this project for you
 
-# To install dependencies you need to create file named vckpg.json and fill it with
-
-# {
-#   "name": "Lab2",
-#   "version": "0.1.0",
-#   "dependencies": [
-#     "glfw3",
-#     "glad",
-#     {
-#       "name": "imgui",
-#       "features": ["glfw-binding", "opengl3-glad-binding"]
-#     }
-#   ]
-# }
 
 cmake_minimum_required(VERSION 3.22.1)
 
