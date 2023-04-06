@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ADT.h"
-
+#include "Logger.h"
+#include "Sequence.h"
 
 template <typename T>
 class ArraySequence : public Sequence<T>
@@ -124,7 +124,7 @@ public:
         {
             Logger::Trace("At Get() at ArraySequence.h");
             logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-            exit(EXIT_FAILURE);
+            throw EXCEPTION_INDEX_OUT_OF_RANGE;
         }
 
         return container.Get(0);
@@ -136,7 +136,7 @@ public:
         {
             Logger::Trace("At Get() at ArraySequence.h");
             logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-            exit(EXIT_FAILURE);
+            throw EXCEPTION_INDEX_OUT_OF_RANGE;
         }
         
         return container.Get(GetLength() - 1);
@@ -148,7 +148,7 @@ public:
         {
             Logger::Trace("At Get() at ArraySequence.h");
             logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-            exit(EXIT_FAILURE);
+            throw EXCEPTION_INDEX_OUT_OF_RANGE;
         }
 
         return container.Get(index);

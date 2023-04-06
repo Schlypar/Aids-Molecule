@@ -81,187 +81,187 @@ private:
 
 	bool SegmentIsEmpty(Segment<T>* segment) { return (segment) ? segment->size == 0 : true; }
 
-	void AppendToSegment(Segment<T>* segment, const T& data)
-	{
-		Node<T>* pointer = new Node<T>;
+	// void AppendToSegment(Segment<T>* segment, const T& data)
+	// {
+	// 	Node<T>* pointer = new Node<T>;
 
-		pointer->data = data;
-		pointer->next = nullptr;
-		pointer->prev = nullptr;
+	// 	pointer->data = data;
+	// 	pointer->next = nullptr;
+	// 	pointer->prev = nullptr;
 
-		if (isEmpty())
-		{
-			if (segment != this->head)
-			{
-				pointer->next = segment->prev->tail->next;
-				segment->prev->tail->next = pointer;
-				pointer->prev = segment->prev->tail;
-			}
-			if (segment != this->tail)
-			{
-				segment->next->head->prev = pointer;
-				pointer->next = segment->next->head;
-			}
-			segment->head = pointer;
-			segment->tail = pointer;
-			segment->size = 1;
-		}
-		else
-		{
-			pointer->prev = segment->tail;
-			pointer->next = segment->tail->next;
-			segment->tail->next = pointer;
-			segment->tail = pointer;
-			segment->size += 1;
-		}
-	}
+	// 	if (isEmpty())
+	// 	{
+	// 		if (segment != this->head)
+	// 		{
+	// 			pointer->next = segment->prev->tail->next;
+	// 			segment->prev->tail->next = pointer;
+	// 			pointer->prev = segment->prev->tail;
+	// 		}
+	// 		if (segment != this->tail)
+	// 		{
+	// 			segment->next->head->prev = pointer;
+	// 			pointer->next = segment->next->head;
+	// 		}
+	// 		segment->head = pointer;
+	// 		segment->tail = pointer;
+	// 		segment->size = 1;
+	// 	}
+	// 	else
+	// 	{
+	// 		pointer->prev = segment->tail;
+	// 		pointer->next = segment->tail->next;
+	// 		segment->tail->next = pointer;
+	// 		segment->tail = pointer;
+	// 		segment->size += 1;
+	// 	}
+	// }
 
-	void PrependToSegment(Segment<T>* segment, const T& data)
-	{
-		Node<T>* pointer = new Node<T>;
+	// void PrependToSegment(Segment<T>* segment, const T& data)
+	// {
+	// 	Node<T>* pointer = new Node<T>;
 
-		pointer->data = data;
-		pointer->next = nullptr;
-		pointer->prev = nullptr;
+	// 	pointer->data = data;
+	// 	pointer->next = nullptr;
+	// 	pointer->prev = nullptr;
 
-		if (isEmpty())
-		{
-			if (segment != this->head)
-			{
-				segment->prev->tail->next = pointer;
-				pointer->prev = segment->prev->tail;
-			}
-			if (segment != this->tail)
-			{
-				segment->next->tail->next = pointer;
-				pointer->prev = segment->next->tail;
-			}
-			segment->head = pointer;
-			segment->tail = pointer;
-			segment->size += 1;
-		}
-		else
-		{
-			pointer->next = segment->head;
-			pointer->prev = segment->head->prev;
-			segment->head->prev = pointer;
-			segment->head = pointer;
-			segment->size += 1;
-		}
-	}
+	// 	if (isEmpty())
+	// 	{
+	// 		if (segment != this->head)
+	// 		{
+	// 			segment->prev->tail->next = pointer;
+	// 			pointer->prev = segment->prev->tail;
+	// 		}
+	// 		if (segment != this->tail)
+	// 		{
+	// 			segment->next->tail->next = pointer;
+	// 			pointer->prev = segment->next->tail;
+	// 		}
+	// 		segment->head = pointer;
+	// 		segment->tail = pointer;
+	// 		segment->size += 1;
+	// 	}
+	// 	else
+	// 	{
+	// 		pointer->next = segment->head;
+	// 		pointer->prev = segment->head->prev;
+	// 		segment->head->prev = pointer;
+	// 		segment->head = pointer;
+	// 		segment->size += 1;
+	// 	}
+	// }
 
-	T GetFromSegment(Segment<T>* segment, const Index index)
-	{
-		if (SegmentIsEmpty(segment)) return GetFirst();
+	// T GetFromSegment(Segment<T>* segment, const Index index)
+	// {
+	// 	if (SegmentIsEmpty(segment)) return GetFirst();
 
-		if (index >= segment->size || index < 0)
-		{
-			std::cout << "\nindexOutOfRange" << std::endl;
-			throw;
-		}
+	// 	if (index >= segment->size || index < 0)
+	// 	{
+	// 		std::cout << "\nindexOutOfRange" << std::endl;
+	// 		throw;
+	// 	}
 
-		Node<T>* pointer = segment->head;
-		int counter = 0;
-		while (counter < index)
-		{
-			counter++;
-			pointer = pointer->next;
-		}
+	// 	Node<T>* pointer = segment->head;
+	// 	int counter = 0;
+	// 	while (counter < index)
+	// 	{
+	// 		counter++;
+	// 		pointer = pointer->next;
+	// 	}
 
-		return pointer->data;
-	}
+	// 	return pointer->data;
+	// }
 
-	void RemoveFromSegment(Segment<T>* segment, Index index)
-	{
-		if (index > segment->size || index < 0)
-		{
-			std::cout << "\nindexOutOfRange" << std::endl;
-			throw;
-		}
+	// void RemoveFromSegment(Segment<T>* segment, Index index)
+	// {
+	// 	if (index > segment->size || index < 0)
+	// 	{
+	// 		std::cout << "\nindexOutOfRange" << std::endl;
+	// 		throw;
+	// 	}
 
-		if (segment->size == 1 && segment->prev && segment->next)
-		{
-			this->tail->prev->next = this->tail->next;
-			delete segment->head;
-			delete segment;
-			return;
-		}
+	// 	if (segment->size == 1 && segment->prev && segment->next)
+	// 	{
+	// 		this->tail->prev->next = this->tail->next;
+	// 		delete segment->head;
+	// 		delete segment;
+	// 		return;
+	// 	}
 
-		if (index == segment->size - 1)
-		{
-			if (segment != this->tail)
-			{
-				segment->tail->prev->next = segment->next->head;
-				segment->next->head->prev = segment->tail->prev;
-				Node<T>* temp = segment->tail;
-				if (segment->size != 1)
-				{
-					segment->tail = segment->tail->prev;
-					delete temp;
-					segment->size -= 1;
-					return;
-				}
-				else
-				{
-					if (segment == this->head)
-					{
-						this->head = segment->next;
-					}
-					delete temp;
-					delete segment;
-					return;
-				}
-			}
+	// 	if (index == segment->size - 1)
+	// 	{
+	// 		if (segment != this->tail)
+	// 		{
+	// 			segment->tail->prev->next = segment->next->head;
+	// 			segment->next->head->prev = segment->tail->prev;
+	// 			Node<T>* temp = segment->tail;
+	// 			if (segment->size != 1)
+	// 			{
+	// 				segment->tail = segment->tail->prev;
+	// 				delete temp;
+	// 				segment->size -= 1;
+	// 				return;
+	// 			}
+	// 			else
+	// 			{
+	// 				if (segment == this->head)
+	// 				{
+	// 					this->head = segment->next;
+	// 				}
+	// 				delete temp;
+	// 				delete segment;
+	// 				return;
+	// 			}
+	// 		}
 
-			segment->tail = segment->tail->prev;
-			delete segment->tail->next;
-			segment->tail->next = nullptr;
-			segment->size -= 1;
+	// 		segment->tail = segment->tail->prev;
+	// 		delete segment->tail->next;
+	// 		segment->tail->next = nullptr;
+	// 		segment->size -= 1;
 
-			return;
-		}
+	// 		return;
+	// 	}
 
-		if (index == 0)
-		{
-			if (segment != this->head)
-			{
-				segment->head->next->prev = segment->prev->tail;
-				segment->prev->tail->next = segment->head->next;
-				Node<T>* temp = segment->head;
-				if (segment->size != 1)
-				{
-					segment->head = segment->head->next;
-					delete temp;
-					segment->size -= 1;
-					return;
-				}
-				else
-				{
-					if (segment == this->tail)
-					{
-						this->tail = segment->prev;
-					}
-					delete temp;
-					delete segment;
-					return;
-				}
-			}
+	// 	if (index == 0)
+	// 	{
+	// 		if (segment != this->head)
+	// 		{
+	// 			segment->head->next->prev = segment->prev->tail;
+	// 			segment->prev->tail->next = segment->head->next;
+	// 			Node<T>* temp = segment->head;
+	// 			if (segment->size != 1)
+	// 			{
+	// 				segment->head = segment->head->next;
+	// 				delete temp;
+	// 				segment->size -= 1;
+	// 				return;
+	// 			}
+	// 			else
+	// 			{
+	// 				if (segment == this->tail)
+	// 				{
+	// 					this->tail = segment->prev;
+	// 				}
+	// 				delete temp;
+	// 				delete segment;
+	// 				return;
+	// 			}
+	// 		}
 
-			segment->head = segment->head->next;
-			delete segment->head->prev;
-			segment->head->prev = nullptr;
-			segment->size -= 1;
-			return;
-		}
+	// 		segment->head = segment->head->next;
+	// 		delete segment->head->prev;
+	// 		segment->head->prev = nullptr;
+	// 		segment->size -= 1;
+	// 		return;
+	// 	}
 
-		Node<T>* node = segment->head;
-		for (Size i = 0; i < index; i++) node = node->next;
+	// 	Node<T>* node = segment->head;
+	// 	for (Size i = 0; i < index; i++) node = node->next;
 
-		node->prev->next = node->next;
-		node->next->prev = node->prev;
-		delete node;
-		segment->size -= 1;
-	}
+	// 	node->prev->next = node->next;
+	// 	node->next->prev = node->prev;
+	// 	delete node;
+	// 	segment->size -= 1;
+	// }
 
 	Segment<T>* maxFrom(Segment<T>* segmentOne, Segment<T>* segmentTwo)
 	{

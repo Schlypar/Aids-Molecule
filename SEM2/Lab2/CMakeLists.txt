@@ -1,12 +1,26 @@
 # Big note: I am using WLS (Ubuntu distro) so I don't
 # know if it will run on windows systems.
 
-# Using package manager called vckpg
+# Using package manager called conan (version 1.59.0)
 
 # To build this project we go into build directory (cd build/)
 # And then run "cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release" command
 # Then "cmake --build ." to actually compile our project
 # And finally run our exec file with our case being Lab2
+
+# conanfile.txt
+
+# [requires]
+# imgui/1.89.4
+# glfw/3.3.2
+# glew/2.1.0
+# glad/0.1.36
+
+# [generators]
+# cmake
+# CMakeToolchain
+# CMakeDeps
+
 
 # If you are using Unix-like OS you can use launch.sh to configure, compile and run this project for you
 
@@ -37,7 +51,9 @@ glad_add_library(glad_gl_core_33 REPRODUCIBLE API gl:core=3.3)
 # setting my files
 set(SOURCES
         src/main.cpp
-        src/moduleTest.cpp 
+        src/moduleTest.cpp
+        src/GUI.cpp
+        src/GUI.h
 )
 
 find_package(glfw3 REQUIRED)
@@ -46,6 +62,7 @@ find_package(imgui REQUIRED)
 
 # will use later to make script more concise (contains actual relative paths to git cloned repos)
 set(IMGUI "../../../imgui")
+set(GLFW "../../../glad")
 set(GLFW "../../../glfw-3.3.8")
 
 # we will need this as this wont add by itself (headers needed to be included as well)

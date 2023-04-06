@@ -3,7 +3,8 @@
 #include "IContainer.h"
 #include "Tuple.h"
 
-template <typename T> struct Node
+template <typename T> 
+struct Node
 {
 public:
 	T data;

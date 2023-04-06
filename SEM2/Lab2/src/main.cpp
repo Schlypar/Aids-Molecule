@@ -1,19 +1,12 @@
-
-#include "ADT.h"
-#include "ArraySequence.h"
-#include "Sequence.h"
-#include "moduleTest.h"
 #include "Logger.h"
+#include "GUI.h"
+
+#include <cctype>
+#include <stdlib.h>
+#include <string.h>
 
 LogPriority Logger::priority = TracePriority;
 
-/*
-! Just pasted all this stuff from ImGui examples
-*/
-
-#include <imgui.h>
-#include <backends/imgui_impl_glfw.h>
-#include <backends/imgui_impl_opengl3.h>
 #include <stdio.h>
 #define GL_SILENCE_DEPRECATION
 #if defined(IMGUI_IMPL_OPENGL_ES2)
@@ -45,28 +38,9 @@ int main(int, char**)
     if (!glfwInit())
         return 1;
 
-    // Decide GL+GLSL versions
-#if defined(IMGUI_IMPL_OPENGL_ES2)
-    // GL ES 2.0 + GLSL 100
-    const char* glsl_version = "#version 100";
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
-#elif defined(__APPLE__)
-    // GL 3.2 + GLSL 150
-    const char* glsl_version = "#version 150";
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // Required on Mac
-#else
-    // GL 3.0 + GLSL 130
     const char* glsl_version = "#version 130";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
-    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
-#endif
 
     // Create window with graphics context
     GLFWwindow* window = glfwCreateWindow(1280, 720, "Dear ImGui GLFW+OpenGL3 example", NULL, NULL);
@@ -90,43 +64,28 @@ int main(int, char**)
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    // Load Fonts
-    // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
-    // - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
-    // - If the file cannot be loaded, the function will return NULL. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
-    // - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
-    // - Use '#define IMGUI_ENABLE_FREETYPE' in your imconfig file to use Freetype for higher quality font rendering.
-    // - Read 'docs/FONTS.md' for more instructions and details.
-    // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-    // - Our Emscripten build process allows embedding fonts to be accessible at runtime from the "fonts/" folder. See Makefile.emscripten for details.
-    //io.Fonts->AddFontDefault();
-    //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-    //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
-    //IM_ASSERT(font != NULL);
-
     // Our state
     bool show_demo_window = true;
-    bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    // Main loop
-#ifdef __EMSCRIPTEN__
-    // For an Emscripten build we are disabling file-system access, so let's not attempt to do a fopen() of the imgui.ini file.
-    // You may manually call LoadIniSettingsFromMemory() to load settings from your own storage.
-    io.IniFilename = NULL;
-    EMSCRIPTEN_MAINLOOP_BEGIN
-#else
+
+
+    bool appendButtonClicked = false;
+    bool prependButtonClicked = false;
+    bool insertAtButtonClicked = false;
+    bool getSubsequenceButtonClicked = false;
+    bool concatButtonClicked = false;
+    bool sliceButtonClicked = false;
+
+    char buffer[128];
+
+    int inputs[] = { 0,0,0 };
+
+    GUI<int>* button = new IntButton();
+    // GUI* gui = new GUI;
+
     while (!glfwWindowShouldClose(window))
-#endif
     {
-        // Poll and handle events (inputs, window resize, etc.)
-        // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
-        // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
-        // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
-        // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
         glfwPollEvents();
 
         // Start the Dear ImGui frame
@@ -140,34 +99,120 @@ int main(int, char**)
 
         // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
         {
-            static float f = 0.0f;
-            static int counter = 0;
+            
+        ImGui::SetNextWindowSize({962.f,600.f});
 
-            ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+            ImGui::Begin("Main menu", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoBringToFrontOnFocus);
 
-            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-            ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-            ImGui::Checkbox("Another Window", &show_another_window);
+            if (ImGui::BeginMenuBar())
+            {
+                if (ImGui::BeginMenu("Main"))
+                {
+                    if (ImGui::MenuItem("Save", "Ctrl+S")) { /* Handle save action */ }
+                    if (ImGui::MenuItem("Open", "Ctrl+O")) { /* Handle open action */ }
+                    if (ImGui::MenuItem("Close")) { /* Handle close action */ }
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Tools"))
+                {
+                    if (ImGui::MenuItem("Open log")) { /* Handle open log action */ }
+                    if (ImGui::MenuItem("Show stats")) { /* Handle show stats action */ }
+                    ImGui::EndMenu();
+                }
+                ImGui::EndMenuBar();
+            }
 
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+            ImGui::SetCursorPos({10.f,43.f});
+            ImGui::BeginChild("StatusBarFrame",{931.f,25.f},true );
 
-            if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-                counter++;
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
+            ImGui::SetCursorPos({11.f,4.f});
+                ImGui::PushItemWidth(63.000000);
+                ImGui::Text("| Status:");
+                ImGui::PopItemWidth( );
+            
+            ImGui::EndChild();
 
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-            ImGui::End();
-        }
 
-        // 3. Show another simple window.
-        if (show_another_window)
-        {
-            ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-            ImGui::Text("Hello from another window!");
-            if (ImGui::Button("Close Me"))
-                show_another_window = false;
+            ImGui::SetCursorPos({10.f,74.f});
+            ImGui::BeginChild("MethodsFrame",{931.f,172.f},true);
+
+                ImGui::SetCursorPos({14.f,12.f});
+                    if(ImGui::Button("Append", {232.f,71.f }))
+                    {
+                        appendButtonClicked = true;
+                    }
+                    if (appendButtonClicked)
+                    {
+                        button->showAppendButton(&appendButtonClicked);
+                    }
+
+                ImGui::SetCursorPos({254.f,12.f});
+                    if(ImGui::Button("Prepend", {232.f,71.f }))
+                    {
+                        prependButtonClicked = true;
+                    }
+                    ImGui::SetCursorPos({254.f,12.f});
+                    if (prependButtonClicked)
+                    {
+                        button->showPrependButton(&prependButtonClicked);
+                    }
+
+
+                ImGui::SetCursorPos({494.f,12.f});
+                    if(ImGui::Button("Insert At", {232.f,71.f }))
+                    {
+                        insertAtButtonClicked = true;
+                    }
+                    if (insertAtButtonClicked)
+                    {
+                        button->showInsertAtButton(&insertAtButtonClicked);
+                    }
+                
+                ImGui::SetCursorPos({14.f,156.f});
+                    if(ImGui::Button("Get Subsequence", {232.f,71.f }))
+                    {
+                        getSubsequenceButtonClicked = true;
+                    }
+                    if (getSubsequenceButtonClicked)
+                    {
+                       button->showGetSubsequenceButton(&getSubsequenceButtonClicked);
+                    }
+                
+                ImGui::SetCursorPos({254.f,156.f});
+                    if(ImGui::Button("Concatenate", {232.f,71.f }))
+                    {
+                        concatButtonClicked = true;
+                    }
+                    if (concatButtonClicked)
+                    {
+                       button->showConcatenateButton(&concatButtonClicked, inputs);
+                    }
+                
+                ImGui::SetCursorPos({494.f,156.f});
+                    if(ImGui::Button("Slice", {232.f,71.f }))
+                    {
+                        concatButtonClicked = true;
+                    }
+                    if (concatButtonClicked)
+                    {
+                       
+                    }
+            
+            ImGui::EndChild();
+
+            const float treeWindowWidth = 450;
+
+            ImGui::SetCursorPos({10.f,260.f});
+            ImGui::BeginChild("OutputFrame",{931.f,238.f},true );
+
+                // first debug-tree
+                button->ShowData({5.f,24.f}, treeWindowWidth, 0, "First", "Sequence", "Child"); 
+
+                // second debug-tree
+                button->ShowData({5.f,24.f}, treeWindowWidth, 10 + treeWindowWidth, "Second", "Omegalul Sequence", "lul");
+
+            ImGui::EndChild();
+
             ImGui::End();
         }
 
@@ -193,6 +238,8 @@ int main(int, char**)
 
     glfwDestroyWindow(window);
     glfwTerminate();
+
+    delete button;
 
     return 0;
 }

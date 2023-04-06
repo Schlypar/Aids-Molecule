@@ -1,6 +1,7 @@
 #pragma once
 
-#include "ADT.h"
+#include "Logger.h"
+#include "Sequence.h"
 
 
 template <typename T>
