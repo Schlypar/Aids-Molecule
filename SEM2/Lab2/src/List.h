@@ -149,6 +149,18 @@ public:
 		size = count;
 	}
 
+	// parameter pack constructor
+	template <typename... Args>
+	List(T head, Args... args)
+		: size(0)
+	{
+		Logger::Info("Parameter Pack constructor of List<T> of size %u", sizeof...(args) + 1);
+
+		Append(head);
+
+		((Append(args)), ...);
+	}
+
 	~List()
 	{
 		Logger::Info("Destoryed List<T>");
@@ -511,7 +523,7 @@ public:
 	}
 
 	//copying operator =
-	List<T>& operator= (const List<T>& other) 
+	List<T>& operator= (List<T>& other) 
 	{
 		Logger::Info("Used copying operator = of List<T>");
 		this->Clear();

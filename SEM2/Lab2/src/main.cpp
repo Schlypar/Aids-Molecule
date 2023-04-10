@@ -1,5 +1,6 @@
 #include "Logger.h"
 #include "GUI.h"
+#include "SegmentedList.h"
 #include "Tuple.h"
 #include "imgui.h"
 
@@ -414,9 +415,11 @@ int main(int, char**)
     delete secondInterface;
 
     Array<int> first = { 1,2,3,4 };
-    Array<double> second = { 1.5, 2.6, 25.0 };
+    List<double> second = { 1.5, 2.6, 25.0 };
 
-    Tuple<Array<int>, Array<double>> tuple = { first, second };
+    print(first, ' ', second, '\n');
+
+    Tuple<Array<int>, List<double>> tuple = { first, second };
 
     Array<int> array = tuple.get<0>();
 
@@ -424,11 +427,8 @@ int main(int, char**)
 
     Tuple<int, double, char> secondTuple = { 5, 2.2575, 'b' };
 
-    std::cout << secondTuple << std::endl; // fine also 
-    print(secondTuple, '\n'); // same as std::cout
-
-    Tuple<std::string> string = { "govno" };
-    print(string, '\n');
+    std::cout << secondTuple << std::endl;
+    print(secondTuple, '\n'); 
 
     return 0;
 }

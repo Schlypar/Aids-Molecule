@@ -149,6 +149,12 @@ public:
     {
 	}
     
+    template <typename... Args>
+    ListSequence(Args... args)
+        : container(args...)
+    {
+    }
+
     virtual ~ListSequence() 
     { 
         Logger::Info("Destroyed ListSequence<T>"); 

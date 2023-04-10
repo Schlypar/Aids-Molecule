@@ -382,6 +382,17 @@ public:
 		other.Clear();
 	}
 
+	template <typename... Args>
+	SegmentedList(T head, Args... args)
+		: size(0)
+	{
+		Logger::Info("Parameter Pack constructor of List<T> of size %u", sizeof...(args) + 1);
+
+		Append(head);
+
+		((Append(args)), ...);
+	}
+
 	~SegmentedList()
 	{
 		Logger::Info("Destroyed SegmentedList<T>");

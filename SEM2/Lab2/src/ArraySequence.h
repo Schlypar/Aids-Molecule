@@ -152,6 +152,12 @@ public:
     {
 	}
     
+    template <typename... Args>
+    ArraySequence(Args... args)
+        : container(args...)
+    {
+    }    
+
     virtual ~ArraySequence() 
     { 
         Logger::Info("Destroyed ArraySequence<T>"); 
