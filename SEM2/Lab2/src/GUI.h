@@ -1,23 +1,65 @@
 #pragma once
 
 #include "ADT.h"
+#include "ArraySequence.h"
+#include "ListSequence.h"
+#include "Sequence.h"
 
 #include <imgui.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <GLFW/glfw3.h>
 
+static int whichSequence = 0;
+
+static int values[] = { 0,0,0 };
 
 // default promts
 #define PROMT "..."
 #define INPUT_TEXT "Input is here"
 
-template <typename T>
+#define GREEN "I'm fine"
+#define YELLOW "Initialising"
+#define RED "Error detected"
+
+#define RED_FRAMES 300
+
+#define INT "int"
+#define FLOAT "float (not working yet)"
+#define NUMBER_OF_TYPES 2
+
+
+#define ARRAY_SEQUENCE "Array Sequence"
+#define LIST_SEQUENCE "List Sequence"
+#define NUMBER_OF_SEQUENCES 2
+
+#define PLUS_TWO 0
+#define PLUS_ZERO 1
+#define MINUS_TWO 2
+#define SQUARE 3
+
+#define MORE_THAN_ZERO 0
+#define LESS_THAN_ZERO 1
+#define IS_ALWAYS_TRUE 2
+
+#define PLUS_TWO_STR "Plus Two"
+#define PLUS_ZERO_STR "Plus Zero"
+#define MINUS_TWO_STR "Minus Two"
+#define SQUARE_STR "Square"
+
+#define MORE_THAN_ZERO_STR "More Than Zero"
+#define LESS_THAN_ZERO_STR "Less Than Zero"
+#define IS_ALWAYS_TRUE_STR "Is Always True"
+
+typedef class Interface Interface;
+struct SequenceLabel
+{
+    char type[100] = {"Sequence"};
+    char elements[100] = {"Element"};
+};
 class GUI
 {
 private:
-    Sequence<T>* sequence;
-
     void setupWindow()
     {
         ImVec2 prev_item_pos = ImGui::GetItemRectMin();
@@ -51,77 +93,95 @@ private:
         ImGui::SetNextWindowPos(window_pos);
     }
 
-    virtual void Append(bool* showWindow) = 0;
+    virtual void Append(bool* showWindow, Interface* current) {}
 
-    virtual void Prepend(bool* showWindow) = 0;
+    virtual void Prepend(bool* showWindow, Interface* current) {}
 
-    virtual void InsertAt(bool *showWindow) = 0;
+    virtual void InsertAt(bool *showWindow, Interface* current) {}
 
-    virtual void GetSubSequence(bool* showWindow) = 0;
+    virtual void GetSubSequence(bool* showWindow, Interface* current) {}
 
-    virtual void Concatnate(bool* showWindow, int values[]) = 0;
+    virtual void Concatenate(bool* showWindow, Interface* other) {}
 
-    virtual void ShowTree(const char* label, const char* children) = 0;
+    // virtual Sequence<float>* Concatenate(bool* showWindow) {}
+
+    virtual void ShowTree(const char* label, const char* children) {}
+
+    virtual void Slice(bool* showWindow, Interface* other) {}
 
 public:
-    GUI()
-        : sequence((Sequence<T>*) new ListSequence<T>()) { Logger::Info("Default constructor of GUI"); }
+    virtual ~GUI() {}
+
+    virtual Size GetLength() const  = 0;
+
+    virtual Sequence<int>* GetSequence() const = 0;
+
+    virtual void SetSequence(Sequence<int>* newSequence) = 0;
+
+    // virtual Sequence<int>* GetSequence() const = 0;
     
-
-    GUI(Sequence<T>* another)
-        : sequence(another) { Logger::Info("Sequence based constructor of GUI"); }
-
-    void showAppendButton(bool* showWindow)
+    void showAppendButton(bool* showWindow, Interface* current)
     {
         this->setupWindow();
 
         ImGui::Begin(INPUT_TEXT, showWindow, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
 
-        Append(showWindow);
+        Append(showWindow, current);
 
         ImGui::End();
     }
 
-    void showPrependButton(bool* showWindow)
+    void showPrependButton(bool* showWindow, Interface* current)
     {
         this->setupWindow();
 
         ImGui::Begin(INPUT_TEXT, showWindow, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
 
-        Prepend(showWindow);
+        Prepend(showWindow, current);
 
         ImGui::End();
     }
 
-    void showInsertAtButton(bool* showWindow)
+    void showInsertAtButton(bool* showWindow, Interface* current)
     {
         this->setupWindow();
 
         ImGui::Begin(INPUT_TEXT, showWindow, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
 
-        InsertAt(showWindow);
+        InsertAt(showWindow, current);
 
         ImGui::End();
     }
 
-    void showGetSubsequenceButton(bool* showWindow)
+    void showGetSubsequenceButton(bool* showWindow, Interface* current)
     {
         this->setupWindowToUpwards();
 
         ImGui::Begin(INPUT_TEXT, showWindow, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
 
-        GetSubSequence(showWindow);
+        GetSubSequence(showWindow, current);
 
         ImGui::End();
     }
 
-    void showConcatenateButton(bool* showWindow, int inputs[])
+    void showConcatenateButton(bool* showWindow, Interface* other)
     {
         this->setupWindowToUpwards();
 
         ImGui::Begin(INPUT_TEXT, showWindow, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
 
-        Concatnate(showWindow, inputs);
+        Concatenate(showWindow, other);
+
+        ImGui::End();
+    }
+
+    void showSliceButton(bool* showWindow, Interface* current)
+    {
+        this->setupWindowToUpwards();
+
+        ImGui::Begin(INPUT_TEXT, showWindow, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
+
+        Slice(showWindow, current);
 
         ImGui::End();
     }
@@ -138,133 +198,108 @@ public:
         
         ImGui::End();
     }
+
+    void showStatusBar(int status, float fps, float memoryUsage, Interface* interface);
+    
 };
 
-class IntButton : virtual public GUI<int>
+class IntButton : public GUI
 {
+private:
+    Sequence<int>* sequence;
+
 public:
     IntButton()
-        : GUI() { Logger::Info("Default constructor of IntButton"); }
+        : sequence((Sequence<int>*) new ListSequence<int>) { Logger::Info("Default constructor of IntButton"); }
     
 
     IntButton(Sequence<int>* another)
-        : GUI(another) { Logger::Info("Sequence based constructor of IntButton"); }
+        : sequence(another) { Logger::Info("Sequence based constructor of IntButton"); }
 
-    virtual void Append(bool* showWindow)
+    virtual ~IntButton()
     {
-        short shortInt = 0;
-        ImGui::InputScalar(PROMT,     ImGuiDataType_S16,    &shortInt, NULL, "%d");
-
-        if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)) || !ImGui::IsWindowFocused())
-        {
-            if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)))
-            {
-                print(shortInt, "\n");
-            }
-            *showWindow = false;
-        }
+        delete sequence;
     }
 
-    virtual void Prepend(bool* showWindow)
-    {
-        short shortInt = 0;
-        ImGui::InputScalar(PROMT,     ImGuiDataType_S16,    &shortInt, NULL, "%d");
+    Size GetLength() const override { return sequence->GetLength(); }
 
-        if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)) || !ImGui::IsWindowFocused())
-        {
-            if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)))
-            {
-                print(shortInt, "\n");
-            }
-            *showWindow = false;
-        }
-    }
+    void Append(bool* showWindow, Interface* current) override;
 
-    virtual void InsertAt(bool *showWindow)
-    {
-        static int inputs[4] = { 0, 0, 100, 255 };
+    void Prepend(bool* showWindow, Interface* current) override;
 
-        ImGui::InputInt2(PROMT, inputs);
+    void InsertAt(bool *showWindow, Interface* current) override;
 
-        if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)) || (!ImGui::IsWindowFocused()))
-        {
-            if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)))
-            {
-                print(inputs[0], " <-> ", inputs[1], "\n");
-            }
+    void GetSubSequence(bool* showWindow, Interface* current) override;
 
-            *showWindow = false;
+    void Concatenate(bool* showWindow, Interface* other) override;
 
-            inputs[0] = 0;
-            inputs[1] = 0;
-        }
-    }
+    void Slice(bool* showWindow, Interface* current) override;
 
-    virtual void GetSubSequence(bool* showWindow)
-    {
-        static int inputs[4] = { 0, 0, 100, 255 };
-
-        ImGui::InputInt2(PROMT, inputs);
-
-        if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)) || (!ImGui::IsWindowFocused()))
-        {
-            if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)))
-            {
-                print(inputs[0], " <-> ", inputs[1], "\n");
-            }
-
-            *showWindow = false;
-
-            inputs[0] = 0;
-            inputs[1] = 0;
-        }
-    }
-
-    virtual void Concatnate(bool* showWindow, int values[])
-    {
-
-        const char* items[] = {"1", "2"};
-
-        ImGui::PushItemWidth(67);
-
-        ImGui::Combo("##value1", &values[0], items, IM_ARRAYSIZE(items));
-        ImGui::SameLine();
-        ImGui::Combo("##value2", &values[1], items, IM_ARRAYSIZE(items));
-        ImGui::SameLine();
-        ImGui::Combo("##value3", &values[2], items, IM_ARRAYSIZE(items));
-
-        ImGui::PopItemWidth();
-
-        if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)))
-        {
-            if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)))
-            {
-                print(values[0], " <-> ", values[1], " <-> ", values[2], "\n");
-            }
-
-            *showWindow = false;
-
-            values[0] = 0;
-            values[1] = 0;
-            values[2] = 0;
-        }
-    }
-
-    virtual void ShowTree(const char* label, const char* children)
+    void ShowTree(const char* label, const char* children) override
     {
         if (ImGui::TreeNode(label))
         {
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < sequence->GetLength(); i++)
             {
                 if (ImGui::TreeNode((void*)(intptr_t)i, "%s %d", children, i))
                 {
-                    ImGui::Text("blah blah");
-                    ImGui::SameLine();
-                    if (ImGui::SmallButton("button")) {}
+                    ImGui::Text("Address: %p", &sequence->Get(i));
+                    ImGui::Text("Value: %d", sequence->Get(i));
+                    if (ImGui::SmallButton("Delete")) 
+                    {
+                        sequence->Remove(i);
+                    }
                     ImGui::TreePop();
                 }
             }
             ImGui::TreePop();
         }
     }
+
+    Sequence<int>* GetSequence() const override { return sequence; }
+
+    void SetSequence(Sequence<int>* newSequence) override { sequence = newSequence; }
 };
+
+GUI* init(int dataType, int sequenceType, SequenceLabel* labels);
+
+// template <typename T>
+// inline T PlusTwo(T& x) { return x + 2; }
+// // inline float PlusTwo(float& x) { return x + 2; }
+
+// inline int PlusZero(int& x) { return x; }
+// inline float PlusZero(float& x) { return x; }
+
+// inline int MinusTwo(int& x) { return x - 2; }
+// inline float MinusTwo(float& x) { return x - 2; }
+
+// inline int Square(int& x) { return x * x; }
+// inline float Square(float& x) { return x * x; }
+
+// inline bool LessThanZero(int& x) { return x < 0; }
+// inline bool LessThanZero(float& x) { return x < 0; }
+
+// inline bool MoreThanZero(int& x) { return x > 0; }
+// inline bool MoreThanZero(float& x) { return x > 0; }
+
+// inline bool AlwaysTrue(int& x) { return true; }
+// inline bool AlwaysTrue(float& x) { return true; }
+// struct Fn
+// {
+//     void* fn;
+//     char name[100] = {"None"};
+// };
+class Interface
+{
+public:
+    GUI* gui;
+    SequenceLabel labels;
+    char role[100] = {"None"}; 
+    Interface* other;
+
+    ~Interface()
+    {
+        delete gui;
+    }
+};
+

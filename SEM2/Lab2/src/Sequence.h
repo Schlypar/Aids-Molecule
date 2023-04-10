@@ -4,7 +4,6 @@
 #include "IIterator.h"
 
 #include "Tuple.h"
-#include "List.h"
 #include "SegmentedList.h"
 #include "Array.h"
 #include "Logger.h"
@@ -22,6 +21,7 @@ template <typename T>
 class Sequence
 {
 public:
+    virtual ~Sequence() {}
     
     virtual T* GetFirstPointer() = 0; 
     virtual T* GetEndPointer() = 0;
@@ -51,6 +51,7 @@ public:
     virtual Sequence<T>* Prepend(T&& data) = 0;
 
     virtual void InsertAt(const Index index, const T& data) = 0;
+    virtual void Remove(const Index index) = 0;
 
     virtual bool isEmpty() const noexcept { return GetLength() == 0; }
 
@@ -109,7 +110,7 @@ Sequence<T>* Sequence<T>::GetSubsequence(const Index start, const Index end)
 
     Sequence<T>* result = this->Create();
 
-    for (Index i = start; i < end; i++)
+    for (Index i = start; i <= end; i++)
         result->Append(this->Get(i));
     
     return result;
@@ -125,10 +126,16 @@ Sequence<T>* Sequence<T>::Concat(Sequence<T>* other)
         throw(EXCEPTION_INDEX_OUT_OF_RANGE);
     }
 
-    Sequence<T>* result = this->Copy();
+    Sequence<T>* result = this->Create();
 
-    IIterator<T>* iter = other->_Begin();
-    IIterator<T>* end = other->_End();
+    IIterator<T>* iter = this->_Begin();
+    IIterator<T>* end = this->_End();
+
+    for (iter; !(iter->_isEquals(end)); iter->_Next())
+        result->Append(iter->_GetCurrent());
+
+    iter = other->_Begin();
+    end = other->_End();
 
     for (iter; !(iter->_isEquals(end)); iter->_Next())
         result->Append(iter->_GetCurrent());

@@ -29,6 +29,9 @@ cmake_minimum_required(VERSION 3.22.1)
 
 project(Lab2)
 
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
 # defining paths to all neccessary *.cmake 
 set(opengl_system_DIR "build/")
 set(glfw3_DIR "build/")

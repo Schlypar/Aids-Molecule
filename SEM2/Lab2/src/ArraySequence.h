@@ -20,10 +20,16 @@ public:
     {
         T* current;
     public:
-        Iterator() { Logger::Info("Used default constructor of ArraySequence<T>::Iterator"); }
+        Iterator() 
+        { 
+            Logger::Info("Used default constructor of ArraySequence<T>::Iterator"); 
+        }
 
         Iterator(T* data)
-            : current(data) { Logger::Info("Used T* constructor of ArraySequence<T>::Iterator"); }
+            : current(data) 
+            { 
+                Logger::Info("Used T* constructor of ArraySequence<T>::Iterator"); 
+            }
         
         Iterator(IIterator<T>* other)
             : current(((Iterator*)other)->current) 
@@ -55,15 +61,30 @@ public:
             return *this;
         }
 
-        Iterator operator++ () { this->_Next() ; return *this; }
+        Iterator operator++ () 
+        { 
+            this->_Next() ; return *this; 
+        }
 
-        Iterator operator-- () { this->_Prev() ; return *this; }
+        Iterator operator-- () 
+        { 
+            this->_Prev() ; return *this; 
+        }
 
-        bool operator!= (Iterator& other) const { return this->current != other.current; }
+        bool operator!= (Iterator& other) const 
+        {
+            return this->current != other.current; 
+        }
 
-		bool operator== (Iterator& other) const { return this->current == other.current; }
+		bool operator== (Iterator& other) const 
+        { 
+            return this->current == other.current; 
+        }
 
-        T& operator* () { return *(this->current); }
+        T& operator* () 
+        { 
+            return *(this->current); 
+        }
 
         IIterator<T>* _Next() override
         {
@@ -93,25 +114,48 @@ public:
         }
     };
 
-    IIterator<T>* _Begin() override { return (IIterator<T>*) new (Iterator)(GetFirstPointer()); }
-    IIterator<T>* _End() override { return (IIterator<T>*) new (Iterator)(GetEndPointer()); }
+    IIterator<T>* _Begin() override 
+    { 
+        return (IIterator<T>*) new (Iterator)(GetFirstPointer()); 
+    }
+    IIterator<T>* _End() override 
+    { 
+        return (IIterator<T>*) new (Iterator)(GetEndPointer()); 
+    }
 
-    Iterator begin() { return (Iterator)(this->_Begin()); }
-    Iterator end() { return (Iterator)(this->_End()); }
+    Iterator begin() 
+    {
+        return (Iterator)(this->_Begin()); 
+    }
+    Iterator end() 
+    { 
+        return (Iterator)(this->_End()); 
+    }
 
     ArraySequence()
-        : container() {}
+        : container()
+    {
+	}
 
     ArraySequence(T* data, Size count)
-        : container(data, count) {}
+        : container(data, count) 
+    {
+	}
 
     ArraySequence(const Sequence<T>& other)
-        : container(other) {}
+        : container(other)
+    {
+	}
 
     ArraySequence(Sequence<T>&& other)
-        : container(other) {}
+        : container(other)
+    {
+	}
     
-    ~ArraySequence() {}
+    virtual ~ArraySequence() 
+    { 
+        Logger::Info("Destroyed ArraySequence<T>"); 
+    }
 
     Sequence<T>* ArrayAllocator()
     {
@@ -239,6 +283,15 @@ public:
         container.SetSize(GetLength() + 1);
     }
 
+    void Remove(const Index index) override
+    {
+        for (Index i = index; i < GetLength() - 1; i++)
+        {
+            container[i] = container[i + 1];
+        }
+        container.SetSize(GetLength() - 1);
+    }
+
     Size GetLength() const noexcept override { return container.GetLength(); }
 
     bool isEmpty() const noexcept override { return GetLength() == 0; }
@@ -264,7 +317,10 @@ public:
         return (Sequence<T>*) new ArraySequence<T>(*this);
     }
 
-    T& operator[] (const Index index) { return container[index]; }
+    T& operator[] (const Index index) 
+    { 
+        return container[index]; 
+    }
 
     friend std::ostream& operator<< (std::ostream& stream, ArraySequence<T>& array)
     {

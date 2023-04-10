@@ -13,25 +13,31 @@ class Allocator
 public:
 
     template <typename... Args>
-    Array<T>* AllocateArray(Args... args)
+    static Array<T>* AllocateArray(Args... args)
     {
         return new Array<T>(args...);
     }
 
     template <typename... Args>
-    List<T>* AllocateList(Args... args)
+    static List<T>* AllocateList(Args... args)
     {
         return new List<T>(args...);
     }
 
     template <typename... Args>
-    Sequence<T>* AllocateArraySequence(Args... args)
+    static SegmentedList<T>* AllocateSegmentedList(Args... args)
+    {
+        return new SegmentedList<T>(args...);
+    }
+
+    template <typename... Args>
+    static Sequence<T>* AllocateArraySequence(Args... args)
     {
         return (Sequence<T>*) new ArraySequence<T>(args...);
     }
 
     template <typename... Args>
-    ListSequence<T>* AllocateListSequence(Args... args)
+    static Sequence<T>* AllocateListSequence(Args... args)
     {
         return (Sequence<T>*) new ListSequence<T>(args...);
     }

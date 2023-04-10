@@ -2,6 +2,22 @@
 
 #include <stdio.h>
 
+#include <iostream>
+
+template <typename... Args> 
+void print(Args...args) {}
+
+template <typename T, typename... Args> 
+void print(T& data, Args... args)
+{
+	if (sizeof...(args) == 0)
+		std::cout << data;
+	else 
+		std::cout << data;
+
+	print(args...);
+}
+
 typedef int Exception;
 
 #define EXCEPTION_INDEX_OUT_OF_RANGE 1

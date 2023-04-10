@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Logger.h"
+#include "SegmentedList.h"
 #include "Sequence.h"
 
 
@@ -16,10 +17,16 @@ public:
         Node<T>* current;
     public:
         Iterator() 
-            : current(nullptr) { Logger::Info("Used default constructor of ArraySequence<T>::Iterator"); }
+            : current(nullptr) 
+            { 
+                Logger::Info("Used default constructor of ArraySequence<T>::Iterator"); 
+            }
 
         Iterator(Node<T>* data)
-            : current(data) { Logger::Info("Used T* constructor of ArraySequence<T>::Iterator"); }
+            : current(data) 
+            { 
+                Logger::Info("Used T* constructor of ArraySequence<T>::Iterator"); 
+            }
         
         Iterator(IIterator<T>* other)
             : current(((Iterator*)other)->current) 
@@ -51,15 +58,30 @@ public:
             return *this;
         }
 
-        Iterator operator++ () { this->_Next() ; return *this; }
+        Iterator operator++ () 
+        { 
+            this->_Next() ; return *this; 
+        }
 
-        Iterator operator-- () { this->_Prev() ; return *this; }
+        Iterator operator-- () 
+        { 
+            this->_Prev() ; return *this; 
+        }
 
-        bool operator!= (Iterator& other) const { return this->current != other.current; }
+        bool operator!= (Iterator& other) const 
+        { 
+            return this->current != other.current; 
+        }
 
-		bool operator== (Iterator& other) const { return this->current == other.current; }
+		bool operator== (Iterator& other) const 
+        { 
+            return this->current == other.current; 
+        }
 
-        T& operator* () { return this->current->data; }
+        T& operator* () 
+        {
+            return this->current->data; 
+        }
 
         IIterator<T>* _Next() override
         {
@@ -89,25 +111,48 @@ public:
         }
     };
 
-    IIterator<T>* _Begin() override { return (IIterator<T>*) new (Iterator)(container.GetHead()); }
-    IIterator<T>* _End() override { return (IIterator<T>*) new (Iterator)(); }
+    IIterator<T>* _Begin() override 
+    {
+        return (IIterator<T>*) new (Iterator)(container.GetHead()); 
+    }
+    IIterator<T>* _End() override 
+    { 
+        return (IIterator<T>*) new (Iterator)(); 
+    }
 
-    Iterator begin() { return (Iterator)(this->_Begin()); }
-    Iterator end() { return (Iterator)(this->_End()); }
+    Iterator begin() 
+    { 
+        return (Iterator)(this->_Begin()); 
+    }
+    Iterator end() 
+    { 
+        return (Iterator)(this->_End()); 
+    }
 
     ListSequence()
-        : container() {}
+        : container() 
+    {
+	}
 
     ListSequence(T* data, Size count)
-        : container(data, count) {}
+        : container(data, count) 
+    {
+	}
     
     ListSequence(const Sequence<T>& other)
-        : container(other) {}
+        : container(other) 
+    {
+	}
 
     ListSequence(Sequence<T>&& other)
-        : container(other) {}
+        : container(other) 
+    {
+	}
     
-    ~ListSequence() {}
+    virtual ~ListSequence() 
+    { 
+        Logger::Info("Destroyed ListSequence<T>"); 
+    }
 
     T& GetFirst() const override
     {
@@ -175,35 +220,27 @@ public:
 
     void InsertAt(const Index index, const T& data) override
     {
-        // if (index >= GetLength())
-        // {
-        //     Logger::Trace("At InsertAt() at ArraySequence.h");
-        //     logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-        //     throw EXCEPTION_INDEX_OUT_OF_RANGE;
-        // }
-
-        // Node<T>* node = new Node<T>;
-        // node->data = data;
-        // node->next = nullptr;
-        // node->prev = nullptr;
-
-        // Node<T>* pointer = container.GetHead();
-
-        // for (Index i = 0; i < index; i++)
-        //     pointer = pointer->next;
-        
-        // node->next = pointer;
-        // node->prev = pointer->prev;
-        // pointer->prev = node;
-        // node->prev->next = node;
-
-        // container.SetSize(GetLength() + 1);
         container.insertAt(index, data);
     }
 
-    Size GetLength() const noexcept override { return container.GetLength(); }
+    void Remove(const Index index) override
+    {
+        for (Index i = index; i < GetLength() - 1; i++)
+        {
+            container[i] = container[i + 1];
+        }
+        container.SetSize(GetLength() - 1);
+    }
 
-    bool isEmpty() const noexcept override { return GetLength() == 0; }
+    Size GetLength() const noexcept override 
+    { 
+        return container.GetLength(); 
+    }
+
+    bool isEmpty() const noexcept override 
+    { 
+        return GetLength() == 0; 
+    }
 
     T* GetFirstPointer() override
     {
@@ -225,7 +262,10 @@ public:
         return (Sequence<T>*) new ListSequence<T>(*this);
     }
 
-    T& operator[] (const Index index) { return container[index]; }
+    T& operator[] (const Index index) 
+    { 
+        return container[index]; 
+    }
 
     friend std::ostream& operator<< (std::ostream& stream, ListSequence<T>& list)
     {

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "IContainer.h"
-#include "Tuple.h"
 
 template <typename T> 
 struct Node
@@ -506,7 +505,10 @@ public:
 		}
 	}
 
-	const T& operator[] (const Index index) { return Get(index); }
+	auto& operator[] (const Index index) const
+	{ 
+		return Get(index); 
+	}
 
 	//copying operator =
 	List<T>& operator= (const List<T>& other) 

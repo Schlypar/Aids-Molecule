@@ -1,9 +1,13 @@
 #include "Logger.h"
 #include "GUI.h"
+#include "Tuple.h"
+#include "imgui.h"
 
 #include <cctype>
 #include <stdlib.h>
 #include <string.h>
+#include <chrono>
+#include <thread>
 
 LogPriority Logger::priority = TracePriority;
 
@@ -25,6 +29,8 @@ LogPriority Logger::priority = TracePriority;
 #ifdef __EMSCRIPTEN__
 #include "../libs/emscripten/emscripten_mainloop_stub.h"
 #endif
+
+static int FramesToWearOffStatus = 0;
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -57,7 +63,7 @@ int main(int, char**)
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
     // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
+    ImGui::StyleColorsClassic();
     //ImGui::StyleColorsLight();
 
     // Setup Platform/Renderer backends
@@ -68,7 +74,17 @@ int main(int, char**)
     bool show_demo_window = true;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+    static int selected = -1;
+    static int firstSelect = -1;
+    static int secondSelect = -1;
 
+    float fps = 0.0f;
+    float memoryUsage = 0.0f;
+    int status = 1; // 0 = green, 1 = yellow, 2 = red
+
+    bool selectedType = false;
+    bool selectedSequenceFirst = false;
+    bool selectedSequenceSecond = false;
 
     bool appendButtonClicked = false;
     bool prependButtonClicked = false;
@@ -78,14 +94,35 @@ int main(int, char**)
     bool sliceButtonClicked = false;
 
     char buffer[128];
+    const char* types[] = { INT, FLOAT };
+
+    const char* sequenceTypes[] = { ARRAY_SEQUENCE, LIST_SEQUENCE };
 
     int inputs[] = { 0,0,0 };
 
-    GUI<int>* button = new IntButton();
-    // GUI* gui = new GUI;
+
+    Interface* secondInterface = new Interface;
+    SequenceLabel secondLabel;
+    GUI* secondGUI = init(0, 0, &secondLabel);
+    secondInterface->gui = secondGUI;
+    
+    
+    Interface* firstInterface = new Interface;
+    SequenceLabel firstLabel;
+    GUI* GUI = init(0, 0, &firstLabel);
+    firstInterface->gui = GUI;
+
+    secondInterface->other = firstInterface;
+    firstInterface->other = secondInterface;
+
+
+
+    Interface* interface = firstInterface;
 
     while (!glfwWindowShouldClose(window))
     {
+
+
         glfwPollEvents();
 
         // Start the Dear ImGui frame
@@ -100,38 +137,23 @@ int main(int, char**)
         // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
         {
             
+        ImGui::BeginDisabled(!selectedType || !selectedSequenceFirst || !selectedSequenceSecond);
+
         ImGui::SetNextWindowSize({962.f,600.f});
 
             ImGui::Begin("Main menu", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoBringToFrontOnFocus);
 
-            if (ImGui::BeginMenuBar())
-            {
-                if (ImGui::BeginMenu("Main"))
-                {
-                    if (ImGui::MenuItem("Save", "Ctrl+S")) { /* Handle save action */ }
-                    if (ImGui::MenuItem("Open", "Ctrl+O")) { /* Handle open action */ }
-                    if (ImGui::MenuItem("Close")) { /* Handle close action */ }
-                    ImGui::EndMenu();
-                }
-                if (ImGui::BeginMenu("Tools"))
-                {
-                    if (ImGui::MenuItem("Open log")) { /* Handle open log action */ }
-                    if (ImGui::MenuItem("Show stats")) { /* Handle show stats action */ }
-                    ImGui::EndMenu();
-                }
-                ImGui::EndMenuBar();
-            }
+            fps = ImGui::GetIO().Framerate;
+            memoryUsage = ImGui::GetIO().MetricsActiveAllocations;
 
             ImGui::SetCursorPos({10.f,43.f});
             ImGui::BeginChild("StatusBarFrame",{931.f,25.f},true );
 
-            ImGui::SetCursorPos({11.f,4.f});
-                ImGui::PushItemWidth(63.000000);
-                ImGui::Text("| Status:");
-                ImGui::PopItemWidth( );
+                ImGui::SetCursorPos({11.f,4.f});
+
+                    interface->gui->showStatusBar(status, fps, memoryUsage, interface);
             
             ImGui::EndChild();
-
 
             ImGui::SetCursorPos({10.f,74.f});
             ImGui::BeginChild("MethodsFrame",{931.f,172.f},true);
@@ -143,7 +165,15 @@ int main(int, char**)
                     }
                     if (appendButtonClicked)
                     {
-                        button->showAppendButton(&appendButtonClicked);
+                        try
+                        {
+                            interface->gui->showAppendButton(&appendButtonClicked, interface);
+                        }
+                        catch(Exception e)
+                        {
+                            status = 2;
+                            FramesToWearOffStatus = RED_FRAMES;
+                        }
                     }
 
                 ImGui::SetCursorPos({254.f,12.f});
@@ -154,7 +184,15 @@ int main(int, char**)
                     ImGui::SetCursorPos({254.f,12.f});
                     if (prependButtonClicked)
                     {
-                        button->showPrependButton(&prependButtonClicked);
+                        try
+                        {
+                            interface->gui->showPrependButton(&prependButtonClicked, interface);
+                        }
+                        catch(Exception e)
+                        {
+                            status = 2;
+                            FramesToWearOffStatus = RED_FRAMES;
+                        }
                     }
 
 
@@ -165,9 +203,23 @@ int main(int, char**)
                     }
                     if (insertAtButtonClicked)
                     {
-                        button->showInsertAtButton(&insertAtButtonClicked);
+                        try
+                        {
+                            interface->gui->showInsertAtButton(&insertAtButtonClicked, interface);
+                        }
+                        catch(Exception e)
+                        {
+                            status = 2;
+                            FramesToWearOffStatus = RED_FRAMES;
+                        }
                     }
-                
+                ImGui::SetCursorPos({734.f,12.f});
+                    if(ImGui::Button("Map", {171.f,71.f }))
+                    {
+                        
+                    }
+
+
                 ImGui::SetCursorPos({14.f,156.f});
                     if(ImGui::Button("Get Subsequence", {232.f,71.f }))
                     {
@@ -175,7 +227,15 @@ int main(int, char**)
                     }
                     if (getSubsequenceButtonClicked)
                     {
-                       button->showGetSubsequenceButton(&getSubsequenceButtonClicked);
+                        try
+                        {
+                            interface->gui->showGetSubsequenceButton(&getSubsequenceButtonClicked, interface);
+                        }
+                        catch(Exception e)
+                        {
+                            status = 2;
+                            FramesToWearOffStatus = RED_FRAMES;
+                        }
                     }
                 
                 ImGui::SetCursorPos({254.f,156.f});
@@ -185,17 +245,39 @@ int main(int, char**)
                     }
                     if (concatButtonClicked)
                     {
-                       button->showConcatenateButton(&concatButtonClicked, inputs);
+                        try
+                        {
+                            interface->gui->showConcatenateButton(&concatButtonClicked, interface);
+                        }
+                        catch(Exception e)
+                        {
+                            status = 2;
+                            FramesToWearOffStatus = RED_FRAMES;
+                        }
                     }
                 
                 ImGui::SetCursorPos({494.f,156.f});
                     if(ImGui::Button("Slice", {232.f,71.f }))
                     {
-                        concatButtonClicked = true;
+                        sliceButtonClicked = true;
                     }
-                    if (concatButtonClicked)
+                    if (sliceButtonClicked)
                     {
-                       
+                        try
+                        {
+                            interface->gui->showSliceButton(&sliceButtonClicked, interface);
+                        }
+                        catch(Exception e)
+                        {
+                            status = 2;
+                            FramesToWearOffStatus = RED_FRAMES;
+                        }
+                    }
+
+                    ImGui::SetCursorPos({734.f,156.f});
+                    if(ImGui::Button("Where", {171.f,71.f }))
+                    {
+
                     }
             
             ImGui::EndChild();
@@ -206,10 +288,99 @@ int main(int, char**)
             ImGui::BeginChild("OutputFrame",{931.f,238.f},true );
 
                 // first debug-tree
-                button->ShowData({5.f,24.f}, treeWindowWidth, 0, "First", "Sequence", "Child"); 
+                firstInterface->gui->ShowData({5.f,24.f}, treeWindowWidth,
+                 0, "Main", firstInterface->labels.type, firstInterface->labels.elements); 
 
                 // second debug-tree
-                button->ShowData({5.f,24.f}, treeWindowWidth, 10 + treeWindowWidth, "Second", "Omegalul Sequence", "lul");
+                secondInterface->gui->ShowData({5.f,24.f}, treeWindowWidth,
+                 10 + treeWindowWidth, "Auxiliary", secondInterface->labels.type, secondInterface->labels.elements);
+
+            ImGui::EndChild();
+
+            ImGui::EndDisabled();
+
+            ImGui::SetCursorPos({10.f,504.f});
+            ImGui::BeginChild("TypeSelection",{931.f,86.f}, false);
+
+            if (!selectedType)
+            {
+            
+                ImGui::SetCursorPos({10.f,14.f});
+                if (ImGui::TreeNodeEx("Selection State: Type", ImGuiTreeNodeFlags_DefaultOpen))
+                {
+                   
+                    for (int n = 0; n < NUMBER_OF_TYPES; n++)
+                    {
+                        if (ImGui::Selectable( types[n], selected == n))
+                        {
+                            selected = n;
+                            selectedType = true;
+                        }
+
+                    }
+                    ImGui::TreePop();
+                }
+            }
+            else if (!selectedSequenceFirst)
+            {
+                ImGui::SetCursorPos({10.f,14.f});
+                if (ImGui::TreeNodeEx("Selection State: First Sequence", ImGuiTreeNodeFlags_DefaultOpen))
+                {
+                    for (int n = 0; n < NUMBER_OF_SEQUENCES; n++)
+                    {
+                        if (ImGui::Selectable(sequenceTypes[n], firstSelect == n))
+                        {
+                            firstSelect = n;
+                            selectedSequenceFirst = true;
+                        }
+                    }
+                    ImGui::TreePop();
+                }
+            }
+            else if (!selectedSequenceSecond)
+            {
+                ImGui::SetCursorPos({10.f,14.f});
+                if (ImGui::TreeNodeEx("Selection State: Second Sequence", ImGuiTreeNodeFlags_DefaultOpen))
+                {
+                    for (int n = 0; n < NUMBER_OF_SEQUENCES; n++)
+                    {
+                        if (ImGui::Selectable(sequenceTypes[n], secondSelect == n))
+                        {
+                            secondSelect = n;
+                            selectedSequenceSecond = true;
+
+                            delete GUI;
+                            delete secondGUI;
+
+                            GUI = init(selected, firstSelect, &firstLabel);
+                            secondGUI = init(selected, secondSelect, &secondLabel);
+
+                            firstInterface->gui = GUI;
+                            firstInterface->labels = firstLabel;
+                            memcpy(firstInterface->role, "Main", 5);
+
+                            secondInterface->gui = secondGUI;
+                            secondInterface->labels = secondLabel;
+                            memcpy(secondInterface->role, "Auxiliary", strlen("Auxiliary"));
+                        }
+                    }
+                    
+                    ImGui::TreePop();
+                }
+            }
+            else
+            {
+                ImGui::Text("Will be something");
+            }
+
+            if (selectedSequenceSecond)
+            {
+                if (FramesToWearOffStatus > 0)
+                    FramesToWearOffStatus--;
+                
+                if (FramesToWearOffStatus == 0)
+                    status = 0;
+            }
 
             ImGui::EndChild();
 
@@ -239,7 +410,25 @@ int main(int, char**)
     glfwDestroyWindow(window);
     glfwTerminate();
 
-    delete button;
+    delete firstInterface;
+    delete secondInterface;
+
+    Array<int> first = { 1,2,3,4 };
+    Array<double> second = { 1.5, 2.6, 25.0 };
+
+    Tuple<Array<int>, Array<double>> tuple = { first, second };
+
+    Array<int> array = tuple.get<0>();
+
+    print(tuple, '\n');
+
+    Tuple<int, double, char> secondTuple = { 5, 2.2575, 'b' };
+
+    std::cout << secondTuple << std::endl; // fine also 
+    print(secondTuple, '\n'); // same as std::cout
+
+    Tuple<std::string> string = { "govno" };
+    print(string, '\n');
 
     return 0;
 }

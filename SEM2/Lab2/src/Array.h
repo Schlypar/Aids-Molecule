@@ -2,7 +2,7 @@
 
 #include "IContainer.h"
 #include "Logger.h"
-#include "Tuple.h"
+#include <utility>
 
 #define CAPACITY_TO_REAL_SIZE 2
 
@@ -12,20 +12,26 @@ class Array : IContainer<T>
 private:
     Size size;
     Size capacity;
-    T* data;
+    T* data = nullptr;
 
 public:
 
     class Iterator
     {
+    private:
         T* current;
+
     public:
         
         Iterator(T* data)
-            : current(data) {}
+            : current(data) 
+        {
+        }
 
         Iterator(const Array<T>& other)
-            : current(other.data) {}
+            : current(other.data) 
+        {
+        }
         
         Iterator operator+ (int n) 
         {
@@ -37,7 +43,10 @@ public:
             return Iterator(current - n);
         }
 
-        Iterator& operator++ () { current++; return *this; }
+        Iterator& operator++ () 
+        { 
+            current++; return *this;
+        }
 
         Iterator operator++ (int)
         {
@@ -46,7 +55,10 @@ public:
             return iter;
         }
 
-        Iterator& operator-- () { current--; return *this; }
+        Iterator& operator-- () 
+        { 
+            current--; return *this; 
+        }
 
         Iterator operator-- (int)
         {
@@ -55,13 +67,27 @@ public:
             return iter;
         }
 
-        bool operator!= (const Iterator& other) const { return this->current != other.current; }
-		bool operator== (const Iterator& other) const { return this->current == other.current; }
+        bool operator!= (const Iterator& other) const
+        { 
+            return this->current != other.current; 
+        }
+		bool operator== (const Iterator& other) const 
+        { 
+            return this->current == other.current; 
+        }
 
+        // add exeption
         T& operator* () { return *(current); }
     };
-    Iterator begin() { return Iterator(data); }
-    Iterator end() { return Iterator(data + size); }
+    
+    Iterator begin() 
+    { 
+        return Iterator(data); 
+    }
+    Iterator end() 
+    { 
+        return Iterator(data + size); 
+    }
 
     Array()
         : size(0)
@@ -79,7 +105,10 @@ public:
     }
 
     Array(Size size)
-        : size(size), capacity(size), data(size ? new T[size]() : nullptr) { Logger::Info("Allocated Array<T>"); }
+        : size(size), capacity(size), data(size ? new T[size]() : nullptr) 
+        { 
+            Logger::Info("Allocated Array<T>"); 
+        }
 
     //copying constructor
     Array(const Array<T>& other)
@@ -96,10 +125,22 @@ public:
     Array(Array<T>&& other)
         : size(other.size), capacity(other.capacity), data(other.data)
     {
-        Logger::Info("Moved SegmentedList<T>");
+        Logger::Info("Moved Array<T>");
         other.size = 0;
         other.capacity = 0;
         other.data = nullptr;
+    }
+
+    template <typename... Args>
+    Array(T head, Args&&... args) 
+        : size(sizeof...(args) + 1), capacity(sizeof...(args) + 1), data(new T[sizeof...(args) + 1]) 
+    {
+        Logger::Info("Parameter Pack constructor of Array<T> of size %u", size);
+
+        data[0] = head;
+
+        Index i = 1;
+        ((data[i++] = args), ...);
     }
 
     ~Array()
@@ -134,7 +175,8 @@ public:
 
         capacity = newCapacity;
         
-        delete[] data;
+        if (data)
+            delete[] data;
 
         data = newBlock;
     }
@@ -151,9 +193,9 @@ public:
 
     void Set(const Index index, T data)
     {
-        if (isEmpty() || index < 0 || index >= size)
+        if (index < 0 || index > size)
         {
-            Logger::Trace("At Set() at Array.h");
+            Logger::Trace("At Set(%d) at Array.h", index);
             logException(EXCEPTION_INDEX_OUT_OF_RANGE);
             throw EXCEPTION_INDEX_OUT_OF_RANGE;
         }
@@ -174,11 +216,20 @@ public:
     }
     
 
-    Size GetLength() const noexcept override { return size; }
+    Size GetLength() const noexcept override 
+    { 
+        return size; 
+    }
 
-    bool isEmpty() const noexcept override { return (size == 0 || !data); }
+    bool isEmpty() const noexcept override 
+    { 
+        return (size == 0 || !data); 
+    }
 
-    T& operator[] (const Index index) { return data[index]; }
+    T& operator[] (const Index index) const 
+    { 
+        return data[index]; 
+    }
 
     Array<T>& operator= (const Array<T>& other)
     {
