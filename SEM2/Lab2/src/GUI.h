@@ -1,5 +1,7 @@
 #pragma once
 
+#include <any>
+
 #include "ADT.h"
 #include "ArraySequence.h"
 #include "ListSequence.h"
@@ -9,6 +11,7 @@
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <GLFW/glfw3.h>
+#include <utility>
 
 static int whichSequence = 0;
 
@@ -32,24 +35,6 @@ static int values[] = { 0,0,0 };
 #define ARRAY_SEQUENCE "Array Sequence"
 #define LIST_SEQUENCE "List Sequence"
 #define NUMBER_OF_SEQUENCES 2
-
-#define PLUS_TWO 0
-#define PLUS_ZERO 1
-#define MINUS_TWO 2
-#define SQUARE 3
-
-#define MORE_THAN_ZERO 0
-#define LESS_THAN_ZERO 1
-#define IS_ALWAYS_TRUE 2
-
-#define PLUS_TWO_STR "Plus Two"
-#define PLUS_ZERO_STR "Plus Zero"
-#define MINUS_TWO_STR "Minus Two"
-#define SQUARE_STR "Square"
-
-#define MORE_THAN_ZERO_STR "More Than Zero"
-#define LESS_THAN_ZERO_STR "Less Than Zero"
-#define IS_ALWAYS_TRUE_STR "Is Always True"
 
 typedef class Interface Interface;
 struct SequenceLabel
@@ -105,6 +90,8 @@ private:
 
     // virtual Sequence<float>* Concatenate(bool* showWindow) {}
 
+
+
     virtual void ShowTree(const char* label, const char* children) {}
 
     virtual void Slice(bool* showWindow, Interface* other) {}
@@ -113,10 +100,6 @@ public:
     virtual ~GUI() {}
 
     virtual Size GetLength() const  = 0;
-
-    virtual Sequence<int>* GetSequence() const = 0;
-
-    virtual void SetSequence(Sequence<int>* newSequence) = 0;
 
     // virtual Sequence<int>* GetSequence() const = 0;
     
@@ -200,23 +183,34 @@ public:
     }
 
     void showStatusBar(int status, float fps, float memoryUsage, Interface* interface);
+
+    virtual std::any GetSequence() = 0;
+
+    virtual void SetSequence(std::any other) = 0;
     
 };
 
-class IntButton : public GUI
+template <typename T>
+class Button : public GUI
 {
 private:
-    Sequence<int>* sequence;
+    Sequence<T>* sequence;
 
 public:
-    IntButton()
-        : sequence((Sequence<int>*) new ListSequence<int>) { Logger::Info("Default constructor of IntButton"); }
+    Button()
+        : sequence((Sequence<T>*) new ListSequence<T>) 
+    { 
+        Logger::Info("Default constructor of IntButton"); 
+    }
     
 
-    IntButton(Sequence<int>* another)
-        : sequence(another) { Logger::Info("Sequence based constructor of IntButton"); }
+    Button(Sequence<T>* another)
+        : sequence(another) 
+    { 
+        Logger::Info("Sequence based constructor of IntButton"); 
+    }
 
-    virtual ~IntButton()
+    virtual ~Button()
     {
         delete sequence;
     }
@@ -235,61 +229,34 @@ public:
 
     void Slice(bool* showWindow, Interface* current) override;
 
-    void ShowTree(const char* label, const char* children) override
-    {
-        if (ImGui::TreeNode(label))
-        {
-            for (int i = 0; i < sequence->GetLength(); i++)
-            {
-                if (ImGui::TreeNode((void*)(intptr_t)i, "%s %d", children, i))
-                {
-                    ImGui::Text("Address: %p", &sequence->Get(i));
-                    ImGui::Text("Value: %d", sequence->Get(i));
-                    if (ImGui::SmallButton("Delete")) 
-                    {
-                        sequence->Remove(i);
-                    }
-                    ImGui::TreePop();
-                }
-            }
-            ImGui::TreePop();
-        }
+    void ShowTree(const char* label, const char* children) override;
+
+    Sequence<int>* GetSequenceInt() const 
+    { 
+        return sequence; 
     }
 
-    Sequence<int>* GetSequence() const override { return sequence; }
+    std::any GetSequence() override
+    {
+        return std::any(GetSequenceInt());
+    }
 
-    void SetSequence(Sequence<int>* newSequence) override { sequence = newSequence; }
+    void SetSequenceInt(Sequence<int>* newSequence) 
+    { 
+        sequence = newSequence; 
+    }
+
+    void SetSequence(std::any other) override
+    {
+        // delete sequence;
+
+        sequence = std::any_cast<Sequence<int>*>(other);
+    }
 };
 
 GUI* init(int dataType, int sequenceType, SequenceLabel* labels);
 
-// template <typename T>
-// inline T PlusTwo(T& x) { return x + 2; }
-// // inline float PlusTwo(float& x) { return x + 2; }
-
-// inline int PlusZero(int& x) { return x; }
-// inline float PlusZero(float& x) { return x; }
-
-// inline int MinusTwo(int& x) { return x - 2; }
-// inline float MinusTwo(float& x) { return x - 2; }
-
-// inline int Square(int& x) { return x * x; }
-// inline float Square(float& x) { return x * x; }
-
-// inline bool LessThanZero(int& x) { return x < 0; }
-// inline bool LessThanZero(float& x) { return x < 0; }
-
-// inline bool MoreThanZero(int& x) { return x > 0; }
-// inline bool MoreThanZero(float& x) { return x > 0; }
-
-// inline bool AlwaysTrue(int& x) { return true; }
-// inline bool AlwaysTrue(float& x) { return true; }
-// struct Fn
-// {
-//     void* fn;
-//     char name[100] = {"None"};
-// };
-class Interface
+struct Interface
 {
 public:
     GUI* gui;
@@ -302,4 +269,3 @@ public:
         delete gui;
     }
 };
-

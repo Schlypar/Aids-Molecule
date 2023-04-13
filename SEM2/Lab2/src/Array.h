@@ -12,7 +12,7 @@ class Array : IContainer<T>
 private:
     Size size;
     Size capacity;
-    T* data = nullptr;
+    T* data = NULL;
 
 public:
 
@@ -90,11 +90,9 @@ public:
     }
 
     Array()
-        : size(0)
+        : size(0), capacity(2), data(new T[2])
     {
         Logger::Info("Default constructor of Array<T>");
-        capacity = 2;
-        data = new T[2];
     }
 
     Array(T* other, Size count)

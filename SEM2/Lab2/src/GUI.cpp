@@ -1,3 +1,4 @@
+#include <any>
 #include <string.h>
 
 #include "GUI.h"
@@ -12,7 +13,7 @@ GUI* init(int dataType, int sequenceType, SequenceLabel* labels)
             memcpy(labels->type, ARRAY_SEQUENCE , strlen(ARRAY_SEQUENCE));
             memcpy(labels->elements, "Element", sizeof("Element"));
 
-            return (GUI*) new IntButton ((Allocator<int>::AllocateArraySequence()));
+            return (GUI*) new Button<int> ((Allocator<int>::AllocateArraySequence()));
         }
         
         if (sequenceType == 1)
@@ -20,7 +21,7 @@ GUI* init(int dataType, int sequenceType, SequenceLabel* labels)
             memcpy(labels->type, LIST_SEQUENCE , strlen(LIST_SEQUENCE));
             memcpy(labels->elements, "Node", sizeof("Node"));
 
-            return (GUI*) new IntButton ((Allocator<int>::AllocateListSequence()));
+            return (GUI*) new Button<int> ((Allocator<int>::AllocateListSequence()));
         }
     }
 }
@@ -43,7 +44,8 @@ void GUI::showStatusBar(int status, float fps, float memoryUsage, Interface* int
     ImGui::Text("\tFPS: %.1f\tMemory: %.1f MB\tWorking in Sequence: %s", fps, memoryUsage, interface->role);
 }
 
-void IntButton::Append(bool* showWindow, Interface* current)
+template <>
+void Button<int>::Append(bool* showWindow, Interface* current)
 {
     short shortInt = 0;
     ImGui::InputScalar(PROMT,     ImGuiDataType_S16,    &shortInt, NULL, "%d");
@@ -52,14 +54,15 @@ void IntButton::Append(bool* showWindow, Interface* current)
     {
         if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)))
         {
-            Sequence<int>* result = current->gui->GetSequence();
+            Sequence<int>* result = std::any_cast<Sequence<int>*>(current->gui->GetSequence());
             result->Append(shortInt);
         }
         *showWindow = false;
     }
 }
 
-void IntButton::Prepend(bool* showWindow, Interface* current)
+template <>
+void Button<int>::Prepend(bool* showWindow, Interface* current)
 {
     short shortInt = 0;
     ImGui::InputScalar(PROMT,     ImGuiDataType_S16,    &shortInt, NULL, "%d");
@@ -68,14 +71,15 @@ void IntButton::Prepend(bool* showWindow, Interface* current)
     {
         if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)))
         {
-            Sequence<int>* result = current->gui->GetSequence();
+            Sequence<int>* result = std::any_cast<Sequence<int>*>(current->gui->GetSequence());
             result->Prepend(shortInt);
         }
         *showWindow = false;
     }
 }
 
-void IntButton::InsertAt(bool *showWindow, Interface* current)
+template <>
+void Button<int>::InsertAt(bool *showWindow, Interface* current)
 {
     static int inputs[4] = { 0, 0, 100, 255 };
 
@@ -85,7 +89,7 @@ void IntButton::InsertAt(bool *showWindow, Interface* current)
     {
         if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)))
         {
-            Sequence<int>* result = current->gui->GetSequence();
+            Sequence<int>* result = std::any_cast<Sequence<int>*>(current->gui->GetSequence());
             result->InsertAt(inputs[0], inputs[1]);
         }
 
@@ -96,7 +100,8 @@ void IntButton::InsertAt(bool *showWindow, Interface* current)
     }
 }
 
-void IntButton::GetSubSequence(bool* showWindow, Interface* current)
+template <>
+void Button<int>::GetSubSequence(bool* showWindow, Interface* current)
 {
     static int inputs[4] = { 0, 0, 100, 255 };
 
@@ -106,10 +111,11 @@ void IntButton::GetSubSequence(bool* showWindow, Interface* current)
     {
         if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)))
         {
-            Sequence<int>* temp = current->gui->GetSequence();
+            Sequence<int>* temp = std::any_cast<Sequence<int>*>(current->gui->GetSequence());
             Sequence<int>* result = temp->GetSubsequence(inputs[0], inputs[1]);
 
-            delete (current->other->gui->GetSequence());
+            // delete (std::any_cast<Sequence<int>*>(current->other->gui->GetSequence()));
+            // std::any resultAny = result;
             current->other->gui->SetSequence(result);
         }
 
@@ -120,7 +126,8 @@ void IntButton::GetSubSequence(bool* showWindow, Interface* current)
     }
 }
 
-void IntButton::Concatenate(bool* showWindow, Interface* current)
+template <>
+void Button<int>::Concatenate(bool* showWindow, Interface* current)
 {
 
     const char* items[] = {"Main", "Auxiliary"};
@@ -142,21 +149,21 @@ void IntButton::Concatenate(bool* showWindow, Interface* current)
             Sequence<int>* first = nullptr;
             if (values[0] == 0)
             {
-                first = current->gui->GetSequence();
+                first = std::any_cast<Sequence<int>*>(current->gui->GetSequence());
             }
             else
             {
-                first = current->other->gui->GetSequence();
+                first = std::any_cast<Sequence<int>*>(current->other->gui->GetSequence());
             }
 
             Sequence<int>* second = nullptr;
             if (values[1] == 0)
             {
-                second = current->gui->GetSequence();
+                second = std::any_cast<Sequence<int>*>(current->gui->GetSequence());
             }
             else
             {
-                second = current->other->gui->GetSequence();
+                second = std::any_cast<Sequence<int>*>(current->other->gui->GetSequence());
             }
 
             Sequence<int>* result = first->Concat(second);
@@ -179,7 +186,8 @@ void IntButton::Concatenate(bool* showWindow, Interface* current)
     }
 }
 
-void IntButton::Slice(bool* showWindow, Interface* current)
+template <>
+void Button<int>::Slice(bool* showWindow, Interface* current)
 {
     static int inputs[4] = { 0, 0, 100, 255 };
     
@@ -198,18 +206,18 @@ void IntButton::Slice(bool* showWindow, Interface* current)
         if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)))
         {
             Sequence<int>* temp = nullptr;
-            (whichSequence == 0) ? temp = current->gui->GetSequence() : temp = current->other->gui->GetSequence();
+            (whichSequence == 0) ? temp = std::any_cast<Sequence<int>*>(current->gui->GetSequence()) : temp = std::any_cast<Sequence<int>*>(current->other->gui->GetSequence());
 
             if (whichSequence == 0)
             {
-                Sequence<int>* result = temp->Slice(inputs[0], inputs[1], current->other->gui->GetSequence());
-                delete temp;
+                Sequence<int>* result = temp->Slice(inputs[0], inputs[1], std::any_cast<Sequence<int>*>(current->other->gui->GetSequence()));
+                // delete temp;
                 current->gui->SetSequence(result);
             }
             else
             {
-                Sequence<int>* result = temp->Slice(inputs[0], inputs[1], current->gui->GetSequence());
-                delete temp;
+                Sequence<int>* result = temp->Slice(inputs[0], inputs[1], std::any_cast<Sequence<int>*>(current->gui->GetSequence()));
+                // delete temp;
                 current->other->gui->SetSequence(result);
             }
             
@@ -219,5 +227,27 @@ void IntButton::Slice(bool* showWindow, Interface* current)
 
         inputs[0] = 0;
         inputs[1] = 0;
+    }
+}
+
+template <>
+void Button<int>::ShowTree(const char* label, const char* children)
+{
+    if (ImGui::TreeNode(label))
+    {
+        for (int i = 0; i < sequence->GetLength(); i++)
+        {
+            if (ImGui::TreeNode((void*)(intptr_t)i, "%s %d", children, i))
+            {
+                ImGui::Text("Address: %p", &sequence->Get(i));
+                ImGui::Text("Value: %d", sequence->Get(i));
+                if (ImGui::SmallButton("Delete")) 
+                {
+                    sequence->Remove(i);
+                }
+                ImGui::TreePop();
+            }
+        }
+        ImGui::TreePop();
     }
 }

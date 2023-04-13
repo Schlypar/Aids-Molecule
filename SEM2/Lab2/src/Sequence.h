@@ -57,6 +57,14 @@ public:
 
     virtual Sequence<T>* Create() = 0;
     virtual Sequence<T>* Copy() = 0;
+
+    friend std::ostream& operator<< (std::ostream& stream, Sequence<T>* sequence)
+    {
+        for (Index i = 0; i < sequence->GetLength(); i++)
+            stream << sequence->Get(i) << " ";
+
+        return stream;
+    }
 };
 
 template <typename T>
