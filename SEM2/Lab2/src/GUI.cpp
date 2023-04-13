@@ -170,10 +170,12 @@ void Button<int>::Concatenate(bool* showWindow, Interface* current)
 
             if (values[2] == 0)
             {
+                delete(std::any_cast<Sequence<int>*>(current->gui->GetSequence()));
                 current->gui->SetSequence(result);
             }
             else
             {
+                delete(std::any_cast<Sequence<int>*>(current->other->gui->GetSequence()));
                 current->other->gui->SetSequence(result);
             }
         }
@@ -211,13 +213,13 @@ void Button<int>::Slice(bool* showWindow, Interface* current)
             if (whichSequence == 0)
             {
                 Sequence<int>* result = temp->Slice(inputs[0], inputs[1], std::any_cast<Sequence<int>*>(current->other->gui->GetSequence()));
-                // delete temp;
+                delete temp;
                 current->gui->SetSequence(result);
             }
             else
             {
                 Sequence<int>* result = temp->Slice(inputs[0], inputs[1], std::any_cast<Sequence<int>*>(current->gui->GetSequence()));
-                // delete temp;
+                delete temp;
                 current->other->gui->SetSequence(result);
             }
             

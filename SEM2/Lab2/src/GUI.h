@@ -231,26 +231,16 @@ public:
 
     void ShowTree(const char* label, const char* children) override;
 
-    Sequence<int>* GetSequenceInt() const 
-    { 
-        return sequence; 
-    }
-
     std::any GetSequence() override
     {
-        return std::any(GetSequenceInt());
-    }
-
-    void SetSequenceInt(Sequence<int>* newSequence) 
-    { 
-        sequence = newSequence; 
+        return std::any(sequence);
     }
 
     void SetSequence(std::any other) override
     {
         // delete sequence;
 
-        sequence = std::any_cast<Sequence<int>*>(other);
+        sequence = std::any_cast<Sequence<T>*>(other);
     }
 };
 
