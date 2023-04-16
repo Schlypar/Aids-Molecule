@@ -103,7 +103,7 @@ inline void TestSequenceGetSubsequence()
     Sequence<int>* subsequence = sequence->GetSubsequence(1, 3);
 
     // Check that the subsequence has the correct length and values
-    assert(subsequence->GetLength() == 2);
+    assert(subsequence->GetLength() == 3);
     assert(subsequence->Get(0) == 2);
     assert(subsequence->Get(1) == 3);
 

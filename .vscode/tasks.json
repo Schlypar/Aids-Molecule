@@ -30,17 +30,14 @@
         },
         {
             "type": "shell",
-            "label": "CMake launch Lab2",
+            "label": "CMake compile Lab2-3",
             "command": "cmake",
             "args": [
-                "-DCMAKE_BUILD_TYPE=Release",
-                "-S",
-                "SEM2/Lab2/",
-                "-B",
-                "SEM2/Lab2/build/"
+                "--build",
+                "."
             ],
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}/SEM2/Lab2-3/build/"
             },
             "group": {
                 "kind": "build",

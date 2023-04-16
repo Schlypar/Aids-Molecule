@@ -1,6 +1,5 @@
 #include "Logger.h"
 #include "GUI.h"
-#include "SegmentedList.h"
 #include "Tuple.h"
 #include "imgui.h"
 
@@ -17,7 +16,6 @@ LogPriority Logger::priority = TracePriority;
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
 #endif
-#include <GLFW/glfw3.h> // Will drag system OpenGL headers
 
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
 // To link with VS2010-era libraries, VS2015+ requires linking with legacy_stdio_definitions.lib, which we do using this pragma.
@@ -116,117 +114,8 @@ int main(int, char**)
     secondInterface->other = firstInterface;
     firstInterface->other = secondInterface;
 
-
-
     Interface* interface = firstInterface;
-
-    while (!glfwWindowShouldClose(window) && (!selectedType || !selectedSequenceFirst || !selectedSequenceSecond))
-    {
-         glfwPollEvents();
-
-        // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-        if (show_demo_window)
-            ImGui::ShowDemoWindow(&show_demo_window);
-
-        // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
-        {
-            ImGui::SetNextWindowSize({962.f,600.f});
-
-            ImGui::Begin("Main menu", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoBringToFrontOnFocus);
-
-                ImGui::SetCursorPos({10.f,504.f});
-            ImGui::BeginChild("TypeSelection",{931.f,86.f}, false);
-
-            if (!selectedType)
-            {
-            
-                ImGui::SetCursorPos({10.f,14.f});
-                if (ImGui::TreeNodeEx("Selection State: Type", ImGuiTreeNodeFlags_DefaultOpen))
-                {
-                   
-                    for (int n = 0; n < NUMBER_OF_TYPES; n++)
-                    {
-                        if (ImGui::Selectable( types[n], selected == n))
-                        {
-                            selected = n;
-                            selectedType = true;
-                        }
-
-                    }
-                    ImGui::TreePop();
-                }
-            }
-            else if (!selectedSequenceFirst)
-            {
-                ImGui::SetCursorPos({10.f,14.f});
-                if (ImGui::TreeNodeEx("Selection State: First Sequence", ImGuiTreeNodeFlags_DefaultOpen))
-                {
-                    for (int n = 0; n < NUMBER_OF_SEQUENCES; n++)
-                    {
-                        if (ImGui::Selectable(sequenceTypes[n], firstSelect == n))
-                        {
-                            firstSelect = n;
-                            selectedSequenceFirst = true;
-                        }
-                    }
-                    ImGui::TreePop();
-                }
-            }
-            else if (!selectedSequenceSecond)
-            {
-                ImGui::SetCursorPos({10.f,14.f});
-                if (ImGui::TreeNodeEx("Selection State: Second Sequence", ImGuiTreeNodeFlags_DefaultOpen))
-                {
-                    for (int n = 0; n < NUMBER_OF_SEQUENCES; n++)
-                    {
-                        if (ImGui::Selectable(sequenceTypes[n], secondSelect == n))
-                        {
-                            secondSelect = n;
-                            selectedSequenceSecond = true;
-
-                            delete GUI;
-                            delete secondGUI;
-
-                            GUI = init(selected, firstSelect, &firstLabel);
-                            secondGUI = init(selected, secondSelect, &secondLabel);
-
-                            firstInterface->gui = GUI;
-                            firstInterface->labels = firstLabel;
-                            memcpy(firstInterface->role, "Main", 5);
-
-                            secondInterface->gui = secondGUI;
-                            secondInterface->labels = secondLabel;
-                            memcpy(secondInterface->role, "Auxiliary", strlen("Auxiliary"));
-                        }
-                    }
-                    
-                    ImGui::TreePop();
-                }
-            }
-
-            ImGui::EndChild();
-
-            ImGui::End();
-        }
-
-        // Rendering
-        ImGui::Render();
-        int display_w, display_h;
-        glfwGetFramebufferSize(window, &display_w, &display_h);
-        glViewport(0, 0, display_w, display_h);
-        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-        glClear(GL_COLOR_BUFFER_BIT);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        glfwSwapBuffers(window);
-    }
-
-    while (!glfwWindowShouldClose(window) && selectedType && selectedSequenceFirst && selectedSequenceSecond)
+    while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
 
@@ -241,13 +130,84 @@ int main(int, char**)
 
         // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
         {
-            
-        ImGui::BeginDisabled(!selectedType || !selectedSequenceFirst || !selectedSequenceSecond);
-
             ImGui::SetNextWindowSize({962.f,600.f});
 
             ImGui::Begin("Main menu", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoBringToFrontOnFocus);
 
+            ImGui::SetCursorPos({10.f,260.f}); // init phase
+
+                ImGui::BeginChild("TypeSelection",{931.f,86.f}, true);
+
+                if (!selectedType)
+                {
+                
+                    ImGui::SetCursorPos({10.f,14.f});
+                    if (ImGui::TreeNodeEx("Selection State: Type", ImGuiTreeNodeFlags_DefaultOpen))
+                    {
+                        
+                        for (int n = 0; n < NUMBER_OF_TYPES; n++)
+                        {
+                            if (ImGui::Selectable( types[n], selected == n))
+                            {
+                                selected = n;
+                                selectedType = true;
+                            }
+
+                        }
+                        ImGui::TreePop();
+                    }
+                }
+                else if (!selectedSequenceFirst)
+                {
+                    ImGui::SetCursorPos({10.f,14.f});
+                    if (ImGui::TreeNodeEx("Selection State: First Sequence", ImGuiTreeNodeFlags_DefaultOpen))
+                    {
+                        for (int n = 0; n < NUMBER_OF_SEQUENCES; n++)
+                        {
+                            if (ImGui::Selectable(sequenceTypes[n], firstSelect == n))
+                            {
+                                firstSelect = n;
+                                selectedSequenceFirst = true;
+                            }
+                        }
+                        ImGui::TreePop();
+                    }
+                }
+                else if (!selectedSequenceSecond)
+                {
+                    ImGui::SetCursorPos({10.f,14.f});
+                    if (ImGui::TreeNodeEx("Selection State: Second Sequence", ImGuiTreeNodeFlags_DefaultOpen))
+                    {
+                        for (int n = 0; n < NUMBER_OF_SEQUENCES; n++)
+                        {
+                            if (ImGui::Selectable(sequenceTypes[n], secondSelect == n))
+                            {
+                                secondSelect = n;
+                                selectedSequenceSecond = true;
+
+                                delete GUI;
+                                delete secondGUI;
+
+                                GUI = init(selected, firstSelect, &firstLabel);
+                                secondGUI = init(selected, secondSelect, &secondLabel);
+
+                                firstInterface->gui = GUI;
+                                firstInterface->labels = firstLabel;
+                                memcpy(firstInterface->role, "Main", 5);
+
+                                secondInterface->gui = secondGUI;
+                                secondInterface->labels = secondLabel;
+                                memcpy(secondInterface->role, "Auxiliary", strlen("Auxiliary"));
+                            }
+                        }
+                        
+                        ImGui::TreePop();
+                    }
+                }
+               
+                ImGui::EndChild();
+
+            // Console::Debug("Another test");
             fps = ImGui::GetIO().Framerate;
             memoryUsage = ImGui::GetIO().MetricsActiveAllocations;
 
@@ -255,10 +215,12 @@ int main(int, char**)
             ImGui::BeginChild("StatusBarFrame",{931.f,25.f},true );
 
                 ImGui::SetCursorPos({11.f,4.f});
-
                     interface->gui->showStatusBar(status, fps, memoryUsage, interface);
             
             ImGui::EndChild();
+
+
+            ImGui::BeginDisabled(!selectedType || !selectedSequenceFirst || !selectedSequenceSecond);
 
             ImGui::SetCursorPos({10.f,74.f});
             ImGui::BeginChild("MethodsFrame",{931.f,172.f},true);
@@ -389,7 +351,7 @@ int main(int, char**)
 
             const float treeWindowWidth = 450;
 
-            ImGui::SetCursorPos({10.f,260.f});
+            ImGui::SetCursorPos({10.f,360.f});
             ImGui::BeginChild("OutputFrame",{931.f,238.f},true );
 
                 // first debug-tree
@@ -412,91 +374,6 @@ int main(int, char**)
                 if (FramesToWearOffStatus == 0)
                     status = 0;
             }
-
-            // ImGui::SetCursorPos({10.f,504.f});
-            // ImGui::BeginChild("TypeSelection",{931.f,86.f}, false);
-
-            // if (!selectedType)
-            // {
-            
-            //     ImGui::SetCursorPos({10.f,14.f});
-            //     if (ImGui::TreeNodeEx("Selection State: Type", ImGuiTreeNodeFlags_DefaultOpen))
-            //     {
-                   
-            //         for (int n = 0; n < NUMBER_OF_TYPES; n++)
-            //         {
-            //             if (ImGui::Selectable( types[n], selected == n))
-            //             {
-            //                 selected = n;
-            //                 selectedType = true;
-            //             }
-
-            //         }
-            //         ImGui::TreePop();
-            //     }
-            // }
-            // else if (!selectedSequenceFirst)
-            // {
-            //     ImGui::SetCursorPos({10.f,14.f});
-            //     if (ImGui::TreeNodeEx("Selection State: First Sequence", ImGuiTreeNodeFlags_DefaultOpen))
-            //     {
-            //         for (int n = 0; n < NUMBER_OF_SEQUENCES; n++)
-            //         {
-            //             if (ImGui::Selectable(sequenceTypes[n], firstSelect == n))
-            //             {
-            //                 firstSelect = n;
-            //                 selectedSequenceFirst = true;
-            //             }
-            //         }
-            //         ImGui::TreePop();
-            //     }
-            // }
-            // else if (!selectedSequenceSecond)
-            // {
-            //     ImGui::SetCursorPos({10.f,14.f});
-            //     if (ImGui::TreeNodeEx("Selection State: Second Sequence", ImGuiTreeNodeFlags_DefaultOpen))
-            //     {
-            //         for (int n = 0; n < NUMBER_OF_SEQUENCES; n++)
-            //         {
-            //             if (ImGui::Selectable(sequenceTypes[n], secondSelect == n))
-            //             {
-            //                 secondSelect = n;
-            //                 selectedSequenceSecond = true;
-
-            //                 delete GUI;
-            //                 delete secondGUI;
-
-            //                 GUI = init(selected, firstSelect, &firstLabel);
-            //                 secondGUI = init(selected, secondSelect, &secondLabel);
-
-            //                 firstInterface->gui = GUI;
-            //                 firstInterface->labels = firstLabel;
-            //                 memcpy(firstInterface->role, "Main", 5);
-
-            //                 secondInterface->gui = secondGUI;
-            //                 secondInterface->labels = secondLabel;
-            //                 memcpy(secondInterface->role, "Auxiliary", strlen("Auxiliary"));
-            //             }
-            //         }
-                    
-            //         ImGui::TreePop();
-            //     }
-            // }
-            // else
-            // {
-            //     ImGui::Text("Will be something");
-            // }
-
-            // if (selectedSequenceSecond)
-            // {
-            //     if (FramesToWearOffStatus > 0)
-            //         FramesToWearOffStatus--;
-                
-            //     if (FramesToWearOffStatus == 0)
-            //         status = 0;
-            // }
-
-            // ImGui::EndChild();
 
             ImGui::End();
         }

@@ -104,9 +104,11 @@ public:
 
     Array(Size size)
         : size(size), capacity(size), data(size ? new T[size]() : nullptr) 
-        { 
-            Logger::Info("Allocated Array<T>"); 
-        }
+    { 
+        Logger::Info("Allocated Array<T> of size %u", capacity); 
+        // for (Index i = 0; i < size; i++)
+            // data[i] = 0.0;
+    }
 
     //copying constructor
     Array(const Array<T>& other)
@@ -114,7 +116,10 @@ public:
     {
         Logger::Info("Copied Array<T>");
         for (Index i = 0; i < other.GetLength(); i++)
-            data[i] = other.data[i];
+        {
+            T copyValue = other.data[i];
+            data[i] = copyValue;
+        }
         
         size = other.size;
     }
@@ -144,7 +149,7 @@ public:
     ~Array()
     {
         Logger::Info("Destroyed Array<T>");
-        if(data)
+        if (data)
             delete[] data;
     }
 
@@ -152,8 +157,9 @@ public:
     {
         if (isEmpty()) return;
 
-        for (Index i = 0; i < size; ++i) 
-            data[i].~T();
+        delete[] data;
+
+        data = new T[capacity];
     }
 
     void Realloc(int newCapacity)
@@ -191,7 +197,7 @@ public:
 
     void Set(const Index index, T data)
     {
-        if (index < 0 || index > size)
+        if (index < 0 || index >= size)
         {
             Logger::Trace("At Set(%d) at Array.h", index);
             logException(EXCEPTION_INDEX_OUT_OF_RANGE);
@@ -227,6 +233,27 @@ public:
     T& operator[] (const Index index) const 
     { 
         return data[index]; 
+    }
+
+    bool operator== (const Array<T>& other)
+    {
+        if (this->size != other.size)
+        {
+            return false;
+        }
+
+        for (Index i = 0; i < this->size; i++)
+        {
+            if (this->data[i] != other.data[i])
+                return false;
+        }
+
+        return true;
+    }
+
+    bool operator!= (const Array<T>& other)
+    {
+        return !(*this == other);
     }
 
     Array<T>& operator= (const Array<T>& other)

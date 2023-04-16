@@ -32,7 +32,7 @@ enum LogPriority
 
 class Logger
 {
-private:
+protected:
 	static LogPriority priority;
 
 public:
@@ -47,7 +47,7 @@ public:
 	{
 		if (priority <= TracePriority)
 		{
-			printf("[Trace]\t");
+			printf("\033[1m\033[34m[Trace]\t\033[0m");
 			printf(message, args...);
 			printf("\n");
 		}
@@ -58,7 +58,7 @@ public:
 	{
 		if (priority <= DebugPriority)
 		{
-			printf("[Debug]\t");
+			printf("\033[1;32m[Debug]\t\033[0m");
 			printf(message, args...);
 			printf("\n");
 		}
@@ -69,7 +69,7 @@ public:
 	{
 		if (priority <= InfoPriority)
 		{
-			printf("[Info]\t");
+			printf("\033[33m[Info]\t\033[0m");
 			printf(message, args...);
 			printf("\n");
 		}
@@ -80,7 +80,7 @@ public:
 	{
 		if (priority <= WarnPriority)
 		{
-			printf("[Warn]\t");
+			printf("\033[35m[Warn]\t\033[0m");
 			printf(message, args...);
 			printf("\n");
 		}
@@ -91,7 +91,7 @@ public:
 	{
 		if (priority <= ErrorPriority)
 		{
-			printf("[Error]\t");
+			printf("\033[31m[Error]\t\033[0m");
 			printf(message, args...);
 			printf("\n");
 		}
@@ -102,7 +102,7 @@ public:
 	{
 		if (priority <= FatalPriority)
 		{
-			printf("[Fatal]\t");
+			printf("\033[1;31m[Fatal]\t\033[0m");
 			printf(message, args...);
 			printf("\n");
 		}
@@ -118,10 +118,10 @@ inline void logException(Exception e)
 		Logger::Error("index out of range");
 		break;
 	case EXCEPTION_BAD_POINTER:
-		Logger::Error("Invalid pointer");
+		Logger::Fatal("Invalid pointer");
 		break;
 	case EXCEPTION_BAD_CONTAINER:
-		Logger::Error("Bad container");
+		Logger::Fatal("Bad container");
 		break;
 	default:
 		break;

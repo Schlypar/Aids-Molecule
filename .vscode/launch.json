@@ -13,18 +13,20 @@
         //     "stopAtEntry": false,
         //     "cwd": "${workspaceFolder}",
         //     "environment": [],
-        //     "externalConsole": false,
-        //     "MIMode": "gdb",
+            // "externalConsole": false,
+            // "MIMode": "gdb",
         //     // "preLaunchTask": "Build-debug current active file"
         // },
         {
-            "name": "Linux-Launch Lab2",
+            "name": "Linux-Debug Lab2-3",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/SEM2/Lab2/build/Lab2",
+            "program": "${workspaceFolder}/SEM2/Lab2-3/build/Lab2-3",
             "args": [],
             "cwd": "${workspaceFolder}",
             "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb"
         }
     ]
 }

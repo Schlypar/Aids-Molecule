@@ -142,6 +142,8 @@ Sequence<T>* Sequence<T>::Concat(Sequence<T>* other)
     for (iter; !(iter->_isEquals(end)); iter->_Next())
         result->Append(iter->_GetCurrent());
 
+    delete iter; delete end;
+    
     iter = other->_Begin();
     end = other->_End();
 

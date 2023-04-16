@@ -13,6 +13,8 @@
 #include <GLFW/glfw3.h>
 #include <utility>
 
+#include <GLFW/glfw3.h> // Will drag system OpenGL headers
+
 static int whichSequence = 0;
 
 static int values[] = { 0,0,0 };
@@ -107,7 +109,7 @@ public:
     {
         this->setupWindow();
 
-        ImGui::Begin(INPUT_TEXT, showWindow, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
+        ImGui::Begin("Append Window", showWindow, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
 
         Append(showWindow, current);
 
@@ -118,7 +120,7 @@ public:
     {
         this->setupWindow();
 
-        ImGui::Begin(INPUT_TEXT, showWindow, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
+        ImGui::Begin("Prepend Window", showWindow, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
 
         Prepend(showWindow, current);
 
@@ -129,7 +131,7 @@ public:
     {
         this->setupWindow();
 
-        ImGui::Begin(INPUT_TEXT, showWindow, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
+        ImGui::Begin("\tIndex\t\t\tvalue", showWindow, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
 
         InsertAt(showWindow, current);
 
@@ -140,7 +142,7 @@ public:
     {
         this->setupWindowToUpwards();
 
-        ImGui::Begin(INPUT_TEXT, showWindow, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
+        ImGui::Begin("\tFrom\t\tTo", showWindow, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
 
         GetSubSequence(showWindow, current);
 
@@ -151,7 +153,7 @@ public:
     {
         this->setupWindowToUpwards();
 
-        ImGui::Begin(INPUT_TEXT, showWindow, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
+        ImGui::Begin("First\tSecond\tDestination", showWindow, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
 
         Concatenate(showWindow, other);
 
@@ -162,7 +164,7 @@ public:
     {
         this->setupWindowToUpwards();
 
-        ImGui::Begin(INPUT_TEXT, showWindow, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
+        ImGui::Begin("Index\tSize\tFrom which", showWindow, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
 
         Slice(showWindow, current);
 
@@ -238,8 +240,6 @@ public:
 
     void SetSequence(std::any other) override
     {
-        // delete sequence;
-
         sequence = std::any_cast<Sequence<T>*>(other);
     }
 };

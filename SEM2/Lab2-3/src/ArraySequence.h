@@ -153,8 +153,8 @@ public:
 	}
     
     template <typename... Args>
-    ArraySequence(Args... args)
-        : container(args...)
+    ArraySequence(T head, Args... args)
+        : container(head, args...)
     {
     }    
 
