@@ -9,9 +9,8 @@ LogPriority Logger::priority = TracePriority;
 
 int main()
 {
-    Logger::setPriority(ErrorPriority);
+    // Logger::setPriority(ErrorPriority);
 
-    Logger::setPriority(ErrorPriority);
     Matrix<float> first = {3,4,
                         1.5, -8.075, 10.001, -1.1,
                         2.225, -4.4, 2.0, 7.75,

@@ -36,7 +36,7 @@ private:
             }
         }
 
-        Matrix<U> finalSecond;
+        Matrix<U> finalSecond = ZeroMatrix<U>(1);
         if (first.columns == second.rows)
         {
             finalSecond = second;
@@ -47,7 +47,7 @@ private:
             finalSecond = std::move(second.Transpose());
         }
 
-        U result = 0;
+        U result = U();
         
         for (Index i = 0; i < first.columns; i++)
         {
@@ -58,26 +58,33 @@ private:
     }
 
 public:
-    Matrix()
-        : matrix(2), rows(2), columns(2)
+    Matrix(Size dimension, T data)
+        : matrix(dimension), rows(dimension), columns(dimension) 
     {
-        Logger::Info("Default constructor of Matrix<T> with %u rows and %u columns", rows, columns);
-
-        matrix[0] = { 1,0 };
-        matrix[1] = { 0,1 };
-    }
-
-    Matrix(Size rows, Size columns)
-        : matrix(rows), rows(rows), columns(columns)
-    {
-        Logger::Info("Allocated Matrix<T> with %u rows and %u columns", rows, columns);
-
-        T data[columns] = {0};
+        Logger::Info("Square Matrix<T> constructor");
 
         for (Index i = 0; i < rows; i++)
         {
-            matrix[i] = Array<T>(data, columns);
-            matrix[i][i] = 1.0;
+            matrix[i] = Array<T>(columns);
+            for (Index j = 0; j < columns; j++)
+            {
+                Set(i, j, data);
+            }
+        }
+    }
+
+    Matrix(Size rows, Size columns, T data)
+        : matrix(rows), rows(rows), columns(columns)
+    {
+        Logger::Info("T data initialiser constructor of Matrix<T>");
+
+        for (Index i = 0; i < rows; i++)
+        {
+            matrix[i] = Array<T>(columns);
+            for (Index j = 0; j < columns; j++)
+            {
+                Set(i, j, data);
+            }
         }
     }
 
@@ -112,7 +119,7 @@ public:
     }
 
     template <typename... Args>
-    Matrix(Size rows, Size columns, T head, Args... args)
+    Matrix(Size rows, Size columns, Args... args)
         : matrix(rows), rows(rows), columns(columns)
     {
         Logger::Info("Parameter Pack constructor of Matrix<T> with %u rows and %u columns", rows, columns);
@@ -124,14 +131,16 @@ public:
         if (sizeof...(args) + 1 > numberOfElements)
             Logger::Warn("Matrix was overflowed with values and last %u will be lost", sizeof...(args) + 1 - numberOfElements);
 
-        Array<T> tempArray{head, args...};
+        T data[sizeof...(args)];
+        Index k = 0;
+        ((data[k++] = args), ...);
 
         for (Index i = 0; i < rows; i++)
         {
             matrix[i] = Array<T>(columns);
             for (Index j = 0; j < columns; j++)
             {
-                Set(i, j, tempArray[makeLinearIndex(i, j)]);
+                Set(i, j, data[makeLinearIndex(i, j)]);
             }
         }
     }
@@ -146,12 +155,16 @@ public:
         : matrix(std::move(other.matrix)), rows(other.rows), columns(other.columns)
     {
         Logger::Info("Moved Matrix<T>");
+        other.matrix = Array<Array<T>>();
+        other.rows = 0;
+        other.columns = 0;
     }
 
     ~Matrix()
     {
         Logger::Info("Destroyed Matrix<T> with %u rows and %u columns", rows, columns);
     }
+
 
     Array<T>& Get(Index i) const 
     {
@@ -264,7 +277,7 @@ public:
         this->rows = other.rows;
         this->columns = other.columns;
 
-        other.matrix = Array<T>();
+        other.matrix = Array<Array<T>>();
         other.rows = 0;
         other.columns = 0;
 
@@ -440,11 +453,11 @@ public:
 
         for (Index i = 0; i < left.rows; i++)
         {
+            Matrix<T> row = std::move(left.GetRow(i));
             for (Index j = 0; j < right.columns; j++)
             {
-                Matrix<T> row = std::move(left.GetRow(i));
-                Matrix<T> column = std::move(right.GetColumn(j));
-                T value = DotProduct(row, column);
+                // Matrix<T> column = std::move(right.GetColumn(j));
+                T value = DotProduct(row, std::move(right.GetColumn(j)));
                 result.Set(i, j, value);
             }
         }
@@ -473,3 +486,21 @@ public:
         return stream;
     }
 };
+
+
+template <typename U>
+Matrix<U> ZeroMatrix(Size dimension)
+{
+    return Matrix<U>(dimension, U());
+}
+
+template <typename U>
+Matrix<U> IdentityMatrix(Size dimension)
+{
+    Matrix<U> result = Matrix<U>(dimension, U());
+
+    for (Index i = 0; i < dimension; i++)
+        result[i][i] = U(1);
+    
+    return result;
+}
