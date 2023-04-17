@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Allocator.h"
+#include "Logger.h"
+#include "Vector.h"
 
 template <typename T>
 class Matrix
@@ -20,41 +22,6 @@ private:
         }
 
         return (i * columns) + j;
-    }
-
-    // vector multiplication, Vector is just one case of Matrix
-    template <typename U>
-    friend U DotProduct(const Matrix<U>& first, const Matrix<U>& second)
-    {
-        if (first.columns != second.rows)
-        {
-            if (first.columns != second.columns)
-            {
-                Logger::Trace("At Matrix<T> at DotProduct(const Matrix<T>&)");
-                logException(EXCEPTION_BAD_CONTAINER);
-                throw EXCEPTION_BAD_CONTAINER;
-            }
-        }
-
-        Matrix<U> finalSecond = ZeroMatrix<U>(1);
-        if (first.columns == second.rows)
-        {
-            finalSecond = second;
-        }
-        else
-        {
-            Logger::Warn("Transoposing Matrix in Dot Product. Check the order");
-            finalSecond = std::move(second.Transpose());
-        }
-
-        U result = U();
-        
-        for (Index i = 0; i < first.columns; i++)
-        {
-            result += first.Get(0, i) * finalSecond.Get(i, 0);
-        }
-
-        return result;
     }
 
 public:
@@ -126,9 +93,9 @@ public:
 
         Size numberOfElements = rows * columns;
 
-        if (sizeof...(args) + 1 < numberOfElements)
+        if (sizeof...(args) < numberOfElements)
             Logger::Warn("Matrix wasn't filled fully with values");
-        if (sizeof...(args) + 1 > numberOfElements)
+        if (sizeof...(args) > numberOfElements)
             Logger::Warn("Matrix was overflowed with values and last %u will be lost", sizeof...(args) + 1 - numberOfElements);
 
         T data[sizeof...(args)];
@@ -212,7 +179,7 @@ public:
         return columns;
     }
 
-    Matrix<T> GetRow(Index i) const
+    Vector<T> GetRow(Index i) const
     {
         if (i < 0 || i >= rows)
         {
@@ -221,10 +188,10 @@ public:
             throw EXCEPTION_INDEX_OUT_OF_RANGE;
         }
 
-        return Matrix<T>(1, columns, matrix[i]);
+        return Vector<T>(columns, matrix[i]);
     }
 
-    Matrix<T> GetColumn(Index j) const
+    Vector<T> GetColumn(Index j) const
     {
         if (j < 0 || j >= columns)
         {
@@ -240,7 +207,7 @@ public:
             data[i] = matrix[i][j];
         }
 
-        return Matrix<T>(rows, 1, data);
+        return Vector<T>(rows, data);
     }
 
     Matrix<T> Transpose() const
@@ -313,7 +280,9 @@ public:
     {
         if (left.rows != right.rows || left.columns != right.columns)
         {
-            Logger::Warn("Matrices don't have same size, behaviour is undefined");
+            Logger::Error("Matrices don't have same size, behaviour is undefined");
+            logException(EXCEPTION_BAD_CONTAINER);
+            throw EXCEPTION_BAD_CONTAINER;
         }
 
         Size rows = std::min(left.GetNumberOfRows(), right.GetNumberOfRows());
@@ -379,7 +348,9 @@ public:
     {
         if (left.rows != right.rows || left.columns != right.columns)
         {
-            Logger::Warn("Matrices don't have same size, behaviour is undefined");
+            Logger::Error("Matrices don't have same size, behaviour is undefined");
+            logException(EXCEPTION_BAD_CONTAINER);
+            throw EXCEPTION_BAD_CONTAINER;
         }
 
         Size rows = std::min(left.GetNumberOfRows(), right.GetNumberOfRows());
@@ -449,15 +420,15 @@ public:
             throw EXCEPTION_BAD_CONTAINER;
         }
 
-        Matrix<T> result = Matrix<T>(left.rows, right.columns);
+        Matrix<T> result = Matrix<T>(left.rows, right.columns, T());
 
         for (Index i = 0; i < left.rows; i++)
         {
-            Matrix<T> row = std::move(left.GetRow(i));
+            Vector<T> row = std::move(left.GetRow(i));
             for (Index j = 0; j < right.columns; j++)
             {
-                // Matrix<T> column = std::move(right.GetColumn(j));
-                T value = DotProduct(row, std::move(right.GetColumn(j)));
+                Vector<T> column = right.GetColumn(j);
+                T value = row * column;
                 result.Set(i, j, value);
             }
         }
