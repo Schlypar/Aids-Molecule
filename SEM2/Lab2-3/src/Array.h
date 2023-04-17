@@ -11,7 +11,7 @@ class Array : IContainer<T>
 {
 private:
     Size size;
-    Size capacity;
+    // Size capacity;
     T* data = NULL;
 
 public:
@@ -90,53 +90,48 @@ public:
     }
 
     Array()
-        : size(0), capacity(2), data(new T[2])
+        : size(0), data(new T[1])
     {
         Logger::Info("Default constructor of Array<T>");
+        data[0] = T();
     }
 
     Array(T* other, Size count)
-        : size(count), capacity(count), data(new T[count])
+        : size(count), data(new T[count])
     {
         Logger::Info("Copied Array<T> from array");
         std::copy(other, other + count, data);
     }
 
     Array(Size size)
-        : size(size), capacity(size), data(size ? new T[size]() : nullptr) 
+        : size(size), data(size ? new T[size]() : nullptr) 
     { 
-        Logger::Info("Allocated Array<T> of size %u", capacity); 
-        // for (Index i = 0; i < size; i++)
-            // data[i] = 0.0;
+        Logger::Info("Allocated Array<T> of size %u", size); 
+        for (Index i = 0; i < size; i++)
+            data[i] = T();
     }
 
     //copying constructor
     Array(const Array<T>& other)
-        : size(0), capacity(other.capacity), data(new T[capacity])
+        : size(other.size), data(new T[size])
     {
         Logger::Info("Copied Array<T>");
         for (Index i = 0; i < other.GetLength(); i++)
-        {
-            T copyValue = other.data[i];
-            data[i] = copyValue;
-        }
-        
-        size = other.size;
+            data[i] = other.data[i];
     }
 
     //moving constructor
     Array(Array<T>&& other)
-        : size(other.size), capacity(other.capacity), data(other.data)
+        : size(other.size), data(other.data)
     {
         Logger::Info("Moved Array<T>");
         other.size = 0;
-        other.capacity = 0;
         other.data = nullptr;
     }
 
     template <typename... Args>
     Array(T head, Args&&... args) 
-        : size(sizeof...(args) + 1), capacity(sizeof...(args) + 1), data(new T[sizeof...(args) + 1]) 
+        : size(sizeof...(args) + 1), data(new T[sizeof...(args) + 1]) 
     {
         Logger::Info("Parameter Pack constructor of Array<T> of size %u", size);
 
@@ -159,41 +154,44 @@ public:
 
         delete[] data;
 
-        data = new T[capacity];
+        data = new T[1];
     }
 
-    void Realloc(int newCapacity)
+    void Realloc(int newSize)
     {
-        if (newCapacity < 0)
+        if (newSize < 0)
         {
             Logger::Trace("At Realloc() at Array.h");
             logException(EXCEPTION_INDEX_OUT_OF_RANGE);
             throw EXCEPTION_INDEX_OUT_OF_RANGE;
         }
 
-        size = std::min((int)size, newCapacity);
-        T* newBlock = new T[newCapacity];
+        // size = std::min((int)size, newSize);
 
-        for (Index i = 0; i < size; i++)
-            newBlock[i] = std::move(data[i]);
+        T* newBlock = new T[newSize];
 
-        capacity = newCapacity;
+        if (data)
+        {
+            for (Index i = 0; i < size; i++)
+                newBlock[i] = std::move(data[i]);
+        }
+        else
+        {
+            for (Index i = 0; i < size; i++)
+                newBlock[i] = T();
+        }
+        size = newSize;
         
         if (data)
             delete[] data;
 
         data = newBlock;
     }
-    
-    Size GetCapacity()
-    {
-        return capacity;
-    }
 
-    void SetSize(Size newSize)
-    {
-        size= newSize;
-    }
+    // void SetSize(Size newSize)
+    // {
+    //     size= newSize;
+    // }
 
     void Set(const Index index, T data)
     {
@@ -262,10 +260,9 @@ public:
         Clear();
 
         size = other.size;
-        capacity = other.capacity;
 
         delete[] data;
-        data = new T[capacity];
+        data = new T[size];
 
         for (Index i = 0; i < size; i++)
             data[i] = other.Get(i);
@@ -282,7 +279,6 @@ public:
 
         data = other.data;
         size = other.size;
-        capacity = other.capacity;
 
         other.data = nullptr;
 

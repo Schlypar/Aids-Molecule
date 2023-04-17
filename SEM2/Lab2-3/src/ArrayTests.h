@@ -10,13 +10,11 @@ inline void TestArrayConstructors()
     // Test default constructor
     Array<int> arr1;
     assert(arr1.GetLength() == 0);
-    assert(arr1.GetCapacity() == 2);
 
     // Test constructor that takes a pointer and count
     int arr2_data[] = { 1, 2, 3 };
     Array<int> arr2(arr2_data, 3);
     assert(arr2.GetLength() == 3);
-    assert(arr2.GetCapacity() == 3);
     assert(arr2.Get(0) == 1);
     assert(arr2.Get(1) == 2);
     assert(arr2.Get(2) == 3);
@@ -25,12 +23,11 @@ inline void TestArrayConstructors()
     Size arr3Size = 4;
     Array<int> arr3(arr3Size);
     assert(arr3.GetLength() == 4);
-    assert(arr3.GetCapacity() == 4);
 
     // Test copying constructor
     Array<int> arr4(arr2);
     assert(arr4.GetLength() == 3);
-    assert(arr4.GetCapacity() == arr2.GetCapacity());
+    assert(arr4.GetLength() == arr2.GetLength());
     assert(arr4.Get(0) == 1);
     assert(arr4.Get(1) == 2);
     assert(arr4.Get(2) == 3);
@@ -38,7 +35,7 @@ inline void TestArrayConstructors()
     // Test moving constructor
     Array<int> arr5(std::move(arr4));
     assert(arr5.GetLength() == 3);
-    assert(arr5.GetCapacity() == arr2.GetCapacity());
+    assert(arr5.GetLength() == arr2.GetLength());
     assert(arr5.Get(0) == 1);
     assert(arr5.Get(1) == 2);
     assert(arr5.Get(2) == 3);
@@ -62,8 +59,7 @@ inline void TestArrayRealloc()
     arr.Realloc(5);
 
     // Check that the array has been resized correctly
-    assert(arr.GetLength() == 3);
-    assert(arr.GetCapacity() == 5);
+    assert(arr.GetLength() == 5);
 
     // Check that the values in the array are still correct
     assert(arr[0] == 1);
@@ -84,8 +80,7 @@ inline void TestArrayRealloc()
     assert(exceptionThrown);
 
     // Check that the array has not been resized
-    assert(arr.GetLength() == 3);
-    assert(arr.GetCapacity() == 5);
+    assert(arr.GetLength() == 5);
 
     // Check that the values in the array are still correct
     assert(arr[0] == 1);

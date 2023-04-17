@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Array.h"
 #include "Logger.h"
 #include "Sequence.h"
 
@@ -9,9 +10,9 @@ class ArraySequence : public Sequence<T>
 private:
     Array<T> container;
 
-    void Resize(Size newCapacity)
+    void Resize()
     {
-        container.Realloc(newCapacity);
+        container.Realloc(container.GetLength() * CAPACITY_TO_REAL_SIZE);
     }
 
 public:
@@ -102,11 +103,6 @@ public:
         {
             return *(this->current);
         }
-
-        // T* _GetPointer() override
-        // {
-        //     return this->current;
-        // }
 
         bool _isEquals(IIterator<T>* other) override
         {
@@ -206,36 +202,24 @@ public:
 
     Sequence<T>* Append(const T& data) override
     {
-        if (container.GetCapacity() - container.GetLength() < 1)
-        {
-            (container.GetCapacity() == 0) ? Resize(2) : Resize(container.GetLength() * CAPACITY_TO_REAL_SIZE);
-        }
-
-        container[GetLength()] = data;
-        container.SetSize(GetLength() + 1);
+        
+        container.Realloc(container.GetLength() + 1);
+        container[container.GetLength() - 1] = data;
 
         return this;
     }
 
     Sequence<T>* Append(T&& data) override
     {
-        if (container.GetCapacity() - container.GetLength() < 1)
-        {
-            Resize(container.GetLength() * CAPACITY_TO_REAL_SIZE);
-        }
-
-        container[GetLength()] = data;
-        container.SetSize(GetLength() + 1);
+        container.Realloc(container.GetLength() + 1);
+        container[container.GetLength() - 1] = data;
 
         return this;
     }
 
     Sequence<T>* Prepend(const T& data) override
     {
-        if (container.GetCapacity() - container.GetLength() < 1)
-        {
-            Resize(container.GetLength() * CAPACITY_TO_REAL_SIZE);
-        }
+        container.Realloc(GetLength() + 1);
 
         for (Index i = GetLength(); i > 0; i--)
         {
@@ -243,17 +227,13 @@ public:
         }
 
         container[0] = data;
-        container.SetSize(GetLength() + 1);
 
         return this;
     }
 
     Sequence<T>* Prepend(T&& data) override
     {
-        if (container.GetCapacity() - container.GetLength() < 1)
-        {
-            Resize(container.GetLength() * CAPACITY_TO_REAL_SIZE);
-        }
+        container.Realloc(GetLength() + 1);
 
         for (Index i = GetLength(); i > 0; i--)
         {
@@ -261,7 +241,6 @@ public:
         }
 
         container[0] = data;
-        container.SetSize(GetLength() + 1);
 
         return this;
     }
@@ -275,10 +254,7 @@ public:
             throw EXCEPTION_INDEX_OUT_OF_RANGE;
         }
 
-        if (container.GetCapacity() - container.GetLength() < 1)
-        {
-            Resize(container.GetLength() * CAPACITY_TO_REAL_SIZE);
-        }
+        container.Realloc(container.GetLength() + 1);
 
         for (Index i = GetLength(); i > index; i--)
         {
@@ -286,7 +262,6 @@ public:
         }
 
         container[index] = data;
-        container.SetSize(GetLength() + 1);
     }
 
     void Remove(const Index index) override
@@ -295,7 +270,7 @@ public:
         {
             container[i] = container[i + 1];
         }
-        container.SetSize(GetLength() - 1);
+        container.Realloc(container.GetLength() - 1);
     }
 
     Size GetLength() const noexcept override { return container.GetLength(); }

@@ -26,7 +26,6 @@ private:
     template <typename U>
     friend U DotProduct(const Matrix<U>& first, const Matrix<U>& second)
     {
-        Logger::Debug("Dot Product has started");
         if (first.columns != second.rows)
         {
             if (first.columns != second.columns)
@@ -40,23 +39,21 @@ private:
         Matrix<U> finalSecond;
         if (first.columns == second.rows)
         {
-            Logger::Debug("Here possibly");
             finalSecond = second;
         }
         else
         {
             Logger::Warn("Transoposing Matrix in Dot Product. Check the order");
-            finalSecond = second.Transpose();
+            finalSecond = std::move(second.Transpose());
         }
 
-        U result;
-        result = 0;
+        U result = 0;
+        
         for (Index i = 0; i < first.columns; i++)
         {
             result += first.Get(0, i) * finalSecond.Get(i, 0);
         }
 
-        Logger::Debug("Dot Product has finished");
         return result;
     }
 
@@ -252,18 +249,7 @@ public:
     {
         Logger::Info("Used assignment operator= of Matrix<T>");
 
-        // Logger::Debug("Here possibly");
-        // matrix.~Array();
-        // Logger::Debug("Here possibly");
-
-        Array<Array<T>> copy = Array<Array<T>>(other.rows);
-
-        for (Index i = 0; i < other.rows; i++)
-        {
-            copy[i] = Array<T>(other.matrix[i]);
-        }
-        
-        this->matrix = std::move(copy);
+        this->matrix = other.matrix;
         this->rows = other.rows;
         this->columns = other.columns;
 
@@ -279,6 +265,8 @@ public:
         this->columns = other.columns;
 
         other.matrix = Array<T>();
+        other.rows = 0;
+        other.columns = 0;
 
         return *this;
     }
@@ -302,18 +290,9 @@ public:
         return true;
     }
 
-    bool operator== (const Matrix<T>* other) const
+    bool operator!= (const Matrix<T>& other) const
     {
-        if (this->rows != other->rows || this->columns != other->columns)
-            return false;
-        
-        for (Index i = 0; i < this->rows; i++)
-        {
-            if (matrix[i] != other.matrix[i])
-                return false;
-        }
-
-        return true;
+        return !(*this == other);
     }
 
     template <typename U>
@@ -321,7 +300,7 @@ public:
     {
         if (left.rows != right.rows || left.columns != right.columns)
         {
-            Logger::Warn("Matrices don't have same size, addition is undefined");
+            Logger::Warn("Matrices don't have same size, behaviour is undefined");
         }
 
         Size rows = std::min(left.GetNumberOfRows(), right.GetNumberOfRows());
@@ -387,7 +366,7 @@ public:
     {
         if (left.rows != right.rows || left.columns != right.columns)
         {
-            Logger::Warn("Matrices don't have same size, addition is undefined");
+            Logger::Warn("Matrices don't have same size, behaviour is undefined");
         }
 
         Size rows = std::min(left.GetNumberOfRows(), right.GetNumberOfRows());
@@ -483,13 +462,12 @@ public:
     {
         for (Index i = 0; i < matrix.rows; i++)
         {
-            stream << "|";
             for (Index j = 0; j < matrix.columns -1 ; j++)
             {
-                stream << matrix[i][j] << ",\t";
+                stream << matrix[i][j] << ", ";
             }
 
-            stream << matrix[i][matrix.columns - 1] << "|\n";
+            stream << matrix[i][matrix.columns - 1] << "\n";
         }
 
         return stream;
