@@ -3,6 +3,7 @@
 #include "Allocator.h"
 #include "Logger.h"
 #include "Vector.h"
+#include <cmath>
 
 template <typename T>
 class Matrix
@@ -436,11 +437,150 @@ public:
         return result;
     }
 
-    // template <typename U>
-    // friend Matrix<U> operator* (const U& left, const Matrix<U>& right); 
+    template <typename U>
+    friend Matrix<U> operator* (const U& left, const Matrix<U>& right)
+    {
+        Size rows = right.rows;
+        Size columns = right.columns;
+        Size linearSize = rows * columns;
 
-    // template <typename U>
-    // friend Matrix<U> operator* (const Matrix<U>& left, const U& right);
+        T data[linearSize];
+
+        for (Index i = 0; i < rows; i++)
+        {
+            for (Index j = 0; j < columns; j++)
+            {
+                data[right.makeLinearIndex(i, j)] = left * right.Get(i,j);
+            }
+        }
+        
+        return Matrix<T>(rows, columns, data);
+    }
+
+    template <typename U>
+    friend Matrix<U> operator* (const Matrix<U>& left, const U& right)
+    {
+        Size rows = left.rows;
+        Size columns = left.columns;
+        Size linearSize = rows * columns;
+
+        T data[linearSize];
+
+        for (Index i = 0; i < rows; i++)
+        {
+            for (Index j = 0; j < columns; j++)
+            {
+                data[left.makeLinearIndex(i, j)] = left.Get(i,j) * right;
+            }
+        }
+        
+        return Matrix<T>(rows, columns, data);
+    }
+
+    Matrix<T> RowsLinearCombination(const T& multiplier, Index which, Index other)
+    {
+        if (which < 0 || other < 0 || which >= rows || other >= rows)
+        {
+            Logger::Trace("At RowsLinearCombination(const T&, Index, Index) at MAtrix<T>");
+            logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+            throw EXCEPTION_INDEX_OUT_OF_RANGE;
+        }
+
+        Matrix<T> result = Matrix<T>(*this);
+
+        Vector<T> otherRow = result.GetRow(other);
+
+        otherRow = otherRow * multiplier;
+
+        for (Index j = 0; j < columns; j++)
+        {
+            Logger::Debug("Value was %d", result[which][j]);
+            result[which][j] += otherRow[j];
+            Logger::Debug("Current value %d", result[which][j]);
+        }
+
+        return result;
+    }
+
+    Matrix<T> ColumnsLinearCombination(const T& multiplier, Index which, Index other)
+    {
+        if (which < 0 || other < 0 || which >= rows || other >= rows)
+        {
+            Logger::Trace("At RowsLinearCombination(const T&, Index, Index) at MAtrix<T>");
+            logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+            throw EXCEPTION_INDEX_OUT_OF_RANGE;
+        }
+
+        Matrix<T> result = Matrix<T>(*this);
+
+        Vector<T> otherColumn = result.GetColumn(other);
+
+        otherColumn = multiplier * otherColumn;
+
+        for (Index i = 0; i < columns; i++)
+        {
+            result[i][which] += otherColumn[i];
+        }
+
+        return result;
+    }
+
+    T OneNorm()
+    {
+        T maxAbsRowSum = T();
+        T currentRowSum = T();
+
+        for (Index i = 0; i < rows; i++)
+        {
+            for (Index j = 0; j < columns; j++)
+            {
+                currentRowSum += std::abs(this->Get(i, j));
+            }
+
+            if (currentRowSum > maxAbsRowSum)
+                maxAbsRowSum = currentRowSum;
+            
+            currentRowSum = T();
+        }
+
+        return maxAbsRowSum;
+    }
+
+    T InfNorm()
+    {
+        T maxAbsColumnSum = T();
+        T currentColumnSum = T();
+
+        for (Index j = 0; j < columns; j++)
+        {
+            for (Index i = 0; i < rows; i++)
+            {
+                currentColumnSum += std::abs(this->Get(i, j));
+            }
+
+            if (currentColumnSum > maxAbsColumnSum)
+                maxAbsColumnSum = currentColumnSum;
+            
+            currentColumnSum = T();
+        }
+
+        return maxAbsColumnSum;
+    }
+
+    template <typename ReturnType>
+    ReturnType EuclideanNorm()
+    {
+        T sum = T();
+        for (Index i = 0; i < rows; i++)
+        {
+            for (Index j = 0; j < columns; j++)
+            {
+                sum += this->Get(i, j) * this->Get(i, j);
+            }
+        }
+
+        return ReturnType(std::sqrt(sum));
+    }
 
     friend std::ostream& operator<< (std::ostream& stream, Matrix<T>& matrix)
     {
@@ -457,7 +597,6 @@ public:
         return stream;
     }
 };
-
 
 template <typename U>
 Matrix<U> ZeroMatrix(Size dimension)

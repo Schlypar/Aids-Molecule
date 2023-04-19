@@ -79,7 +79,7 @@ public:
 
     ~Vector()
     {
-        Logger::Info("Destroyed Vector<T> of dimension &u", vector.GetLength());
+        Logger::Info("Destroyed Vector<T> of dimension %u", vector.GetLength());
     }
 
     T& Get(Index i) const
@@ -108,10 +108,12 @@ public:
     Vector<T>& operator= (Vector<T>&& other)
     {
         Logger::Info("Used moving operator= of Vector<T>");
-        this->vector.~Array();
+        this->vector.Clear();
 
         vector = other.vector;
         other.vector = Array<T>();
+
+        return *this;
     }
 
     bool operator== (const Vector<T>& other) const
@@ -278,14 +280,6 @@ public:
     template <typename U>
     friend Vector<U> operator* (const Vector<U>& left, const U& right)
     {
-        if (left.Dimension() != right.Dimension())
-        {
-            Logger::Error("Vectors don't have same size, behaviour is undefined");
-            logException(EXCEPTION_BAD_CONTAINER);
-            throw EXCEPTION_BAD_CONTAINER;
-        }
-
-
         Size dim = left.Dimension();
         T data[dim];
 
@@ -298,15 +292,7 @@ public:
     template <typename U>
     friend Vector<U> operator* (const U& left, const Vector<U>& right)
     {
-        if (left.Dimension() != right.Dimension())
-        {
-            Logger::Error("Vectors don't have same size, behaviour is undefined");
-            logException(EXCEPTION_BAD_CONTAINER);
-            throw EXCEPTION_BAD_CONTAINER;
-        }
-
-
-        Size dim = left.Dimension();
+        Size dim = right.Dimension();
         T data[dim];
 
         for (Index i = 0; i < dim; i++)
