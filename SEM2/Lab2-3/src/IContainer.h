@@ -7,7 +7,7 @@
 #include "Logger.h"
 
 typedef size_t Size;
-typedef int Index;
+typedef size_t Index;
 
 template <typename T> 
 class IContainer

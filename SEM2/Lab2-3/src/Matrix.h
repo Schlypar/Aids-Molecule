@@ -277,207 +277,33 @@ public:
     }
 
     template <typename U>
-    friend Matrix<U> operator+ (const Matrix<U>& left, const Matrix<U>& right)
-    {
-        if (left.rows != right.rows || left.columns != right.columns)
-        {
-            Logger::Error("Matrices don't have same size, behaviour is undefined");
-            logException(EXCEPTION_BAD_CONTAINER);
-            throw EXCEPTION_BAD_CONTAINER;
-        }
-
-        Size rows = std::min(left.GetNumberOfRows(), right.GetNumberOfRows());
-        Size columns = std::min(left.GetNumberOfColumns(), right.GetNumberOfColumns());
-        Size linearSize = rows * columns;
-
-        T data[linearSize];
-
-        for (Index i = 0; i < rows; i++)
-        {
-            for (Index j = 0; j < columns; j++)
-            {
-                data[left.makeLinearIndex(i, j)] = left.Get(i,j) + right.Get(i,j);
-            }
-        }
-        
-        return Matrix<T>(rows, columns, data);
-    }
+    friend Matrix<U> operator+ (const Matrix<U>& left, const Matrix<U>& right);
 
     template <typename U>
-    friend Matrix<U> operator+ (const U& left, const Matrix<U>& right)
-    {
-        Size rows = right.rows;
-        Size columns = right.columns;
-        Size linearSize = rows * columns;
-
-        T data[linearSize];
-
-        for (Index i = 0; i < rows; i++)
-        {
-            for (Index j = 0; j < columns; j++)
-            {
-                data[right.makeLinearIndex(i, j)] = left + right.Get(i,j);
-            }
-        }
-        
-        return Matrix<T>(rows, columns, data);
-    }
+    friend Matrix<U> operator+ (const U& left, const Matrix<U>& right);
 
     template <typename U>
-    friend Matrix<U> operator+ (const Matrix<U>& left, const U& right)
-    {
-        Size rows = left.rows;
-        Size columns = left.columns;
-        Size linearSize = rows * columns;
-
-        T data[linearSize];
-
-        for (Index i = 0; i < rows; i++)
-        {
-            for (Index j = 0; j < columns; j++)
-            {
-                data[left.makeLinearIndex(i, j)] = left.Get(i,j) + right;
-            }
-        }
-        
-        return Matrix<T>(rows, columns, data);
-    }
-
+    friend Matrix<U> operator+ (const Matrix<U>& left, const U& right);
 
     template <typename U>
-    friend Matrix<U> operator- (const Matrix<U>& left, const Matrix<U>& right)
-    {
-        if (left.rows != right.rows || left.columns != right.columns)
-        {
-            Logger::Error("Matrices don't have same size, behaviour is undefined");
-            logException(EXCEPTION_BAD_CONTAINER);
-            throw EXCEPTION_BAD_CONTAINER;
-        }
-
-        Size rows = std::min(left.GetNumberOfRows(), right.GetNumberOfRows());
-        Size columns = std::min(left.GetNumberOfColumns(), right.GetNumberOfColumns());
-        Size linearSize = rows * columns;
-
-        T data[linearSize];
-
-        for (Index i = 0; i < rows; i++)
-        {
-            for (Index j = 0; j < columns; j++)
-            {
-                data[left.makeLinearIndex(i, j)] = left.Get(i,j) - right.Get(i,j);
-            }
-        }
-        
-        return Matrix<T>(rows, columns, data);
-    }
+    friend Matrix<U> operator- (const Matrix<U>& left, const Matrix<U>& right);
 
     template <typename U>
-    friend Matrix<U> operator- (const U& left, const Matrix<U>& right)
-    {
-        Size rows = right.rows;
-        Size columns = right.columns;
-        Size linearSize = rows * columns;
-
-        T data[linearSize];
-
-        for (Index i = 0; i < rows; i++)
-        {
-            for (Index j = 0; j < columns; j++)
-            {
-                data[right.makeLinearIndex(i, j)] = left - right.Get(i,j);
-            }
-        }
-        
-        return Matrix<T>(rows, columns, data);
-    }
+    friend Matrix<U> operator- (const U& left, const Matrix<U>& right);
 
     template <typename U>
-    friend Matrix<U> operator- (const Matrix<U>& left, const U& right)
-    {
-        Size rows = left.rows;
-        Size columns = left.columns;
-        Size linearSize = rows * columns;
-
-        T data[linearSize];
-
-        for (Index i = 0; i < rows; i++)
-        {
-            for (Index j = 0; j < columns; j++)
-            {
-                data[left.makeLinearIndex(i, j)] = left.Get(i,j) - right;
-            }
-        }
-        
-        return Matrix<T>(rows, columns, data);
-    }
+    friend Matrix<U> operator- (const Matrix<U>& left, const U& right);
 
     template <typename U>
-    friend Matrix<U> operator* (const Matrix<U>& left, const Matrix<U>& right)
-    {
-        if (left.columns != right.rows)
-        {
-            Logger::Trace("At Matrix<T> operator* overload");
-            logException(EXCEPTION_BAD_CONTAINER);
-            throw EXCEPTION_BAD_CONTAINER;
-        }
-
-        Matrix<T> result = Matrix<T>(left.rows, right.columns, T());
-
-        for (Index i = 0; i < left.rows; i++)
-        {
-            Vector<T> row = std::move(left.GetRow(i));
-            for (Index j = 0; j < right.columns; j++)
-            {
-                Vector<T> column = right.GetColumn(j);
-                T value = row * column;
-                result.Set(i, j, value);
-            }
-        }
-
-        return result;
-    }
+    friend Matrix<U> operator* (const Matrix<U>& left, const Matrix<U>& right);
 
     template <typename U>
-    friend Matrix<U> operator* (const U& left, const Matrix<U>& right)
-    {
-        Size rows = right.rows;
-        Size columns = right.columns;
-        Size linearSize = rows * columns;
-
-        T data[linearSize];
-
-        for (Index i = 0; i < rows; i++)
-        {
-            for (Index j = 0; j < columns; j++)
-            {
-                data[right.makeLinearIndex(i, j)] = left * right.Get(i,j);
-            }
-        }
-        
-        return Matrix<T>(rows, columns, data);
-    }
+    friend Matrix<U> operator* (const U& left, const Matrix<U>& right);
 
     template <typename U>
-    friend Matrix<U> operator* (const Matrix<U>& left, const U& right)
-    {
-        Size rows = left.rows;
-        Size columns = left.columns;
-        Size linearSize = rows * columns;
+    friend Matrix<U> operator* (const Matrix<U>& left, const U& right);
 
-        T data[linearSize];
-
-        for (Index i = 0; i < rows; i++)
-        {
-            for (Index j = 0; j < columns; j++)
-            {
-                data[left.makeLinearIndex(i, j)] = left.Get(i,j) * right;
-            }
-        }
-        
-        return Matrix<T>(rows, columns, data);
-    }
-
-    Matrix<T> RowsLinearCombination(const T& multiplier, Index which, Index other)
+    Matrix<T>& RowsLinearCombination(const T& multiplier, Index which, Index other)
     {
         if (which < 0 || other < 0 || which >= rows || other >= rows)
         {
@@ -486,20 +312,23 @@ public:
             throw EXCEPTION_INDEX_OUT_OF_RANGE;
         }
 
-        Matrix<T> result = Matrix<T>(*this);
-
-        Vector<T> otherRow = result.GetRow(other);
+        Vector<T> otherRow = GetRow(other);
 
         otherRow = otherRow * multiplier;
 
         for (Index j = 0; j < columns; j++)
         {
-            Logger::Debug("Value was %d", result[which][j]);
-            result[which][j] += otherRow[j];
-            Logger::Debug("Current value %d", result[which][j]);
+            matrix[which][j] += otherRow[j];
         }
 
-        return result;
+        return *this;
+    }
+
+    Matrix<T> RowsLinearCombination(const T& multiplier, Index which, Index other) const
+    {
+        Matrix<T> result = Matrix<T>(*this);
+
+        return result.RowsLinearCombination(multiplier, which, other);
     }
 
     Matrix<T> ColumnsLinearCombination(const T& multiplier, Index which, Index other)
@@ -511,18 +340,23 @@ public:
             throw EXCEPTION_INDEX_OUT_OF_RANGE;
         }
 
-        Matrix<T> result = Matrix<T>(*this);
-
-        Vector<T> otherColumn = result.GetColumn(other);
+        Vector<T> otherColumn = GetColumn(other);
 
         otherColumn = multiplier * otherColumn;
 
         for (Index i = 0; i < columns; i++)
         {
-            result[i][which] += otherColumn[i];
+            matrix[i][which] += otherColumn[i];
         }
 
-        return result;
+        return *this;
+    }
+
+    Matrix<T> ColumnsLinearCombination(const T& multiplier, Index which, Index other) const
+    {
+        Matrix<T> result = Matrix<T>(*this);
+
+        return result.ColumnsLinearCombination(multiplier, which, other);
     }
 
     T OneNorm()
@@ -582,11 +416,193 @@ public:
         return ReturnType(std::sqrt(sum));
     }
 
+    Matrix<T>& SwapRows(Index first, Index second)
+    {
+        if (first < 0 || second < 0 || first >= rows || second >= rows)
+        {
+            Logger::Trace("At SwapRows(Index, Index) at MAtrix<T>");
+            logException(EXCEPTION_BAD_CONTAINER);
+            throw EXCEPTION_BAD_CONTAINER;
+        }
+
+        for (Index j = 0; j < columns; j++)
+            std::swap(matrix[first][j], matrix[second][j]);
+
+        return *this;
+    }
+
+    Matrix<T> SwapRows(Index first, Index second) const
+    {
+        Matrix<T> result = Matrix<T>(*this);
+
+        return result.SwapRows(first, second);
+    }
+
+    Matrix<T>& AddRow(const Vector<T>& row)
+    {
+        if (this->columns != row.Dimension())
+        {
+            Logger::Trace("At AddRow(const Vector<T>&) at MAtrix<T>");
+            logException(EXCEPTION_BAD_CONTAINER);
+            throw EXCEPTION_BAD_CONTAINER;
+        }
+
+        matrix.Realloc(matrix.GetLength() + 1);
+        matrix[matrix.GetLength() - 1] = Array<T>(row.GetContainer());
+
+        rows = rows + 1;
+
+        return *this;
+    }
+
+    Matrix<T> AddRow(const Vector<T>& row) const
+    {
+        Matrix<T> result = Matrix<T>(*this);
+
+        return result.AddRow(row);
+    }
+
+    Matrix<T>& AddColumn(const Vector<T>& column)
+    {
+        if (this->rows != column.Dimension())
+        {
+            Logger::Trace("At AddRow(const Vector<T>&) at MAtrix<T>");
+            logException(EXCEPTION_BAD_CONTAINER);
+            throw EXCEPTION_BAD_CONTAINER;
+        }
+
+        for (Index i = 0; i < rows; i++)
+        {
+            Array<T> newColumn = Array<T>(matrix[i]);
+            newColumn.Realloc(newColumn.GetLength() + 1);
+            newColumn[newColumn.GetLength() - 1] = column[i];
+            matrix[i] = newColumn;
+        }
+
+        columns = columns + 1;
+
+        return *this;
+    }
+
+    Matrix<T> AddColumn(const Vector<T>& column) const
+    {
+        Matrix<T> result = Matrix<T>(*this);
+
+        return result.AddColumn(column);
+    }
+
+    Matrix<T>& AddMatrix(const Matrix<T>& other)
+    {
+        if (this->rows != other.rows)
+        {
+            Logger::Trace("At AddMatrix(const Matrix<T>&) at MAtrix<T>");
+            logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+            throw EXCEPTION_INDEX_OUT_OF_RANGE;
+        }
+
+        for (Index i = 0; i < rows; i++)
+        {
+            Array<T> current = matrix[i];
+            current.Realloc(current.GetLength() + other.columns);
+
+            for (Index j = 0; j < other.columns; j++)
+            {
+                current[j + columns] = other[i][j];
+            }
+            matrix[i] = current;
+        }
+
+        columns += other.columns;
+
+        return *this;
+    }
+
+    Matrix<T> AddMatrix(const Matrix<T>& other) const
+    {
+        Matrix<T> result = Matrix<T>(*this);
+        
+        return result.AddMatrix(other);
+    }
+
+    Matrix<T> FirstPartOfMatrix(Size columnsToFirst)
+    {
+        Matrix<T> first = Matrix<T>(rows, columnsToFirst, T());
+
+        for (Index i = 0; i < columnsToFirst; i++)
+        {
+            Vector<T> currentRow = this->GetRow(i);
+
+            for (Index j = 0; j < columnsToFirst; j++)
+                first[i][j] = currentRow[j];
+        }
+
+        return first;
+    }
+
+    Matrix<T> SecondPartOfMatrix(Size columnsToFirst)
+    {
+        Matrix<T> second = Matrix<T>(rows, columns - columnsToFirst, T());
+
+        for (Index i = 0; i < columnsToFirst; i++)
+        {
+            Vector<T> currentRow = this->GetRow(i);
+
+            for (Index j = 0; j < columns - columnsToFirst; j++)
+                second[i][j] = currentRow[j + columnsToFirst];
+        }
+
+        return second;
+    }
+
+    template <typename ReturnType>
+    Matrix<ReturnType> GaussMethod()
+    {
+        Matrix<ReturnType> result = Matrix<ReturnType>(rows, columns, ReturnType());
+
+       
+
+        Matrix<T> thisMatrix = Matrix<T>(*this);
+
+        for (Index i = 0; i < rows; i++)
+        {
+            for (Index k = i + 1; k < rows; k++)
+            {
+                ReturnType ratio = ReturnType(thisMatrix[k][i]) / ReturnType(thisMatrix[i][i]);
+                thisMatrix.RowsLinearCombination(-ratio, k, i);
+            }
+        }
+
+         for (Index i = 0; i < rows; i++)
+        {
+            for (Index j = 0; j < columns; j++)
+            {
+                result[i][j] = ReturnType(thisMatrix.Get(i, j));
+            }
+        }
+
+        for (Index i = 0; i < rows; i++)
+        {
+            ReturnType diagonalValue = result[i][i];
+            for (Index j = 0; j < columns; j++)
+            {
+                result[i][j] = ReturnType(thisMatrix.Get(i, j)) / diagonalValue;
+            }
+        }
+
+        return result;
+    }
+
+    // template <typename ReturnType>
+    // Matrix<ReturnType> InverseGauss()
+    // {
+
+    // }
+
     friend std::ostream& operator<< (std::ostream& stream, Matrix<T>& matrix)
     {
         for (Index i = 0; i < matrix.rows; i++)
         {
-            for (Index j = 0; j < matrix.columns -1 ; j++)
+            for (Index j = 0; j < matrix.columns - 1 ; j++)
             {
                 stream << matrix[i][j] << ", ";
             }
@@ -596,6 +612,15 @@ public:
 
         return stream;
     }
+
+private:
+    
+
+    
+
+    
+
+    
 };
 
 template <typename U>
@@ -613,4 +638,206 @@ Matrix<U> IdentityMatrix(Size dimension)
         result[i][i] = U(1);
     
     return result;
+}
+
+template <typename U>
+Matrix<U> operator+ (const Matrix<U>& left, const Matrix<U>& right)
+{
+    if (left.rows != right.rows || left.columns != right.columns)
+    {
+        Logger::Error("Matrices don't have same size, behaviour is undefined");
+        logException(EXCEPTION_BAD_CONTAINER);
+        throw EXCEPTION_BAD_CONTAINER;
+    }
+
+    Size rows = std::min(left.GetNumberOfRows(), right.GetNumberOfRows());
+    Size columns = std::min(left.GetNumberOfColumns(), right.GetNumberOfColumns());
+    Size linearSize = rows * columns;
+
+    U data[linearSize];
+
+    for (Index i = 0; i < rows; i++)
+    {
+        for (Index j = 0; j < columns; j++)
+        {
+            data[left.makeLinearIndex(i, j)] = left.Get(i,j) + right.Get(i,j);
+        }
+    }
+    
+    return Matrix<U>(rows, columns, data);
+}
+
+template <typename U>
+Matrix<U> operator+ (const U& left, const Matrix<U>& right)
+{
+    Size rows = right.rows;
+    Size columns = right.columns;
+    Size linearSize = rows * columns;
+
+    U data[linearSize];
+
+    for (Index i = 0; i < rows; i++)
+    {
+        for (Index j = 0; j < columns; j++)
+        {
+            data[right.makeLinearIndex(i, j)] = left + right.Get(i,j);
+        }
+    }
+    
+    return Matrix<U>(rows, columns, data);
+}
+
+template <typename U>
+Matrix<U> operator+ (const Matrix<U>& left, const U& right)
+{
+    Size rows = left.rows;
+    Size columns = left.columns;
+    Size linearSize = rows * columns;
+
+    U data[linearSize];
+
+    for (Index i = 0; i < rows; i++)
+    {
+        for (Index j = 0; j < columns; j++)
+        {
+            data[left.makeLinearIndex(i, j)] = left.Get(i,j) + right;
+        }
+    }
+    
+    return Matrix<U>(rows, columns, data);
+}
+
+
+template <typename U>
+Matrix<U> operator- (const Matrix<U>& left, const Matrix<U>& right)
+{
+    if (left.rows != right.rows || left.columns != right.columns)
+    {
+        Logger::Error("Matrices don't have same size, behaviour is undefined");
+        logException(EXCEPTION_BAD_CONTAINER);
+        throw EXCEPTION_BAD_CONTAINER;
+    }
+
+    Size rows = std::min(left.GetNumberOfRows(), right.GetNumberOfRows());
+    Size columns = std::min(left.GetNumberOfColumns(), right.GetNumberOfColumns());
+    Size linearSize = rows * columns;
+
+    U data[linearSize];
+
+    for (Index i = 0; i < rows; i++)
+    {
+        for (Index j = 0; j < columns; j++)
+        {
+            data[left.makeLinearIndex(i, j)] = left.Get(i,j) - right.Get(i,j);
+        }
+    }
+    
+    return Matrix<U>(rows, columns, data);
+}
+
+template <typename U>
+Matrix<U> operator- (const U& left, const Matrix<U>& right)
+{
+    Size rows = right.rows;
+    Size columns = right.columns;
+    Size linearSize = rows * columns;
+
+    U data[linearSize];
+
+    for (Index i = 0; i < rows; i++)
+    {
+        for (Index j = 0; j < columns; j++)
+        {
+            data[right.makeLinearIndex(i, j)] = left - right.Get(i,j);
+        }
+    }
+    
+    return Matrix<U>(rows, columns, data);
+}
+
+template <typename U>
+Matrix<U> operator- (const Matrix<U>& left, const U& right)
+{
+    Size rows = left.rows;
+    Size columns = left.columns;
+    Size linearSize = rows * columns;
+
+    U data[linearSize];
+
+    for (Index i = 0; i < rows; i++)
+    {
+        for (Index j = 0; j < columns; j++)
+        {
+            data[left.makeLinearIndex(i, j)] = left.Get(i,j) - right;
+        }
+    }
+    
+    return Matrix<U>(rows, columns, data);
+}
+
+
+template <typename U>
+Matrix<U> operator* (const Matrix<U>& left, const Matrix<U>& right)
+{
+    if (left.columns != right.rows)
+    {
+        Logger::Trace("At Matrix<T> operator* overload");
+        logException(EXCEPTION_BAD_CONTAINER);
+        throw EXCEPTION_BAD_CONTAINER;
+    }
+
+    Matrix<U> result = Matrix<U>(left.rows, right.columns, U());
+
+    for (Index i = 0; i < left.rows; i++)
+    {
+        Vector<U> row = std::move(left.GetRow(i));
+        for (Index j = 0; j < right.columns; j++)
+        {
+            Vector<U> column = right.GetColumn(j);
+            U value = row * column;
+            result.Set(i, j, value);
+        }
+    }
+
+    return result;
+}
+
+template <typename U>
+Matrix<U> operator* (const U& left, const Matrix<U>& right)
+{
+    Size rows = right.rows;
+    Size columns = right.columns;
+    Size linearSize = rows * columns;
+
+    U data[linearSize];
+
+    for (Index i = 0; i < rows; i++)
+    {
+        for (Index j = 0; j < columns; j++)
+        {
+            data[right.makeLinearIndex(i, j)] = left * right.Get(i,j);
+        }
+    }
+    
+    return Matrix<U>(rows, columns, data);
+}
+
+template <typename U>
+Matrix<U> operator* (const Matrix<U>& left, const U& right)
+{
+    Size rows = left.rows;
+    Size columns = left.columns;
+    Size linearSize = rows * columns;
+
+    U data[linearSize];
+
+    for (Index i = 0; i < rows; i++)
+    {
+        for (Index j = 0; j < columns; j++)
+        {
+            data[left.makeLinearIndex(i, j)] = left.Get(i,j) * right;
+        }
+    }
+    
+    return Matrix<U>(rows, columns, data);
 }

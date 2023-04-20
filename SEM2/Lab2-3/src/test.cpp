@@ -24,27 +24,60 @@ int main()
     
     Matrix<int> result = first * second.Transpose();
 
+    result = Matrix<int>{3,3,
+                        10,11,12,
+                        20,23,24,
+                        30,33,37};
+
     print(result, '\n');
 
-    auto RowsComb = result.RowsLinearCombination(10, 0, 1);
+    // auto RowsComb = result.RowsLinearCombination(10, 0, 1);
 
-    print(RowsComb, '\n');
+    // print(RowsComb, '\n');
 
-    auto ColumnComb = result.ColumnsLinearCombination(10, 0, 1);
+    // auto ColumnComb = result.ColumnsLinearCombination(10, 0, 1);
 
-    print(ColumnComb, '\n');
+    // print(ColumnComb, '\n');
 
-    int oneNorm = result.OneNorm();
+    // int oneNorm = result.OneNorm();
 
-    print(oneNorm, '\n');
+    // print(oneNorm, '\n');
 
-    int infNorm = result.InfNorm();
+    // int infNorm = result.InfNorm();
 
-    print(infNorm, '\n');
+    // print(infNorm, '\n');
 
-    auto euclidianNorm = result.EuclideanNorm<float>();
+    // auto euclidianNorm = result.EuclideanNorm<float>();
 
-    print(euclidianNorm, '\n');
+    // print(euclidianNorm, '\n');
+
+    // Vector<int> row = {3, 1,2,3};
+
+    // auto concated = result.AddRow(row);
+
+    // print(concated, '\n');
+
+    // Vector<int> column = {3, 3,2,1};
+
+    // auto columnConcated = result.AddColumn(column);
+
+    // print(columnConcated, '\n');
+
+    auto positionedMatrix = result.AddMatrix(IdentityMatrix<int>(result.GetNumberOfRows()));
+
+    print(positionedMatrix, '\n');
+
+    // auto original = positionedMatrix.FirstPartOfMatrix(result.GetNumberOfColumns());
+
+    // print(original, '\n');
+
+    // auto Identity = positionedMatrix.SecondPartOfMatrix(result.GetNumberOfColumns());
+
+    // print(Identity, '\n');
+
+    auto GaussFirstRound = positionedMatrix.GaussMethod<float>();
+
+    print(GaussFirstRound, '\n');
 
     return 0;        
 }

@@ -49,9 +49,9 @@ public:
     {
         Logger::Info("Parameter Pack constructor of Vector<T> of dimension &u", dimension);
 
-        if (sizeof...(args) + 1 < dimension)
+        if (sizeof...(args) < dimension)
             Logger::Warn("Vector wasn't filled fully with values");
-        if (sizeof...(args) + 1 > dimension)
+        if (sizeof...(args) > dimension)
             Logger::Warn("Vector was overflowed with values and last %u will be lost", sizeof...(args) + 1 - dimension);
 
         T data[sizeof...(args)];
@@ -130,6 +130,11 @@ public:
         }
 
         return true;
+    }
+
+    Array<T> GetContainer() const
+    {
+        return vector;
     }
 
     template <typename U>
