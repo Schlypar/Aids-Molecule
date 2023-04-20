@@ -21,85 +21,81 @@ int main()
                         5,3,-1,
                         2,0,2,
                         1,0,1};
-
     
     Matrix<int> result = first.Transpose() * second;
 
-
     print(result, '\n');
 
-    result = Matrix<int>{3,3,
-                        2,2,3,
-                        4,5,6,
-                        7,8,10};
+    auto RowsComb = result.RowsLinearCombination(10, 0, 1);
 
-    print(result, '\n');
+    print(RowsComb, '\n');
 
-    // auto RowsComb = result.RowsLinearCombination(10, 0, 1);
+    auto ColumnComb = result.ColumnsLinearCombination(10, 0, 1);
 
-    // print(RowsComb, '\n');
+    print(ColumnComb, '\n');
 
-    // auto ColumnComb = result.ColumnsLinearCombination(10, 0, 1);
+    int oneNorm = result.OneNorm();
 
-    // print(ColumnComb, '\n');
+    print(oneNorm, '\n');
 
-    // int oneNorm = result.OneNorm();
+    int infNorm = result.InfNorm();
 
-    // print(oneNorm, '\n');
+    print(infNorm, '\n');
 
-    // int infNorm = result.InfNorm();
+    auto euclidianNorm = result.EuclideanNorm<float>();
 
-    // print(infNorm, '\n');
+    print(euclidianNorm, '\n', '\n');
 
-    // auto euclidianNorm = result.EuclideanNorm<float>();
+    Vector<int> row = {4, 1,2,3,4};
 
-    // print(euclidianNorm, '\n');
+    auto concated = result.AddRow(row);
 
-    // Vector<int> row = {3, 1,2,3};
+    print(concated, '\n');
 
-    // auto concated = result.AddRow(row);
+    Vector<int> column = {5, 5,4,3,2,1};
 
-    // print(concated, '\n');
+    auto columnConcated = result.AddColumn(column);
 
-    // Vector<int> column = {3, 3,2,1};
+    print(columnConcated, '\n');
 
-    // auto columnConcated = result.AddColumn(column);
+    auto positionedMatrix = result.AddMatrix(IdentityMatrix<int>(result.GetNumberOfRows()));
 
-    // print(columnConcated, '\n');
+    print(positionedMatrix, '\n');
 
-    // auto positionedMatrix = result.AddMatrix(IdentityMatrix<int>(result.GetNumberOfRows()));
+    auto original = positionedMatrix.FirstPartOfMatrix(5);
 
-    // print(positionedMatrix, '\n');
+    print(original, '\n');
 
-    // auto original = positionedMatrix.FirstPartOfMatrix(result.GetNumberOfColumns());
+    auto Identity = positionedMatrix.SecondPartOfMatrix(5);
 
-    // print(original, '\n');
+    print(Identity, '\n');
 
-    // auto Identity = positionedMatrix.SecondPartOfMatrix(result.GetNumberOfColumns());
+    auto det = determinant(original);
 
-    // print(Identity, '\n');
+    print(det, '\n');
 
-    auto det = determinant(result);
+    Matrix<float> newOriginal = Matrix<float>{3,3,
+                                            2.78,2,3,
+                                            4,5.1,6,
+                                            7,8,10};
 
-    print(det, '\n', '\n');
-
-    auto Inverse = result.InverseMatrix<float>();
+    auto Inverse = newOriginal.InverseMatrix();
     
     print(Inverse, '\n');
 
-    Matrix<float> newResult = Matrix<float>{3,3, float()};
+    Matrix<float> newResult = Matrix<float>{newOriginal.GetNumberOfRows(), newOriginal.GetNumberOfColumns(), float()};
 
     for (Index i = 0; i < 3; i++)
     {
         for (Index j = 0; j < 3; j++)
         {
-            newResult[i][j] = float(result[i][j]);
+            newResult[i][j] = float(newOriginal[i][j]);
         }
     }
 
-    auto Identity = newResult * Inverse;
+    auto possibleIdentity = newResult * Inverse;
 
-    print(Identity, '\n');
+    print(possibleIdentity, '\n');
 
     return 0;        
 }

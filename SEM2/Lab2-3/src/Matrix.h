@@ -6,6 +6,19 @@
 #include "Vector.h"
 #include <cmath>
 
+#define EPSILON 0.0001f
+
+template <typename T>
+T makeFloatZero(T& data)
+{
+    if (data < EPSILON) 
+    {
+        return T();
+    } 
+
+    return data;
+}
+
 template <typename T>
 class Matrix
 {
@@ -654,7 +667,7 @@ public:
         {
             for (Index k = 0; k < i; k++)
             {
-                T ratio = result.Get(k, i) / result.Get(i, i);
+                long double ratio = result.Get(k, i) / result.Get(i, i);
                 result.RowsLinearCombination(-ratio, k, i);
             }
         }
@@ -665,6 +678,13 @@ public:
     template <typename ReturnType>
     Matrix<ReturnType> InverseGauss() const
     {
+        if (!isSquare())
+        {
+            Logger::Trace("At Matrix<T> at InverseGauss()");
+            logException(EXCEPTION_BAD_CONTAINER);
+            throw EXCEPTION_BAD_CONTAINER;
+        }
+
         Matrix<ReturnType> result = Matrix<ReturnType>(rows, columns, ReturnType());
 
         for (Index i = 0; i < rows; i++)
@@ -680,9 +700,18 @@ public:
 
     Matrix<T> InverseMatrix() const
     {
+        if (!isSquare())
+        {
+            Logger::Trace("At Matrix<T> at InverseGauss()");
+            logException(EXCEPTION_BAD_CONTAINER);
+            throw EXCEPTION_BAD_CONTAINER;
+        }
+        
         Matrix<T> augmented = this->AddMatrix(IdentityMatrix<T>(rows));
 
-        return ((augmented.Triangular()).InverseGauss()).SecondPartOfMatrix(columns);
+        Matrix<T> result = ((augmented.Triangular()).InverseGauss()).SecondPartOfMatrix(columns);
+
+        return result;
     }
 
     template <typename ReturnType>
@@ -737,6 +766,17 @@ private:
         }
 
         return result;
+    }
+
+    void Filter()
+    {
+        for (Index i = 0; i < rows; i++)
+        {
+            for (Index j = 0; j < columns; j++)
+            {
+                this->Get(i, j) = makeFloatZero(this->Get(i, j));
+            }
+        }
     }
 };
 
@@ -945,6 +985,8 @@ Matrix<U> operator* (const Matrix<U>& left, const Matrix<U>& right)
             result.Set(i, j, value);
         }
     }
+
+    result.Filter();
 
     return result;
 }
