@@ -325,7 +325,7 @@ void Button<int>::ShowTree(const char* label, const char* children)
     {
         for (Index i = 0; i < sequence->GetLength(); i++)
         {
-            if (ImGui::TreeNode((void*)(intptr_t)i, "%s %d", children, i))
+            if (ImGui::TreeNode((void*)(intptr_t)i, "%s %zu", children, i))
             {
                 ImGui::Text("Address: %p", &sequence->Get(i));
                 ImGui::Text("Value: %d", sequence->Get(i));
@@ -347,7 +347,7 @@ void Button<float>::ShowTree(const char* label, const char* children)
     {
         for (Index i = 0; i < sequence->GetLength(); i++)
         {
-            if (ImGui::TreeNode((void*)(intptr_t)i, "%s %d", children, i))
+            if (ImGui::TreeNode((void*)(intptr_t)i, "%s %zu", children, i))
             {
                 ImGui::Text("Address: %p", &sequence->Get(i));
                 ImGui::Text("Value: %f", sequence->Get(i));

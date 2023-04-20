@@ -667,7 +667,7 @@ public:
         {
             for (Index k = 0; k < i; k++)
             {
-                long double ratio = result.Get(k, i) / result.Get(i, i);
+                T ratio = result.Get(k, i) / result.Get(i, i);
                 result.RowsLinearCombination(-ratio, k, i);
             }
         }

@@ -7,6 +7,7 @@
 #include "ListSequence.h"
 #include "Sequence.h"
 
+#include <cstdlib>
 #include <imgui.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
@@ -30,13 +31,15 @@ static int values[] = { 0,0,0 };
 #define RED_FRAMES 300
 
 #define INT "int"
-#define FLOAT "float (not working yet)"
+#define FLOAT "float"
 #define NUMBER_OF_TYPES 2
 
 
 #define ARRAY_SEQUENCE "Array Sequence"
 #define LIST_SEQUENCE "List Sequence"
 #define NUMBER_OF_SEQUENCES 2
+
+#define UNIT 25
 
 typedef class Interface Interface;
 struct SequenceLabel
@@ -46,7 +49,7 @@ struct SequenceLabel
 };
 class GUI
 {
-private:
+public:
     void setupWindow()
     {
         ImVec2 prev_item_pos = ImGui::GetItemRectMin();
@@ -90,13 +93,10 @@ private:
 
     virtual void Concatenate(bool* showWindow, Interface* other) {}
 
-    // virtual Sequence<float>* Concatenate(bool* showWindow) {}
-
-
-
     virtual void ShowTree(const char* label, const char* children) {}
 
     virtual void Slice(bool* showWindow, Interface* other) {}
+
 
 public:
     virtual ~GUI() {}
@@ -183,6 +183,78 @@ public:
         
         ImGui::End();
     }
+
+    virtual void ShowGrid(ImDrawList* draw_list, ImVec2 canvas_pos, ImVec2 canvas_size, float grid_size, ImU32 grid_color)
+    {
+        // Calculate number of grid lines to draw
+        int num_lines_x = static_cast<int>(std::ceil(canvas_size.x / grid_size));
+        int num_lines_y = static_cast<int>(std::ceil(canvas_size.y / grid_size));
+
+        // Draw vertical grid lines
+        for (int i = 0; i < num_lines_x; ++i)
+        {
+            float x = canvas_pos.x + i * grid_size;
+            draw_list->AddLine(ImVec2(x, canvas_pos.y), ImVec2(x, canvas_pos.y + canvas_size.y), grid_color);
+        }
+
+        // Draw horizontal grid lines
+        for (int i = 0; i < num_lines_y; ++i)
+        {
+            float y = canvas_pos.y + i * grid_size;
+            draw_list->AddLine(ImVec2(canvas_pos.x, y), ImVec2(canvas_pos.x + canvas_size.x, y), grid_color);
+        }
+    }
+
+    void DrawGrid(ImDrawList* draw_list, ImVec2 O, ImVec2 i, ImVec2 j, ImU32 color, float size)
+    {
+
+        int numOfLinesX = 20000;
+        int numOfLinesY = 20000;
+
+        i.y = -i.y;
+        j.y = -j.y;
+
+        if (i.x == 0)
+        {
+            std::swap(i.x, i.y);
+        }
+
+        if (j.x == 0)
+        {
+            std::swap(j.x, j.y);
+        }
+
+        float tanOfX = i.y/i.x;
+        
+        float cotOfY = j.x/j.y;
+
+        for (Index first = 0; first < numOfLinesX; first += UNIT)
+        {
+            float x = O.x + first * i.x;
+
+            float firstPointX = x - size;
+            float firstPointY = O.y + tanOfX * (x - size);
+
+            float secondPointX = x + size;
+            float secondPointY = O.y + tanOfX * (x + size);
+
+            draw_list->AddLine(ImVec2(firstPointX + first, firstPointY), ImVec2(secondPointX + first, secondPointY), color);
+        }
+
+        for (Index second = 0; second < numOfLinesY; second += UNIT)
+        {
+            float y = O.y + second * j.y;
+
+            float firstPointX = O.x + cotOfY * (y - size);
+            float firstPointY = y - size;
+
+            float secondPointX = O.x + cotOfY * (y + size);
+            float secondPointY = y + size;
+
+            draw_list->AddLine(ImVec2(firstPointX + second, firstPointY), ImVec2(secondPointX + second, secondPointY), color);
+        }
+    }
+
 
     void showStatusBar(int status, float fps, float memoryUsage, Interface* interface);
 

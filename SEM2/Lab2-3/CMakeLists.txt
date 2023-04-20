@@ -58,6 +58,7 @@ set(SOURCES
         src/moduleTest.cpp
         # src/GUI.cpp
         # src/GUI.h
+        src/Matrix.h
 )
 
 # find_package(glfw3 REQUIRED)
@@ -70,19 +71,19 @@ set(GLFW "../../../glad")
 set(GLFW "../../../glfw-3.3.8")
 
 # we will need this as this wont add by itself (headers needed to be included as well)
-set(IMGUI_SRC
-        ${IMGUI}/backends/imgui_impl_opengl3.h
-        ${IMGUI}/backends/imgui_impl_opengl3.cpp
-        ${IMGUI}/backends/imgui_impl_opengl3_loader.h
-        ${IMGUI}/backends/imgui_impl_glfw.h
-        ${IMGUI}/backends/imgui_impl_glfw.cpp
-        ${IMGUI}/imgui.h
-        ${IMGUI}/imgui.cpp
-        ${IMGUI}/imgui_draw.cpp
-        ${IMGUI}/imgui_tables.cpp
-        ${IMGUI}/imgui_widgets.cpp
-        ${IMGUI}/imgui_demo.cpp
-)
+# set(IMGUI_SRC
+#         ${IMGUI}/backends/imgui_impl_opengl3.h
+#         ${IMGUI}/backends/imgui_impl_opengl3.cpp
+#         ${IMGUI}/backends/imgui_impl_opengl3_loader.h
+#         ${IMGUI}/backends/imgui_impl_glfw.h
+#         ${IMGUI}/backends/imgui_impl_glfw.cpp
+#         ${IMGUI}/imgui.h
+#         ${IMGUI}/imgui.cpp
+#         ${IMGUI}/imgui_draw.cpp
+#         ${IMGUI}/imgui_tables.cpp
+#         ${IMGUI}/imgui_widgets.cpp
+#         ${IMGUI}/imgui_demo.cpp
+# )
 
 # ${IMGUI_SRC}
 # compiling our project together including ImGui stuff

@@ -92,6 +92,8 @@ int main(int, char**)
     bool concatButtonClicked = false;
     bool sliceButtonClicked = false;
 
+    bool matrixWindow = true;
+
     char buffer[128];
     const char* types[] = { INT, FLOAT };
 
