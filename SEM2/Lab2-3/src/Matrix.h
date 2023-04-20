@@ -211,7 +211,7 @@ public:
         return Vector<T>(rows, data);
     }
 
-    Matrix<T> Transpose() const
+    Matrix<T> Transpose() const noexcept
     {
         T data[rows * columns];
 
@@ -224,6 +224,11 @@ public:
         }
 
         return Matrix<T>(columns, rows, data);
+    }
+
+    bool isSquare() const noexcept
+    {
+        return rows == columns;
     }
 
     Matrix<T>& operator= (const Matrix<T>& other)
@@ -554,8 +559,42 @@ public:
         return second;
     }
 
+    Matrix<T>& Triangular()
+    {
+        for (Index i = 0; i < rows; i++)
+        {
+            for (Index k = i + 1; k < rows; k++)
+            {
+                T ratio = this->Get(k, i) / this->Get(i, i);
+                RowsLinearCombination(-ratio, k, i);
+            }
+        }
+
+        for (Index i = 0; i < rows; i++)
+        {
+            T diagonalValue = matrix[i][i];
+
+            if (diagonalValue == T())
+                continue;
+            
+            for (Index j = 0; j < columns; j++)
+            {
+                matrix[i][j] = matrix[i][j] / diagonalValue;
+            }
+        }
+
+        return *this;
+    }
+
+    Matrix<T> Triangular() const
+    {
+        Matrix<T> result = Matrix<T>(*this);
+
+        return result.Triangular();
+    }
+
     template <typename ReturnType>
-    Matrix<ReturnType> GaussMethod()
+    Matrix<ReturnType> Triangular() const
     {
         Matrix<ReturnType> result = Matrix<ReturnType>(rows, columns, ReturnType());
 
@@ -567,36 +606,45 @@ public:
             }
         }
 
-        for (Index i = 0; i < rows; i++)
-        {
-            for (Index k = i + 1; k < rows; k++)
-            {
-                ReturnType ratio = ReturnType(this->Get(k, i)) / ReturnType(this->Get(i, i));
-                result.RowsLinearCombination(-ratio, k, i);
-            }
-        }
-
-        for (Index i = 0; i < rows; i++)
-        {
-            ReturnType diagonalValue = result[i][i];
-
-            if (diagonalValue == ReturnType())
-                continue;
-            
-            for (Index j = 0; j < columns; j++)
-            {
-                result[i][j] = ReturnType(this->Get(i, j)) / diagonalValue;
-            }
-        }
-
-        return result;
+        return result.Matrix<ReturnType>::Triangular();
     }
 
-    // template <typename ReturnType>
-    // Matrix<ReturnType> InverseGauss()
-    // {
+    Matrix<T>& InverseGauss()
+    {
+        for (Index i = rows - 1; i > 0; i--)
+        {
+            for (Index k = i - 1; k > 0; k--)
+            {
+                T ratio = this->Get(k, i) / this->Get(i, i);
+                RowsLinearCombination(-ratio, k, i);
+            }
+        }
 
-    // }
+        return *this;
+    }
+
+    Matrix<T> InverseGauss() const
+    {
+        Matrix<T> result = Matrix<T>(*this);
+
+        return result.InverseGauss();
+    }
+
+    template <typename ReturnType>
+    Matrix<ReturnType> InverseGauss() const
+    {
+        Matrix<ReturnType> result = Matrix<ReturnType>(rows, columns, ReturnType());
+
+        for (Index i = 0; i < rows; i++)
+        {
+            for (Index j = 0;j < columns; j++)
+            {
+                result[i][j] = ReturnType(this->Get(i, j));
+            }
+        }
+
+        return result.Matrix<ReturnType>::InverseGauss();
+    }
 
     friend std::ostream& operator<< (std::ostream& stream, Matrix<T>& matrix)
     {

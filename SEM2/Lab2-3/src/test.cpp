@@ -17,9 +17,10 @@ int main()
                         3,3,3,3};
 
     Matrix<int> second = {3,4,
-                        4,4,4,4,
-                        3,3,3,3,
-                        2,2,2,2};
+                        4,4,4,
+                        3,3,3,
+                        2,2,2,
+                        1,1,1};
 
     
     Matrix<int> result = first.Transpose() * second;
@@ -71,9 +72,13 @@ int main()
 
     // print(Identity, '\n');
 
-    auto GaussFirstRound = result.GaussMethod<float>();
+    // auto GaussFirstRound = result.Triangular<float>();
 
-    print(GaussFirstRound, '\n');
+    // print(GaussFirstRound, '\n');
+
+    // auto GaussSecondRound = GaussFirstRound.InverseGauss();
+
+    // print(GaussSecondRound, '\n');
 
     return 0;        
 }

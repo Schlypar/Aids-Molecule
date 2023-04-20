@@ -94,6 +94,13 @@ public:
 
     T& operator[] (Index i) const
     {
+        if (i >= Dimension())
+        {
+            Logger::Info("At Vector<T> at operator[%u]", i);
+            logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+            throw EXCEPTION_INDEX_OUT_OF_RANGE;
+        }
+        
         return vector[i];
     }
 
