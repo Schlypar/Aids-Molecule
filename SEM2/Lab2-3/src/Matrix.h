@@ -559,33 +559,33 @@ public:
     {
         Matrix<ReturnType> result = Matrix<ReturnType>(rows, columns, ReturnType());
 
-       
-
-        Matrix<T> thisMatrix = Matrix<T>(*this);
+        for (Index i = 0; i < rows; i++)
+        {
+            for (Index j = 0;j < columns; j++)
+            {
+                result[i][j] = ReturnType(this->Get(i, j));
+            }
+        }
 
         for (Index i = 0; i < rows; i++)
         {
             for (Index k = i + 1; k < rows; k++)
             {
-                ReturnType ratio = ReturnType(thisMatrix[k][i]) / ReturnType(thisMatrix[i][i]);
-                thisMatrix.RowsLinearCombination(-ratio, k, i);
-            }
-        }
-
-         for (Index i = 0; i < rows; i++)
-        {
-            for (Index j = 0; j < columns; j++)
-            {
-                result[i][j] = ReturnType(thisMatrix.Get(i, j));
+                ReturnType ratio = ReturnType(this->Get(k, i)) / ReturnType(this->Get(i, i));
+                result.RowsLinearCombination(-ratio, k, i);
             }
         }
 
         for (Index i = 0; i < rows; i++)
         {
             ReturnType diagonalValue = result[i][i];
+
+            if (diagonalValue == ReturnType())
+                continue;
+            
             for (Index j = 0; j < columns; j++)
             {
-                result[i][j] = ReturnType(thisMatrix.Get(i, j)) / diagonalValue;
+                result[i][j] = ReturnType(this->Get(i, j)) / diagonalValue;
             }
         }
 
@@ -612,15 +612,6 @@ public:
 
         return stream;
     }
-
-private:
-    
-
-    
-
-    
-
-    
 };
 
 template <typename U>

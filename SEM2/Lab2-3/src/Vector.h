@@ -138,177 +138,345 @@ public:
     }
 
     template <typename U>
-    friend Vector<U> operator+ (const Vector<U>& left, const Vector<U>& right)
-    {
-        if (left.Dimension() != right.Dimension())
-        {
-            Logger::Error("Vectors don't have same size, behaviour is undefined");
-            logException(EXCEPTION_BAD_CONTAINER);
-            throw EXCEPTION_BAD_CONTAINER;
-        }
+    friend Vector<U> operator+ (const Vector<U>& left, const Vector<U>& right);
+    // {
+    //     if (left.Dimension() != right.Dimension())
+    //     {
+    //         Logger::Error("Vectors don't have same size, behaviour is undefined");
+    //         logException(EXCEPTION_BAD_CONTAINER);
+    //         throw EXCEPTION_BAD_CONTAINER;
+    //     }
 
 
-        Size dim = left.Dimension();
-        T data[dim];
+    //     Size dim = left.Dimension();
+    //     T data[dim];
 
-        for (Index i = 0; i < dim; i++)
-            data[i] = left[i] + right[i];
+    //     for (Index i = 0; i < dim; i++)
+    //         data[i] = left[i] + right[i];
 
-        return Vector<T>(dim, data);
-    }
-
-    template <typename U>
-    friend Vector<U> operator+ (const Vector<U>& left, const U& right)
-    {
-        if (left.Dimension() != right.Dimension())
-        {
-            Logger::Error("Vectors don't have same size, behaviour is undefined");
-            logException(EXCEPTION_BAD_CONTAINER);
-            throw EXCEPTION_BAD_CONTAINER;
-        }
-
-
-        Size dim = left.Dimension();
-        T data[dim];
-
-        for (Index i = 0; i < dim; i++)
-            data[i] = left[i] + right;
-
-        return Vector<T>(dim, data);
-    }
+    //     return Vector<T>(dim, data);
+    // }
 
     template <typename U>
-    friend Vector<U> operator+ (const U& left, const Vector<U>& right)
-    {
-        if (left.Dimension() != right.Dimension())
-        {
-            Logger::Error("Vectors don't have same size, behaviour is undefined");
-            logException(EXCEPTION_BAD_CONTAINER);
-            throw EXCEPTION_BAD_CONTAINER;
-        }
+    friend Vector<U> operator+ (const Vector<U>& left, const U& right);
+    // {
+    //     if (left.Dimension() != right.Dimension())
+    //     {
+    //         Logger::Error("Vectors don't have same size, behaviour is undefined");
+    //         logException(EXCEPTION_BAD_CONTAINER);
+    //         throw EXCEPTION_BAD_CONTAINER;
+    //     }
 
 
-        Size dim = left.Dimension();
-        T data[dim];
+    //     Size dim = left.Dimension();
+    //     T data[dim];
 
-        for (Index i = 0; i < dim; i++)
-            data[i] = left + right[i];
+    //     for (Index i = 0; i < dim; i++)
+    //         data[i] = left[i] + right;
 
-        return Vector<T>(dim, data);
-    }
+    //     return Vector<T>(dim, data);
+    // }
+
+    template <typename U>
+    friend Vector<U> operator+ (const U& left, const Vector<U>& right);
+    // {
+    //     if (left.Dimension() != right.Dimension())
+    //     {
+    //         Logger::Error("Vectors don't have same size, behaviour is undefined");
+    //         logException(EXCEPTION_BAD_CONTAINER);
+    //         throw EXCEPTION_BAD_CONTAINER;
+    //     }
+
+
+    //     Size dim = left.Dimension();
+    //     T data[dim];
+
+    //     for (Index i = 0; i < dim; i++)
+    //         data[i] = left + right[i];
+
+    //     return Vector<T>(dim, data);
+    // }
 
 
     template <typename U>
-    friend Vector<U> operator- (const Vector<U>& left, const Vector<U>& right)
-    {
-        if (left.Dimension() != right.Dimension())
-        {
-            Logger::Error("Vectors don't have same size, behaviour is undefined");
-            logException(EXCEPTION_BAD_CONTAINER);
-            throw EXCEPTION_BAD_CONTAINER;
-        }
+    friend Vector<U> operator- (const Vector<U>& left, const Vector<U>& right);
+    // {
+    //     if (left.Dimension() != right.Dimension())
+    //     {
+    //         Logger::Error("Vectors don't have same size, behaviour is undefined");
+    //         logException(EXCEPTION_BAD_CONTAINER);
+    //         throw EXCEPTION_BAD_CONTAINER;
+    //     }
 
 
-        Size dim = left.Dimension();
-        T data[dim];
+    //     Size dim = left.Dimension();
+    //     T data[dim];
 
-        for (Index i = 0; i < dim; i++)
-            data[i] = left[i] - right[i];
+    //     for (Index i = 0; i < dim; i++)
+    //         data[i] = left[i] - right[i];
 
-        return Vector<T>(dim, data);
-    }
-
-    template <typename U>
-    friend Vector<U> operator- (const Vector<U>& left, const U& right)
-    {
-        if (left.Dimension() != right.Dimension())
-        {
-            Logger::Error("Vectors don't have same size, behaviour is undefined");
-            logException(EXCEPTION_BAD_CONTAINER);
-            throw EXCEPTION_BAD_CONTAINER;
-        }
-
-
-        Size dim = left.Dimension();
-        T data[dim];
-
-        for (Index i = 0; i < dim; i++)
-            data[i] = left[i] - right;
-
-        return Vector<T>(dim, data);
-    }
+    //     return Vector<T>(dim, data);
+    // }
 
     template <typename U>
-    friend Vector<U> operator- (const U& left, const Vector<U>& right)
-    {
-        if (left.Dimension() != right.Dimension())
-        {
-            Logger::Error("Vectors don't have same size, behaviour is undefined");
-            logException(EXCEPTION_BAD_CONTAINER);
-            throw EXCEPTION_BAD_CONTAINER;
-        }
+    friend Vector<U> operator- (const Vector<U>& left, const U& right);
+    // {
+    //     if (left.Dimension() != right.Dimension())
+    //     {
+    //         Logger::Error("Vectors don't have same size, behaviour is undefined");
+    //         logException(EXCEPTION_BAD_CONTAINER);
+    //         throw EXCEPTION_BAD_CONTAINER;
+    //     }
 
 
-        Size dim = left.Dimension();
-        T data[dim];
+    //     Size dim = left.Dimension();
+    //     T data[dim];
 
-        for (Index i = 0; i < dim; i++)
-            data[i] = left - right[i];
+    //     for (Index i = 0; i < dim; i++)
+    //         data[i] = left[i] - right;
 
-        return Vector<T>(dim, data);
-    }
+    //     return Vector<T>(dim, data);
+    // }
 
     template <typename U>
-    friend U operator* (const Vector<U>& left, const Vector<U>& right)
-    {
-        if (left.Dimension() != right.Dimension())
-        {
-            Logger::Error("Vectors don't have same size, behaviour is undefined");
-            logException(EXCEPTION_BAD_CONTAINER);
-            throw EXCEPTION_BAD_CONTAINER;
-        }
+    friend Vector<U> operator- (const U& left, const Vector<U>& right);
+    // {
+    //     if (left.Dimension() != right.Dimension())
+    //     {
+    //         Logger::Error("Vectors don't have same size, behaviour is undefined");
+    //         logException(EXCEPTION_BAD_CONTAINER);
+    //         throw EXCEPTION_BAD_CONTAINER;
+    //     }
+
+
+    //     Size dim = left.Dimension();
+    //     T data[dim];
+
+    //     for (Index i = 0; i < dim; i++)
+    //         data[i] = left - right[i];
+
+    //     return Vector<T>(dim, data);
+    // }
+
+    template <typename U>
+    friend U operator* (const Vector<U>& left, const Vector<U>& right);
+    // {
+    //     if (left.Dimension() != right.Dimension())
+    //     {
+    //         Logger::Error("Vectors don't have same size, behaviour is undefined");
+    //         logException(EXCEPTION_BAD_CONTAINER);
+    //         throw EXCEPTION_BAD_CONTAINER;
+    //     }
     
-        Size dim = left.Dimension();
+    //     Size dim = left.Dimension();
 
-        Vector<U> finalSecond = ZeroVector<U>(dim);
+    //     Vector<U> finalSecond = ZeroVector<U>(dim);
         
-        U result = U();
+    //     U result = U();
         
-        for (Index i = 0; i < dim; i++)
-        {
-            result += left.Get(i) * right.Get(i);
-        }
+    //     for (Index i = 0; i < dim; i++)
+    //     {
+    //         result += left.Get(i) * right.Get(i);
+    //     }
 
-        return result;
-    }
+    //     return result;
+    // }
 
     template <typename U>
-    friend Vector<U> operator* (const Vector<U>& left, const U& right)
-    {
-        Size dim = left.Dimension();
-        T data[dim];
+    friend Vector<U> operator* (const Vector<U>& left, const U& right);
+    // {
+    //     Size dim = left.Dimension();
+    //     T data[dim];
 
-        for (Index i = 0; i < dim; i++)
-            data[i] = left[i] * right;
+    //     for (Index i = 0; i < dim; i++)
+    //         data[i] = left[i] * right;
 
-        return Vector<T>(dim, data);
-    }
+    //     return Vector<T>(dim, data);
+    // }
 
     template <typename U>
-    friend Vector<U> operator* (const U& left, const Vector<U>& right)
-    {
-        Size dim = right.Dimension();
-        T data[dim];
+    friend Vector<U> operator* (const U& left, const Vector<U>& right);
+    // {
+    //     Size dim = right.Dimension();
+    //     T data[dim];
 
-        for (Index i = 0; i < dim; i++)
-            data[i] = left * right[i];
+    //     for (Index i = 0; i < dim; i++)
+    //         data[i] = left * right[i];
 
-        return Vector<T>(dim, data);
-    }
+    //     return Vector<T>(dim, data);
+    // }
 };
 
 template <typename U>
 Vector<U> ZeroVector(Size dimension)
 {
     return Vector<U>(dimension, U());
+}
+
+template <typename U>
+Vector<U> operator+ (const Vector<U>& left, const Vector<U>& right)
+{
+    if (left.Dimension() != right.Dimension())
+    {
+        Logger::Error("Vectors don't have same size, behaviour is undefined");
+        logException(EXCEPTION_BAD_CONTAINER);
+        throw EXCEPTION_BAD_CONTAINER;
+    }
+
+
+    Size dim = left.Dimension();
+    U data[dim];
+
+    for (Index i = 0; i < dim; i++)
+        data[i] = left[i] + right[i];
+
+    return Vector<U>(dim, data);
+}
+
+template <typename U>
+Vector<U> operator+ (const Vector<U>& left, const U& right)
+{
+    if (left.Dimension() != right.Dimension())
+    {
+        Logger::Error("Vectors don't have same size, behaviour is undefined");
+        logException(EXCEPTION_BAD_CONTAINER);
+        throw EXCEPTION_BAD_CONTAINER;
+    }
+
+
+    Size dim = left.Dimension();
+    U data[dim];
+
+    for (Index i = 0; i < dim; i++)
+        data[i] = left[i] + right;
+
+    return Vector<U>(dim, data);
+}
+
+template <typename U>
+Vector<U> operator+ (const U& left, const Vector<U>& right)
+{
+    if (left.Dimension() != right.Dimension())
+    {
+        Logger::Error("Vectors don't have same size, behaviour is undefined");
+        logException(EXCEPTION_BAD_CONTAINER);
+        throw EXCEPTION_BAD_CONTAINER;
+    }
+
+
+    Size dim = left.Dimension();
+    U data[dim];
+
+    for (Index i = 0; i < dim; i++)
+        data[i] = left + right[i];
+
+    return Vector<U>(dim, data);
+}
+
+template <typename U>
+Vector<U> operator- (const Vector<U>& left, const Vector<U>& right)
+{
+    if (left.Dimension() != right.Dimension())
+    {
+        Logger::Error("Vectors don't have same size, behaviour is undefined");
+        logException(EXCEPTION_BAD_CONTAINER);
+        throw EXCEPTION_BAD_CONTAINER;
+    }
+
+
+    Size dim = left.Dimension();
+    U data[dim];
+
+    for (Index i = 0; i < dim; i++)
+        data[i] = left[i] - right[i];
+
+    return Vector<U>(dim, data);
+}
+
+template <typename U>
+Vector<U> operator- (const Vector<U>& left, const U& right)
+{
+    if (left.Dimension() != right.Dimension())
+    {
+        Logger::Error("Vectors don't have same size, behaviour is undefined");
+        logException(EXCEPTION_BAD_CONTAINER);
+        throw EXCEPTION_BAD_CONTAINER;
+    }
+
+
+    Size dim = left.Dimension();
+    U data[dim];
+
+    for (Index i = 0; i < dim; i++)
+        data[i] = left[i] - right;
+
+    return Vector<U>(dim, data);
+}
+
+template <typename U>
+Vector<U> operator- (const U& left, const Vector<U>& right)
+{
+    if (left.Dimension() != right.Dimension())
+    {
+        Logger::Error("Vectors don't have same size, behaviour is undefined");
+        logException(EXCEPTION_BAD_CONTAINER);
+        throw EXCEPTION_BAD_CONTAINER;
+    }
+
+
+    Size dim = left.Dimension();
+    U data[dim];
+
+    for (Index i = 0; i < dim; i++)
+        data[i] = left - right[i];
+
+    return Vector<U>(dim, data);
+}
+
+template <typename U>
+U operator* (const Vector<U>& left, const Vector<U>& right)
+{
+    if (left.Dimension() != right.Dimension())
+    {
+        Logger::Error("Vectors don't have same size, behaviour is undefined");
+        logException(EXCEPTION_BAD_CONTAINER);
+        throw EXCEPTION_BAD_CONTAINER;
+    }
+
+    Size dim = left.Dimension();
+
+    Vector<U> finalSecond = ZeroVector<U>(dim);
+    
+    U result = U();
+    
+    for (Index i = 0; i < dim; i++)
+    {
+        result += left.Get(i) * right.Get(i);
+    }
+
+    return result;
+}
+
+template <typename U>
+Vector<U> operator* (const Vector<U>& left, const U& right)
+{
+    Size dim = left.Dimension();
+    U data[dim];
+
+    for (Index i = 0; i < dim; i++)
+        data[i] = left[i] * right;
+
+    return Vector<U>(dim, data);
+}
+
+ template <typename U>
+Vector<U> operator* (const U& left, const Vector<U>& right)
+{
+    Size dim = right.Dimension();
+    U data[dim];
+
+    for (Index i = 0; i < dim; i++)
+        data[i] = left * right[i];
+
+    return Vector<U>(dim, data);
 }

@@ -22,12 +22,8 @@ int main()
                         2,2,2,2};
 
     
-    Matrix<int> result = first * second.Transpose();
+    Matrix<int> result = first.Transpose() * second;
 
-    result = Matrix<int>{3,3,
-                        10,11,12,
-                        20,23,24,
-                        30,33,37};
 
     print(result, '\n');
 
@@ -63,9 +59,9 @@ int main()
 
     // print(columnConcated, '\n');
 
-    auto positionedMatrix = result.AddMatrix(IdentityMatrix<int>(result.GetNumberOfRows()));
+    // auto positionedMatrix = result.AddMatrix(IdentityMatrix<int>(result.GetNumberOfRows()));
 
-    print(positionedMatrix, '\n');
+    // print(positionedMatrix, '\n');
 
     // auto original = positionedMatrix.FirstPartOfMatrix(result.GetNumberOfColumns());
 
@@ -75,7 +71,7 @@ int main()
 
     // print(Identity, '\n');
 
-    auto GaussFirstRound = positionedMatrix.GaussMethod<float>();
+    auto GaussFirstRound = result.GaussMethod<float>();
 
     print(GaussFirstRound, '\n');
 
