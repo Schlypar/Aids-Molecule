@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Allocator.h"
+#include "IContainer.h"
 #include "Logger.h"
 #include "Vector.h"
 #include <cmath>
@@ -211,6 +212,39 @@ public:
         return Vector<T>(rows, data);
     }
 
+    Matrix<T> GetMinor(Index i, Index j) const
+    {
+        Matrix<T> result = Matrix<T>(rows - 1, columns - 1, T());
+
+        for (Index k = 0; k < rows ; k++)
+        {
+            for (Index h = 0; h < columns; h++)
+            {
+                if (k != i || h != j)
+                {
+                    if (k < i && h < j)
+                    {
+                        result[k][h] = matrix[k][h];
+                    }
+                    else if (k < i && h > j)
+                    {
+                        result[k][h - 1] = matrix[k][h];
+                    }
+                    else if (k > i && h < j)
+                    {
+                        result[k - 1][h] = matrix[k][h];
+                    }
+                    else if (k > i && h > j)
+                    {
+                        result[k - 1][h - 1] = matrix[k][h];
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
     Matrix<T> Transpose() const noexcept
     {
         T data[rows * columns];
@@ -280,6 +314,9 @@ public:
     {
         return !(*this == other);
     }
+
+    template <typename U>
+    friend U determinant (const Matrix<U>& matrix);
 
     template <typename U>
     friend Matrix<U> operator+ (const Matrix<U>& left, const Matrix<U>& right);
@@ -609,25 +646,20 @@ public:
         return result.Matrix<ReturnType>::Triangular();
     }
 
-    Matrix<T>& InverseGauss()
-    {
-        for (Index i = rows - 1; i > 0; i--)
-        {
-            for (Index k = i - 1; k > 0; k--)
-            {
-                T ratio = this->Get(k, i) / this->Get(i, i);
-                RowsLinearCombination(-ratio, k, i);
-            }
-        }
-
-        return *this;
-    }
-
     Matrix<T> InverseGauss() const
     {
         Matrix<T> result = Matrix<T>(*this);
 
-        return result.InverseGauss();
+        for (Index i = rows - 1; i > 0; i--)
+        {
+            for (Index k = 0; k < i; k++)
+            {
+                T ratio = result.Get(k, i) / result.Get(i, i);
+                result.RowsLinearCombination(-ratio, k, i);
+            }
+        }
+
+        return result;
     }
 
     template <typename ReturnType>
@@ -646,6 +678,29 @@ public:
         return result.Matrix<ReturnType>::InverseGauss();
     }
 
+    Matrix<T> InverseMatrix() const
+    {
+        Matrix<T> augmented = this->AddMatrix(IdentityMatrix<T>(rows));
+
+        return ((augmented.Triangular()).InverseGauss()).SecondPartOfMatrix(columns);
+    }
+
+    template <typename ReturnType>
+    Matrix<ReturnType> InverseMatrix() const
+    {
+        Matrix<ReturnType> result = Matrix<ReturnType>(rows, columns, ReturnType());
+
+        for (Index i = 0; i < rows; i++)
+        {
+            for (Index j = 0; j < columns; j++)
+            {
+                result[i][j] = ReturnType(this->Get(i, j));
+            }
+        }
+
+        return result.Matrix<ReturnType>::InverseMatrix();
+    }
+
     friend std::ostream& operator<< (std::ostream& stream, Matrix<T>& matrix)
     {
         for (Index i = 0; i < matrix.rows; i++)
@@ -660,7 +715,60 @@ public:
 
         return stream;
     }
+
+private:
+    Index IndexOfRowWithMostZeroes() const
+    {
+        Size counter = 0;
+        Index result = 0;
+
+        for (Index i = 0; i < rows; i++)
+        {
+            for (Index j = 0; j < columns; j++)
+            {
+                if (matrix[i][j] == T())
+                    counter++;
+            }
+
+            if (counter > result)
+                result = i;
+            
+            counter = 0;
+        }
+
+        return result;
+    }
 };
+
+template <typename U>
+U determinant (const Matrix<U>& matrix)
+{
+    if (!matrix.isSquare())
+    {
+        Logger::Trace("At determinant(const Matrix<U>&)");
+        logException(EXCEPTION_BAD_CONTAINER);
+        return EXCEPTION_BAD_CONTAINER;
+    }
+
+    if (matrix.rows == 2)
+    {
+        return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+    }
+
+    U det = U();
+
+    Index i = matrix.IndexOfRowWithMostZeroes();
+
+    for (Index j  = 0; j < matrix.columns; j++)
+    {
+        if (matrix[i][j] != U())
+        {
+            det += std::pow(1, i + 1 + j + 1) * determinant(matrix.GetMinor(i, j));
+        }
+    }
+
+    return det;
+}
 
 template <typename U>
 Matrix<U> ZeroMatrix(Size dimension)

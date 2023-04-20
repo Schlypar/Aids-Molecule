@@ -12,19 +12,26 @@ int main()
     Logger::setPriority(ErrorPriority);
 
     Matrix<int> first = {3,4,
-                        1,1,1,1,
-                        2,2,2,2,
-                        3,3,3,3};
+                        1,7,-1,1,
+                        2,1,2,2,
+                        0,2,3,10};
 
     Matrix<int> second = {3,4,
-                        4,4,4,
-                        3,3,3,
-                        2,2,2,
-                        1,1,1};
+                        4,7,4,
+                        5,3,-1,
+                        2,0,2,
+                        1,0,1};
 
     
     Matrix<int> result = first.Transpose() * second;
 
+
+    print(result, '\n');
+
+    result = Matrix<int>{3,3,
+                        2,2,3,
+                        4,5,6,
+                        7,8,10};
 
     print(result, '\n');
 
@@ -72,13 +79,27 @@ int main()
 
     // print(Identity, '\n');
 
-    // auto GaussFirstRound = result.Triangular<float>();
+    auto det = determinant(result);
 
-    // print(GaussFirstRound, '\n');
+    print(det, '\n', '\n');
 
-    // auto GaussSecondRound = GaussFirstRound.InverseGauss();
+    auto Inverse = result.InverseMatrix<float>();
+    
+    print(Inverse, '\n');
 
-    // print(GaussSecondRound, '\n');
+    Matrix<float> newResult = Matrix<float>{3,3, float()};
+
+    for (Index i = 0; i < 3; i++)
+    {
+        for (Index j = 0; j < 3; j++)
+        {
+            newResult[i][j] = float(result[i][j]);
+        }
+    }
+
+    auto Identity = newResult * Inverse;
+
+    print(Identity, '\n');
 
     return 0;        
 }
