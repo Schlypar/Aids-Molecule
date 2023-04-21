@@ -47,9 +47,9 @@ public:
 	{
 		if (priority <= TracePriority)
 		{
-			printf("\033[1m\033[34m[Trace]\t\033[0m");
-			printf(message, args...);
-			printf("\n");
+			fprintf(stdout, "\033[1m\033[34m[Trace]\t\033[0m");
+			fprintf(stdout, message, args...);
+			fprintf(stdout, "\n");
 		}
 	}
 
@@ -58,9 +58,9 @@ public:
 	{
 		if (priority <= DebugPriority)
 		{
-			printf("\033[1;32m[Debug]\t\033[0m");
-			printf(message, args...);
-			printf("\n");
+			fprintf(stdout, "\033[1;32m[Debug]\t\033[0m");
+			fprintf(stdout, message, args...);
+			fprintf(stdout, "\n");
 		}
 	}
 
@@ -69,9 +69,9 @@ public:
 	{
 		if (priority <= InfoPriority)
 		{
-			printf("\033[33m[Info]\t\033[0m");
-			printf(message, args...);
-			printf("\n");
+			fprintf(stdout, "\033[33m[Info]\t\033[0m");
+			fprintf(stdout, message, args...);
+			fprintf(stdout, "\n");
 		}
 	}
 
@@ -80,9 +80,9 @@ public:
 	{
 		if (priority <= WarnPriority)
 		{
-			printf("\033[35m[Warn]\t\033[0m");
-			printf(message, args...);
-			printf("\n");
+			fprintf(stderr, "\033[35m[Warn]\t\033[0m");
+			fprintf(stderr, message, args...);
+			fprintf(stderr, "\n");
 		}
 	}
 
@@ -91,9 +91,9 @@ public:
 	{
 		if (priority <= ErrorPriority)
 		{
-			printf("\033[31m[Error]\t\033[0m");
-			printf(message, args...);
-			printf("\n");
+			fprintf(stderr, "\033[31m[Error]\t\033[0m");
+			fprintf(stderr, message, args...);
+			fprintf(stderr, "\n");
 		}
 	}
 
@@ -102,9 +102,9 @@ public:
 	{
 		if (priority <= FatalPriority)
 		{
-			printf("\033[1;31m[Fatal]\t\033[0m");
-			printf(message, args...);
-			printf("\n");
+			fprintf(stderr, "\033[1;31m[Fatal]\t\033[0m");
+			fprintf(stderr, message, args...);
+			fprintf(stderr, "\n");
 		}
 	}
 };

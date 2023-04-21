@@ -21,10 +21,10 @@ public:
     {
     }
 
-    complex(float&& real)
-        : real(std::move(real)), imaginary()
+    complex(float&& other)
+        : real(std::move(other)), imaginary()
     {
-        real = float();
+        other = float();
     }
 
     complex(const float& real, const float& imaginary)
@@ -51,29 +51,33 @@ public:
         other.imaginary = float();
     }
 
-    complex& operator+ (const float& other)
+    complex operator+ (const float& other)
     {
-        real += other;
+        complex copy = complex(*this);
 
-        return *this;
+        copy.real += other;
+
+        return copy;
     }
 
-    friend complex& operator+ (const float& other, complex& complex)
+    friend complex operator+ (const float& other, complex& complex)
     {
         return complex + other;
     }
 
-    friend complex& operator+ (const float& other, complex&& complex)
-    {
-        return complex + other;
-    }
+    // friend complex operator+ (const float& other, complex&& complex)
+    // {
+    //     return complex + other;
+    // }
 
-    complex& operator+ (const complex& other)
+    complex operator+ (const complex& other)
     {
-        real += other.real;
-        imaginary += other.imaginary;
+        complex copy = complex(*this);
 
-        return *this;
+        copy.real += other.real;
+        copy.imaginary += other.imaginary;
+
+        return copy;
     }
 
     complex& operator+= (const float& other)
@@ -106,31 +110,33 @@ public:
         return *this;
     }
 
-    complex& operator- (const complex& other)
+    complex operator- (const complex& other)
     {
-        real -= other.real;
-        imaginary -= other.imaginary;
+        complex copy = complex(*this);
 
-        return *this;
+        copy.real -= other.real;
+        copy.imaginary -= other.imaginary;
+
+        return copy;
     }
     
-    friend complex& operator- (const float& other, complex& complex)
+    friend complex operator- (const float& other, complex& complex)
     {
         return complex - other;
     }
 
-    friend complex& operator- (const float& other, complex&& complex)
-    {
-        return complex - other;
-    }  
+    // friend complex operator- (const float& other, complex&& complex)
+    // {
+    //     return complex - other;
+    // }  
 
-    friend complex& operator- (complex& complex)
-    {
-        complex.real = -complex.real;
-        complex.imaginary = -complex.imaginary;
+    // complex& operator- (complex& other)
+    // {
+    //     real -= other.real;
+    //     imaginary -= other.imaginary;
 
-        return complex;
-    }
+    //     return *this;
+    // }
 
     complex& operator-= (const float& other)
     {
@@ -155,55 +161,68 @@ public:
         return *this;
     }
 
-    complex& operator* (const float& other)
+    complex operator* (const float& other)
     {
-        real = real * other;
+        complex copy = complex(*this);
 
-        return *this;
+        copy.real = real * other;
+        copy.imaginary = imaginary * other;
+
+        return copy;
     }
 
-    friend complex& operator* (const float& other, complex& complex)
+    complex operator* (const complex& other)
+    {
+        complex copy = complex(*this);
+
+        copy.real = real * other.real - imaginary * other.imaginary;
+        copy.imaginary = real * other.imaginary + other.real * imaginary;
+
+        return copy;
+    }
+
+    complex operator* (const complex& other) const 
+    {
+        complex copy = complex(*this);
+
+        copy.real = real * other.real - imaginary * other.imaginary;
+        copy.imaginary = real * other.imaginary + other.real * imaginary;
+
+        return copy;
+    }
+
+    friend complex operator* (const float& other, complex& complex)
     {
         return complex * other;
     }
 
-    friend complex& operator* (const float& other, complex&& complex)
+    complex operator/ (const float& other) const
     {
-        return complex * other;
+        complex copy = complex(*this);
+
+        copy.real = copy.real / other;
+        copy.imaginary = copy.imaginary / other;
+
+        return copy;
     }
 
-    complex& operator* (const complex& other)
+    complex operator/ (const complex& other) const
     {
-        real = real * other.real - imaginary * other.imaginary;
-        imaginary = real * other.imaginary + other.real * imaginary;
+        complex copy = complex(*this);
 
-        return *this;
+        float denominator =  (other.real * other.real + other.imaginary * other.imaginary); 
+
+        copy.real = (real * other.real + imaginary * other.imaginary) / (other.real * other.real + other.imaginary * other.imaginary);
+        copy.imaginary = (imaginary * other.real - real * other.imaginary) / (other.real * other.real + other.imaginary * other.imaginary);
+
+        return copy;
     }
 
-    complex& operator/ (const float& other)
+    friend complex operator/ (const float& first, const complex& second)
     {
-        real = real / other;
-        imaginary = imaginary / other;
+        complex firstValue = complex(first);
 
-        return *this;
-    }
-
-    complex& operator/ (const complex& other)
-    {
-        real = (real * other.real + imaginary * other.imaginary) / (other.real * other.real + other.imaginary * other.imaginary);
-        imaginary = (imaginary * other.real - real * other.imaginary) / (other.real * other.real + other.imaginary * other.imaginary);
-
-        return *this;
-    }
-
-    friend complex& operator/ (const float& other, complex& _complex)
-    {
-        return complex(other) / _complex;
-    }
-
-    friend complex& operator/ (const float& other, complex&& _complex)
-    {
-        return complex(other) / _complex;
+        return firstValue / second;
     }
 
     complex& operator= (const float& other) 

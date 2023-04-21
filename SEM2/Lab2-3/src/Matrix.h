@@ -4,6 +4,7 @@
 #include "IContainer.h"
 #include "Logger.h"
 #include "Vector.h"
+#include "complex.h"
 #include <cmath>
 
 #define EPSILON 0.0001f
@@ -616,7 +617,7 @@ public:
             for (Index k = i + 1; k < rows; k++)
             {
                 T ratio = this->Get(k, i) / this->Get(i, i);
-                RowsLinearCombination(-ratio, k, i);
+                RowsLinearCombination(T() - ratio, k, i);
             }
         }
 
@@ -668,7 +669,7 @@ public:
             for (Index k = 0; k < i; k++)
             {
                 T ratio = result.Get(k, i) / result.Get(i, i);
-                result.RowsLinearCombination(-ratio, k, i);
+                result.RowsLinearCombination(T() - ratio, k, i);
             }
         }
 
@@ -698,7 +699,7 @@ public:
         return result.Matrix<ReturnType>::InverseGauss();
     }
 
-    Matrix<T> InverseMatrix() const
+    Matrix<T> Inverse() const
     {
         if (!isSquare())
         {
@@ -715,7 +716,7 @@ public:
     }
 
     template <typename ReturnType>
-    Matrix<ReturnType> InverseMatrix() const
+    Matrix<ReturnType> Inverse() const
     {
         Matrix<ReturnType> result = Matrix<ReturnType>(rows, columns, ReturnType());
 
@@ -727,10 +728,10 @@ public:
             }
         }
 
-        return result.Matrix<ReturnType>::InverseMatrix();
+        return result.Matrix<ReturnType>::Inverse();
     }
 
-    friend std::ostream& operator<< (std::ostream& stream, Matrix<T>& matrix)
+    friend std::ostream& operator<< (std::ostream& stream, const Matrix<T>& matrix)
     {
         for (Index i = 0; i < matrix.rows; i++)
         {
@@ -779,6 +780,59 @@ private:
         }
     }
 };
+
+// template <>
+// inline Matrix<complex>& Matrix<complex>::Triangular()
+// {
+
+//     for (Index i = 0; i < rows - 1; i++)
+//     {
+//         complex diagonalValue = matrix[i][i];
+//         complex nextRowLeading = complex(0) - matrix[i + 1][i];
+
+//         for (Index j = 0; j < columns; j++)
+//         {
+//             matrix[i][j] = matrix[i][j] * nextRowLeading;
+//             matrix[i + 1][j] = matrix[i + 1][j] * diagonalValue;
+//         }
+//         RowsLinearCombination(1, i + 1, i);        
+//     }
+
+//     for (Index i = 0; i < rows; i++)
+//     {
+//         complex diagonalValue = matrix[i][i];
+//         for (Index j = 0; j < columns; j++)
+//         {
+//             matrix[i][j] = matrix[i][j] / diagonalValue;
+//         }
+//     }
+
+//     return *this;
+// }
+
+// template <>
+// inline Matrix<complex> Matrix<complex>::Triangular() const
+// {
+//     Matrix<complex> result = Matrix<complex>(*this);
+
+//     result.Triangular();
+
+//     return result;
+// }
+
+// template <>
+// inline Matrix<complex> Matrix<complex>::InverseGauss() const
+// {
+//     Matrix<complex> result = Matrix<complex>(*this);
+
+//     for (Index i = rows - 1; i > 0; i--)
+//     {
+//         complex ratio = complex() - result[i - 1][i];
+//         result.RowsLinearCombination(ratio, i - 1, i);
+//     }
+
+//     return result;
+// }
 
 template <typename U>
 U determinant (const Matrix<U>& matrix)
