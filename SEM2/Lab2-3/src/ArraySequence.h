@@ -131,9 +131,10 @@ public:
     ArraySequence()
         : container()
     {
+        container.Realloc(0);
 	}
 
-    ArraySequence(T* data, Size count)
+    ArraySequence(const T* data, Size count)
         : container(data, count) 
     {
 	}

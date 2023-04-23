@@ -139,7 +139,7 @@ public:
 	}
 
 	//copying from array constructor
-	List(T* data, Size count) noexcept
+	List(const T* data, Size count) noexcept
 		: size(0)
 	{
 		Logger::Info("Copied List<T> from array");

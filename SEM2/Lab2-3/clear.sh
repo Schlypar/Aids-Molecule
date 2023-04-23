@@ -16,6 +16,7 @@ rm *.vcxproj
 rm *.bat
 rm *.dir
 rm Lab2-3
+rm tests
 rm -rf Debug/
 rm -rf x64/
 
@@ -26,6 +27,8 @@ rm -rf CMakeCache.txt
 rm -rf conanbuildinfo.txt
 rm -rf conaninfo.txt
 rm -rf Makefile
+rm -rf Testing/
+rm *.tcl
 
 cd ..
 

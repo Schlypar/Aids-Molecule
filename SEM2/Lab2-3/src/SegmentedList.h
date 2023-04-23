@@ -322,14 +322,12 @@ public:
 		return (Iterator)this->tail->tail->next; 
 	}
 
-	//default constructor
 	SegmentedList()
 		: head(nullptr), tail(nullptr), size(0) 
 	{
 		Logger::Info("Default constructor of SegmentedList<T>");
 	}
 
-	//copying constructor
 	SegmentedList(const SegmentedList<T>& other)
 		: size(0)
 	{
@@ -340,7 +338,6 @@ public:
 		}
 	}
 
-	//moving constructor
 	SegmentedList(SegmentedList<T>&& other)
 		: head(other.head), tail(other.tail), size(other.size)
 	{
@@ -349,8 +346,7 @@ public:
 		other.size = 0;
 	}
 
-	//copying from array constructor
-	SegmentedList(T* data, Size count)
+	SegmentedList(const T* data, Size count)
 		: size(0)
 	{
 		Logger::Info("Copied SegmentedList<T> from array");
@@ -360,7 +356,6 @@ public:
 		}
 	}
 
-	//copying from List
 	SegmentedList(const List<T>& other)
 		: size(0)
 	{
@@ -371,7 +366,6 @@ public:
 		}
 	}
 
-	//moving from List
 	SegmentedList(List<T>&& other)
 		: size(0)
 	{
@@ -515,7 +509,6 @@ public:
 		return (this->tail) ? this->tail->tail : nullptr;
 	}
 
-	//by copying
 	void insertAt(const Index index, const T& data)
 	{
 		if (index <= 0 || index > this->size)
@@ -575,7 +568,6 @@ public:
 		}
 	}
 
-	//by moving
 	void insertAt(const Index index, T&& data)
 	{
 		if (index <= 0 || index > this->size)
@@ -640,7 +632,6 @@ public:
 		return size == 0; 
 	}
 
-	//append by copying
 	void Append(const T& data)
 	{
 		Node<T>* pointer = new Node<T>;
@@ -700,7 +691,6 @@ public:
 		ResizeSegments();
 	}
 
-	//append by moving
 	void Append(T&& data)
 	{
 		Node<T>* pointer = new Node<T>;
@@ -760,7 +750,6 @@ public:
 		ResizeSegments();
 	}
 
-	//prepend by copying
 	void Prepend(const T& data)
 	{
 		Node<T>* pointer = new Node<T>;
@@ -820,7 +809,6 @@ public:
 		ResizeSegments();
 	}
 
-	//prepend by moving
 	void Prepend(T&& data)
 	{
 		Node<T>* pointer = new Node<T>;
@@ -885,7 +873,6 @@ public:
 		return Get(index); 
 	}
 
-	//copying operator =
 	SegmentedList<T>& operator= (const SegmentedList<T>& other)
 	{
 		Logger::Info("Used copying operator = of SegmentedList<T>");
@@ -897,7 +884,6 @@ public:
 		return *this;
 	}
 
-	//moving operator =
 	SegmentedList<T>& operator= (SegmentedList<T>&& other)
 	{
 		Logger::Info("Used moving operator = of SegmentedList<T>");

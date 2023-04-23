@@ -49,17 +49,33 @@ set(glad_DIR "build/")
 
 # glad_add_library(glad_gl_core_33 REPRODUCIBLE API gl:core=3.3)
 
+# testing library
+find_package(Catch2 REQUIRED)
 
+set(SOURCE_DIR "src")
 
 # setting my files
 set(SOURCES
-        # src/main.cpp
-        src/test.cpp
-        src/moduleTest.cpp
-        # src/GUI.cpp
-        # src/GUI.h
-        src/Matrix.h
+        # ${SOURCE_DIR}/main.cpp
+        ${SOURCE_DIR}/test.cpp
+        # ${SOURCE_DIR}/GUI.cpp
+        # ${SOURCE_DIR}/GUI.h
 )
+
+set(SOURCES_HEADERS
+        ${SOURCE_DIR}/Matrix.h
+        ${SOURCE_DIR}/Allocator.h
+        ${SOURCE_DIR}/Array.h
+        ${SOURCE_DIR}/ArraySequence.h
+        ${SOURCE_DIR}/complex.h
+        ${SOURCE_DIR}/ListSequence.h
+        ${SOURCE_DIR}/Logger.h
+        ${SOURCE_DIR}/Matrix.h
+        ${SOURCE_DIR}/SegmentedList.h
+        ${SOURCE_DIR}/Sequence.h
+        ${SOURCE_DIR}/Tuple.h
+        ${SOURCE_DIR}/Vector.h
+        ${SOURCE_DIR}/ADT.h)
 
 # find_package(glfw3 REQUIRED)
 # find_package(glad REQUIRED)
@@ -87,7 +103,7 @@ set(GLFW "../../../glfw-3.3.8")
 
 # ${IMGUI_SRC}
 # compiling our project together including ImGui stuff
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES} ${SOURCES_HEADERS})
 
 # linking our project together
 # target_link_libraries(
@@ -98,6 +114,34 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 #     imgui::imgui
 # )
 
+
+
 # adding inlude paths to make sure I can include them in my code
 # target_include_directories(${PROJECT_NAME} PRIVATE ${IMGUI})
 # target_include_directories(${PROJECT_NAME} PRIVATE ${GLFW}/include/)
+target_include_directories(${PROJECT_NAME} PUBLIC ${SOURCE_DIR})
+
+set(TEST_PROJECT_NAME "tests")
+
+set(TEST_DIR "tests")
+
+# set(TESTS_SOURCE 
+#         ${TEST_DIR}/moduleTest.cpp 
+#         ${TEST_DIR}/ArrayTests.cpp)
+
+# set(TESTS_HEADERS
+#         ${TEST_DIR}/ModuleTest.h
+#         ${TEST_DIR}/SegmentedListTests.h
+#         ${TEST_DIR}/SequenceTests.h)
+
+
+# adding tests to my project
+add_executable(${TEST_PROJECT_NAME} 
+        ${TEST_DIR}/ArrayTests.cpp 
+        ${TEST_DIR}/SegmentedListTests.cpp
+        ${TEST_DIR}/SequenceTests.cpp
+        ${TEST_DIR}/MatrixTests.cpp
+        ${SOURCES_HEADERS}
+        )
+
+target_include_directories(${TEST_PROJECT_NAME} PRIVATE ${SOURCE_DIR})

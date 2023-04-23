@@ -13,15 +13,15 @@ void TestSegmentedList()
     TestSegmentedListMoveAssignment();
 }
 
-void TestArray()
-{
-    TestArrayConstructors();
-    TestArrayRealloc();
-    TestArraySet();
-    TestArrayGet();
-    TestArrayAssignmentOperator();
-    TestArrayMoveAssignmentOperator();
-}
+// void TestArray()
+// {
+//     TestArrayConstructors();
+//     TestArrayRealloc();
+//     TestArraySet();
+//     TestArrayGet();
+//     TestArrayAssignmentOperator();
+//     TestArrayMoveAssignmentOperator();
+// }
 
 void TestSequence()
 {

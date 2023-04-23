@@ -41,6 +41,12 @@ private:
     }
 
 public:
+    template <typename U>
+    friend Matrix<U> ZeroMatrix(Size dimension);
+
+    template <typename U>
+    friend Matrix<U> IdentityMatrix(Size dimension);
+
     Matrix(Size dimension, T data)
         : matrix(dimension), rows(dimension), columns(dimension) 
     {
@@ -118,6 +124,11 @@ public:
         Index k = 0;
         ((data[k++] = args), ...);
 
+        for (Index i = sizeof...(args); i < rows * columns; i++)
+        {
+            data[i] = T();
+        }
+
         for (Index i = 0; i < rows; i++)
         {
             matrix[i] = Array<T>(columns);
@@ -148,6 +159,7 @@ public:
         Logger::Info("Destroyed Matrix<T> with %u rows and %u columns", rows, columns);
     }
 
+    
 
     Array<T>& Get(Index i) const 
     {
@@ -272,6 +284,11 @@ public:
         }
 
         return Matrix<T>(columns, rows, data);
+    }
+
+    bool isEmpty() const noexcept
+    {
+        return (rows == 0 || columns == 0);
     }
 
     bool isSquare() const noexcept
@@ -781,58 +798,22 @@ private:
     }
 };
 
-// template <>
-// inline Matrix<complex>& Matrix<complex>::Triangular()
-// {
+template <typename U>
+Matrix<U> ZeroMatrix(Size dimension)
+{
+    return Matrix<U>(dimension, U());
+}
 
-//     for (Index i = 0; i < rows - 1; i++)
-//     {
-//         complex diagonalValue = matrix[i][i];
-//         complex nextRowLeading = complex(0) - matrix[i + 1][i];
+template <typename U>
+Matrix<U> IdentityMatrix(Size dimension)
+{
+    Matrix<U> result = Matrix<U>(dimension, U());
 
-//         for (Index j = 0; j < columns; j++)
-//         {
-//             matrix[i][j] = matrix[i][j] * nextRowLeading;
-//             matrix[i + 1][j] = matrix[i + 1][j] * diagonalValue;
-//         }
-//         RowsLinearCombination(1, i + 1, i);        
-//     }
-
-//     for (Index i = 0; i < rows; i++)
-//     {
-//         complex diagonalValue = matrix[i][i];
-//         for (Index j = 0; j < columns; j++)
-//         {
-//             matrix[i][j] = matrix[i][j] / diagonalValue;
-//         }
-//     }
-
-//     return *this;
-// }
-
-// template <>
-// inline Matrix<complex> Matrix<complex>::Triangular() const
-// {
-//     Matrix<complex> result = Matrix<complex>(*this);
-
-//     result.Triangular();
-
-//     return result;
-// }
-
-// template <>
-// inline Matrix<complex> Matrix<complex>::InverseGauss() const
-// {
-//     Matrix<complex> result = Matrix<complex>(*this);
-
-//     for (Index i = rows - 1; i > 0; i--)
-//     {
-//         complex ratio = complex() - result[i - 1][i];
-//         result.RowsLinearCombination(ratio, i - 1, i);
-//     }
-
-//     return result;
-// }
+    for (Index i = 0; i < dimension; i++)
+        result[i][i] = U(1);
+    
+    return result;
+}
 
 template <typename U>
 U determinant (const Matrix<U>& matrix)
@@ -857,29 +838,14 @@ U determinant (const Matrix<U>& matrix)
     {
         if (matrix[i][j] != U())
         {
-            det += std::pow(1, i + 1 + j + 1) * determinant(matrix.GetMinor(i, j));
+            det += std::pow(-1, i + 1 + j + 1) * determinant(matrix.GetMinor(i, j));
         }
     }
 
     return det;
 }
 
-template <typename U>
-Matrix<U> ZeroMatrix(Size dimension)
-{
-    return Matrix<U>(dimension, U());
-}
 
-template <typename U>
-Matrix<U> IdentityMatrix(Size dimension)
-{
-    Matrix<U> result = Matrix<U>(dimension, U());
-
-    for (Index i = 0; i < dimension; i++)
-        result[i][i] = U(1);
-    
-    return result;
-}
 
 template <typename U>
 Matrix<U> operator+ (const Matrix<U>& left, const Matrix<U>& right)

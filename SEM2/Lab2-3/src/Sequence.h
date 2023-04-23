@@ -72,7 +72,7 @@ Sequence<T>* Sequence<T>::Map(Func<T> func)
 {
     if (this->isEmpty())
     {
-        Logger::Trace("At GetSubsequence() at Sequence.h");
+        Logger::Trace("At Map() at Sequence.h");
         logException(EXCEPTION_INDEX_OUT_OF_RANGE);
         throw(EXCEPTION_INDEX_OUT_OF_RANGE);
     }
@@ -90,7 +90,7 @@ Sequence<T>* Sequence<T>::Where(Condition<T> condition)
 {
     if (this->isEmpty())
     {
-        Logger::Trace("At GetSubsequence() at Sequence.h");
+        Logger::Trace("At Where() at Sequence.h");
         logException(EXCEPTION_INDEX_OUT_OF_RANGE);
         throw(EXCEPTION_INDEX_OUT_OF_RANGE);
     }
@@ -109,7 +109,7 @@ Sequence<T>* Sequence<T>::Where(Condition<T> condition)
 template<typename T>
 Sequence<T>* Sequence<T>::GetSubsequence(const Index start, const Index end)
 {
-    if (this->isEmpty() || start > end || end >= this->GetLength())
+    if (this->isEmpty() || end >= this->GetLength())
     {
         Logger::Trace("At GetSubsequence() at Sequence.h");
         logException(EXCEPTION_INDEX_OUT_OF_RANGE);
@@ -129,7 +129,7 @@ Sequence<T>* Sequence<T>::Concat(Sequence<T>* other)
 {
     if (this->isEmpty() || other->isEmpty())
     {
-        Logger::Trace("At GetSubsequence() at Sequence.h");
+        Logger::Trace("At Concat() at Sequence.h");
         logException(EXCEPTION_INDEX_OUT_OF_RANGE);
         throw(EXCEPTION_INDEX_OUT_OF_RANGE);
     }
@@ -158,20 +158,39 @@ Sequence<T>* Sequence<T>::Concat(Sequence<T>* other)
 template <typename T>
 Sequence<T>* Sequence<T>::Slice(const Index index, Size size, Sequence<T>* other)
 {
-    if (this->isEmpty() || index >= this->GetLength() || size > other->GetLength() || index + size > this->GetLength())
+    if (this->isEmpty() || index >= this->GetLength())
     {
-        Logger::Trace("At GetSubsequence() at Sequence.h");
+        Logger::Trace("At Slice(1) at Sequence.h");
         logException(EXCEPTION_INDEX_OUT_OF_RANGE);
         throw(EXCEPTION_INDEX_OUT_OF_RANGE);
     }
-
-    Sequence<T>* result = this->Copy();
-
-    for (Index i = 0; i < size; i++)
+    if (other != NULL)
     {
-        result->Get(i + index) = other->Get(i);
+        if (size > other->GetLength() || index + size > this->GetLength())
+        {
+            Logger::Trace("At Slice(2) at Sequence.h");
+            logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+            throw(EXCEPTION_INDEX_OUT_OF_RANGE);
+        }
     }
-    
+
+    Sequence<T>* result = this->Create();
+
+    if (other != NULL)
+    {
+        for (Index i = 0; i < size; i++)
+        {
+            result->Get(i + index) = other->Get(i);
+        }
+    }
+    else
+    {
+        for (Index i = 0; i < index; i++)
+            result->Append(this->Get(i));
+        
+        for (Index i = index + size; i < this->GetLength(); i++)
+            result->Append(this->Get(i));
+    }
     return result;
 }
 
@@ -180,7 +199,7 @@ T Sequence<T>::Reduce(Reducer<T> reducer, T base)
 {
     if (this->isEmpty())
     {
-        Logger::Trace("At GetSubsequence() at Sequence.h");
+        Logger::Trace("At Reduce() at Sequence.h");
         logException(EXCEPTION_INDEX_OUT_OF_RANGE);
         throw(EXCEPTION_INDEX_OUT_OF_RANGE);
     }

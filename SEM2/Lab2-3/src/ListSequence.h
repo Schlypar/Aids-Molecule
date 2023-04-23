@@ -134,7 +134,7 @@ public:
     {
 	}
 
-    ListSequence(T* data, Size count)
+    ListSequence(const T* data, Size count)
         : container(data, count) 
     {
 	}

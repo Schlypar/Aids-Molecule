@@ -11,7 +11,6 @@ class Array : IContainer<T>
 {
 private:
     Size size;
-    // Size capacity;
     T* data = NULL;
 
 public:
@@ -90,13 +89,13 @@ public:
     }
 
     Array()
-        : size(0), data(new T[1])
+        : size(1), data(new T[1])
     {
         Logger::Info("Default constructor of Array<T>");
         data[0] = T();
     }
 
-    Array(T* other, Size count)
+    Array(const T* other, Size count)
         : size(count), data(new T[count])
     {
         Logger::Info("Copied Array<T> from array");
@@ -166,20 +165,25 @@ public:
             throw EXCEPTION_INDEX_OUT_OF_RANGE;
         }
 
-        // size = std::min((int)size, newSize);
-
         T* newBlock = new T[newSize];
 
-        if (data)
+        for (Index i = 0; i < newSize; i++)
+            newBlock[i] = T();
+
+        if (newSize > 0)
         {
-            for (Index i = 0; i < size; i++)
-                newBlock[i] = std::move(data[i]);
+            if (size < newSize)
+            {
+                for (Index i = 0; i < size; i++)
+                    newBlock[i] = std::move(data[i]);
+            }
+            else 
+            {
+                for (Index i = 0; i < newSize; i++)
+                    newBlock[i] = std::move(data[i]);
+            }
         }
-        else
-        {
-            for (Index i = 0; i < size; i++)
-                newBlock[i] = T();
-        }
+            
         size = newSize;
         
         if (data)
@@ -187,11 +191,6 @@ public:
 
         data = newBlock;
     }
-
-    // void SetSize(Size newSize)
-    // {
-    //     size= newSize;
-    // }
 
     void Set(const Index index, T data)
     {
@@ -281,6 +280,7 @@ public:
         size = other.size;
 
         other.data = nullptr;
+        other.size = 0;
 
         return *this;
     }
