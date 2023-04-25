@@ -4,7 +4,7 @@
 #include <utility>
 
 
-template <typename T>
+template <class T>
 class UniquePtr
 {
 private:
@@ -102,13 +102,13 @@ public:
     }
 };
 
-template <typename T>
+template <class T>
 void swap (UniquePtr<T>& left, UniquePtr<T>& right)
 {
     left.swap(right);
 }
 
-template <typename T>
+template <class T>
 class SharedPtr
 {
 private:
@@ -194,8 +194,92 @@ public:
     }
 };
 
-template <typename T>
+template <class T>
 void swap (SharedPtr<T>& left, SharedPtr<T>& right)
+{
+    left.swap(right);
+}
+
+template <class T>
+class WeakPtr
+{
+private:
+    T* ptr;
+
+public:
+    WeakPtr() noexcept
+        : ptr()
+    {
+    }
+
+    WeakPtr(std::nullptr_t) noexcept
+        : ptr(nullptr)
+    {
+    }
+
+    WeakPtr(T* object) noexcept
+        : ptr(object)
+    {
+    }
+
+    WeakPtr(const WeakPtr<T>& other) noexcept
+        : ptr(other.ptr)
+    {
+    }
+
+    ~WeakPtr() noexcept
+    {
+        delete ptr; 
+    }
+
+    WeakPtr<T>& operator= (const WeakPtr<T>& other) noexcept
+    {
+         this->ptr = other.ptr;
+
+         return *this;
+    }
+
+    WeakPtr<T>& operator= (std::nullptr_t) noexcept
+    {
+        reset();
+
+        return *this;
+    }
+
+    WeakPtr(WeakPtr<T>&& other) = delete;
+    WeakPtr<T>& operator= (WeakPtr<T>&& other) = delete;
+
+    T& operator* () const noexcept
+    {
+        return *(this->ptr);
+    }
+
+    operator bool() const noexcept
+    {
+        return this->ptr;
+    }
+
+    T* release() noexcept
+    {
+        T* result = nullptr;
+        std::swap(result, ptr);
+        return result;
+    }
+
+    void swap(WeakPtr<T>& other) noexcept
+    {
+        std::swap(ptr, other.ptr);
+    }
+
+    void reset() noexcept
+    {
+        T* temp = release();
+        delete temp;
+    }
+};
+
+template <class T>
+void swap (WeakPtr<T>& left, WeakPtr<T>& right)
 {
     left.swap(right);
 }
