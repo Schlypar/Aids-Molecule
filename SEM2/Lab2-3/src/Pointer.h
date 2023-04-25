@@ -107,3 +107,95 @@ void swap (UniquePtr<T>& left, UniquePtr<T>& right)
 {
     left.swap(right);
 }
+
+template <typename T>
+class SharedPtr
+{
+private:
+    T* ptr;
+    int counter;
+
+public:
+    SharedPtr() noexcept
+        : ptr(), counter(0)
+    {
+    }
+
+    SharedPtr(std::nullptr_t) noexcept
+        : ptr(nullptr), counter(0)
+    {
+    }
+
+    SharedPtr(T* object) noexcept
+        : ptr(object), counter(1)
+    {
+    }
+
+    SharedPtr(const SharedPtr<T>& other) noexcept
+        : ptr(other.ptr), counter(other.counter + 1)
+    {
+    }
+
+    ~SharedPtr() noexcept
+    {
+        counter--;
+
+        if (counter <= 0)
+            delete ptr; 
+    }
+
+    SharedPtr<T>& operator= (const SharedPtr<T>& other) noexcept
+    {
+         this->ptr = other.ptr;
+         this->counter = other.counter + 1;
+
+         return *this;
+    }
+
+    SharedPtr<T>& operator= (std::nullptr_t) noexcept
+    {
+        reset();
+
+        return *this;
+    }
+
+    SharedPtr(SharedPtr<T>&& other) = delete;
+    SharedPtr<T>& operator= (SharedPtr<T>&& other) = delete;
+
+    T& operator* () const noexcept
+    {
+        return *(this->ptr);
+    }
+
+    operator bool() const noexcept
+    {
+        return this->ptr;
+    }
+
+    T* release() noexcept
+    {
+        T* result = nullptr;
+        std::swap(result, ptr);
+        counter = 0;
+        return result;
+    }
+
+    void swap(SharedPtr<T>& other) noexcept
+    {
+        std::swap(ptr, other.ptr);
+        std::swap(counter, other.counter);
+    }
+
+    void reset() noexcept
+    {
+        T* temp = release();
+        counter = 0;
+        delete temp;
+    }
+};
+
+template <typename T>
+void swap (SharedPtr<T>& left, SharedPtr<T>& right)
+{
+    left.swap(right);
+}

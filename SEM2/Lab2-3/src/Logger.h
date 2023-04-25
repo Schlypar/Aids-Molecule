@@ -118,10 +118,10 @@ inline void logException(Exception e)
 		Logger::Error("index out of range");
 		break;
 	case EXCEPTION_BAD_POINTER:
-		Logger::Fatal("Invalid pointer");
+		Logger::Error("Invalid pointer");
 		break;
 	case EXCEPTION_BAD_CONTAINER:
-		Logger::Fatal("Bad container");
+		Logger::Error("Bad container");
 		break;
 	default:
 		break;
