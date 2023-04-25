@@ -1,5 +1,9 @@
 #pragma once
 
+#include <cmath>
+#include <cstdlib>
+#include <stdlib.h>
+
 #include "Allocator.h"
 #include "Logger.h"
 
@@ -10,6 +14,12 @@ private:
     Array<T> vector;
 
 public:
+    Vector()
+        : vector()
+    {
+        Logger::Warn("Default constructor of Vector has been invoked");
+    }
+
     Vector(Size dimension, T data)
         : vector(dimension) 
     {
@@ -80,9 +90,36 @@ public:
         Logger::Info("Destroyed Vector<T> of dimension %u", vector.GetLength());
     }
 
+    void Randomize()
+    {
+        srand(time(NULL));
+        for (Index i = 0; i < Dimension(); i++)
+            vector[i] = T(std::rand() % 100 + (std::rand() % 100) / 100);
+    }
+
+    void Normalize()
+    {
+        T norm = EuclidianNorm();
+
+        (*this) /= norm;
+    }
+
     T& Get(Index i) const
     {
         return vector[i];
+    }
+
+    T GetMax() const noexcept
+    {
+        T max = Get(0);
+
+        for (Index i = 1; i < Dimension(); i++)
+        {
+            if (vector[i] > max)
+                max = vector[i];
+        }
+
+        return max;
     }
 
     Size Dimension() const
@@ -108,6 +145,8 @@ public:
         this->vector.~Array();
 
         vector = other.vector;
+
+        return *this;
     }
 
     Vector<T>& operator= (Vector<T>&& other)
@@ -142,6 +181,16 @@ public:
         return vector;
     }
 
+    T EuclidianNorm() const
+    {
+        T sum = T();
+
+        for (Index i = 0; i < Dimension(); i++)
+            sum += vector[i] * vector[i];
+        
+        return std::sqrt(sum);
+    }
+
     template <typename U>
     friend Vector<U> operator+ (const Vector<U>& left, const Vector<U>& right);
 
@@ -169,6 +218,26 @@ public:
 
     template <typename U>
     friend Vector<U> operator* (const U& left, const Vector<U>& right);
+
+    template <typename U>
+    Vector<U>& operator/= (const U& other)
+    {
+        for (Index i = 0; i < Dimension(); i++)
+            vector[i] = vector[i] / other;
+        
+        return *this;
+    }
+
+    template <typename U>
+    friend Vector<U> operator/ (const Vector<U>& left, const U& right)
+    {
+        Vector<U> result = Vector<U>(left);
+
+        for (Index i = 0; i < left.Dimension(); i++)
+            result[i] = result[i] / right;
+
+        return result;
+    }
 
     friend std::ostream& operator<< (std::ostream& stream, const Vector<T>& vector)
     {

@@ -222,6 +222,11 @@ public:
         return size; 
     }
 
+    void SetSize(Size newSize)
+    {
+        size = newSize;
+    }
+
     bool isEmpty() const noexcept override 
     { 
         return (size == 0 || !data); 

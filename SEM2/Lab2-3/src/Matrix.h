@@ -7,7 +7,7 @@
 #include "complex.h"
 #include <cmath>
 
-#define EPSILON 0.0001f
+#define EPSILON 1e-7
 
 template <typename T>
 T makeFloatZero(T& data)
@@ -46,6 +46,15 @@ public:
 
     template <typename U>
     friend Matrix<U> IdentityMatrix(Size dimension);
+
+    template <typename U>
+    friend Matrix<U> OuterProduct(const Vector<U>& left, const Vector<U>& right);
+
+    Matrix()
+        : matrix(2), rows(2), columns(2)
+    {
+        Logger::Warn("Default constructor of Matrix<T> was invoked");
+    }
 
     Matrix(Size dimension, T data)
         : matrix(dimension), rows(dimension), columns(dimension) 
@@ -159,8 +168,6 @@ public:
         Logger::Info("Destroyed Matrix<T> with %u rows and %u columns", rows, columns);
     }
 
-    
-
     Array<T>& Get(Index i) const 
     {
         if (i < 0 || i >= rows)
@@ -236,6 +243,32 @@ public:
         }
 
         return Vector<T>(rows, data);
+    }
+
+    void SetRow(Index i, const Vector<T>& row)
+    {
+        if (row.Dimension() != columns)
+        {
+            Logger::Error("At SetRow() at Matrix<T>");
+            logException(EXCEPTION_BAD_CONTAINER);
+            throw EXCEPTION_BAD_CONTAINER;
+        }
+
+        for (Index j = 0 ; j < columns; j++)
+            matrix[i][j] = row[j];
+    }
+
+    void SetColumn(Index j, const Vector<T>& column)
+    {
+        if (column.Dimension() != rows)
+        {
+            Logger::Error("At SetRow() at Matrix<T>");
+            logException(EXCEPTION_BAD_CONTAINER);
+            throw EXCEPTION_BAD_CONTAINER;
+        }
+
+        for (Index i = 0; i < rows; i++)
+            matrix[i][j] = column[i];
     }
 
     Matrix<T> GetMinor(Index i, Index j) const
@@ -375,6 +408,9 @@ public:
 
     template <typename U>
     friend Matrix<U> operator* (const Matrix<U>& left, const U& right);
+
+    template <typename U>
+    friend Vector<U> operator* (const Matrix<U>& left, const Vector<U>& right);
 
     Matrix<T>& RowsLinearCombination(const T& multiplier, Index which, Index other)
     {
@@ -732,6 +768,85 @@ public:
         return result;
     }
 
+    // Gram-Schmidt algorithm
+    Array<Matrix<T>> QRDecomposition() const 
+    {
+        Size n = columns;
+        Matrix<T> Q = Matrix<T>(rows, columns, T());
+        Matrix<T> R = Matrix<T>(columns, columns, T());
+        for (Index j = 0; j < n; j++) 
+        {
+            Vector<T> q(rows, T());
+            for (Index i = 0; i < rows; i++) 
+                q[i] = matrix[i][j];
+
+            for (Index k = 0; k < j; k++) 
+            {
+                T dotProduct = q * Q.GetColumn(k);
+
+                for (Index i = 0; i < rows; i++) 
+                    q[i] -= dotProduct * Q.matrix[i][k];
+
+                R.Set(k, j, dotProduct);
+            }
+
+            T norm = q.EuclidianNorm();
+
+            // if (norm == 0) 
+            //     throw std::runtime_error("Matrix is not full rank");
+
+            for (Size i = 0; i < rows; i++) 
+                Q.Set(i, j, q[i] / norm);
+
+            R.Set(j, j, norm);
+        }
+
+        return Array<Matrix<T>>(Q, R);
+    }
+
+    template <typename ReturnType>
+    Array<Matrix<ReturnType>> QRDecomposition() const
+    {
+        Matrix<ReturnType> result = Matrix<ReturnType>(rows, columns, ReturnType());
+
+        for (Index i = 0; i < rows; i++)
+        {
+            for (Index j = 0; j < columns; j++)
+            {
+                result[i][j] = ReturnType(this->Get(i, j));
+            }
+        }
+
+        return result.Matrix<ReturnType>::QRDecomposition();
+    }
+
+    Tuple<T, Vector<T>> Eigenpair()
+    {
+        if (!isSquare())
+        {
+            Logger::Trace("At Eigenpair() at Matrix<T>");
+            logException(EXCEPTION_BAD_CONTAINER);
+            throw EXCEPTION_BAD_CONTAINER;
+        }
+
+        T lambdaOld = 1;
+        T lambdaNew = T();
+
+        Vector<T> temp = {columns, T()};
+        temp.Randomize();
+
+        for (Index i = 0; i < 15; i++)
+        {
+            temp = (*this) * temp;
+            temp /= temp.EuclidianNorm();
+        }
+
+        Vector<T> eigenvector = (*this) * temp;
+        T eigenvalue = eigenvector.EuclidianNorm() / temp.EuclidianNorm();
+
+        return Tuple<T, Vector<T>>(eigenvalue, eigenvector);
+    }
+
     template <typename ReturnType>
     Matrix<ReturnType> Inverse() const
     {
@@ -1049,4 +1164,41 @@ Matrix<U> operator* (const Matrix<U>& left, const U& right)
     }
     
     return Matrix<U>(rows, columns, data);
+}
+
+template <typename U>
+Vector<U> operator* (const Matrix<U>& left, const Vector<U>& right)
+{
+    if (left.columns != right.Dimension())
+    {
+        Logger::Trace("At operator*(const Matrix<U>& left, const Vector<U>& right)");
+        logException(EXCEPTION_BAD_CONTAINER);
+        throw EXCEPTION_BAD_CONTAINER;
+    }
+
+    Vector<U> result = Vector<U>(right.Dimension());
+    for (Index i = 0; i < left.rows; i++)
+    {
+        result[i] = left.GetRow(i) * right;
+    }
+
+    return result;
+}
+
+template <typename U>
+Matrix<U> OuterProduct(const Vector<U>& left, const Vector<U>& right)
+{
+    Matrix<U> result = Matrix<U>(left.Dimension(), right.Dimension(), U());
+
+    for (Index i = 0; i < result.rows; i++)
+    {
+        U currentLeftValue = left[i];
+
+        for (Index j = 0; j < result.columns; j++)\
+        {
+            result[i][j] = currentLeftValue * right[j];
+        }
+    }
+
+    return result;
 }
