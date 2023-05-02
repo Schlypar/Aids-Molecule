@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Allocator.h"
-#include "IContainer.h"
+#include "../Sequence/IContainer.h"
 #include "Logger.h"
 #include "Vector.h"
 #include "complex.h"

@@ -6,7 +6,7 @@
 
 LogPriority Logger::priority = FatalPriority;
 
-#include "Array.h"
+#include "Sequence/Array.h"
 
 TEST_CASE("Default constructor creates an array of size 1") {
   Array<int> arr;

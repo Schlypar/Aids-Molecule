@@ -1,7 +1,7 @@
 #include "moduleTest.h"
 
 #include "Allocator.h"
-#include "ArraySequence.h"
+#include "Sequence/ArraySequence.h"
 #include <catch2/catch.hpp>
 
 // inline int square (int& x) { return x * x; }

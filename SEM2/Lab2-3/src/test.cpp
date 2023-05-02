@@ -1,11 +1,10 @@
 
 #include "ADT.h"
 #include "Allocator.h"
-#include "ArraySequence.h"
+#include "Sequence/ArraySequence.h"
 #include "Pointer.h"
-#include "Tree.h"
-
-#include <memory>
+#include "Tree/BinaryTree.h"
+#include "Linal/Matrix.h"
 
 LogPriority Logger::priority = TracePriority;
 
@@ -22,7 +21,7 @@ int main()
 
     tree->Insert(10);
 
-    std::cout << tree->Depth(tree->GetRoot(), 1) << "\n";
+    std::cout << *tree << "\n";
 
     return 0;        
 }

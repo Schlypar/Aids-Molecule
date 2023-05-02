@@ -2,9 +2,9 @@
 
 #include <utility>
 
-#include "Sequence.h"
-#include "ListSequence.h"
-#include "ArraySequence.h"
+#include "Sequence/Sequence.h"
+#include "Sequence/ListSequence.h"
+#include "Sequence/ArraySequence.h"
 #include "Tuple.h"
 
 template <typename T>

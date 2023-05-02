@@ -3,10 +3,10 @@
 #include <iostream>
 #include <variant>
 
-#include "List.h"
-#include "Array.h"
+#include "Sequence/List.h"
+#include "Sequence/Array.h"
 
-#include "Sequence.h"
+#include "Sequence/Sequence.h"
 
 #include "Logger.h"
 

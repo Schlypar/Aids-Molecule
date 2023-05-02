@@ -53,6 +53,7 @@ set(glad_DIR "build/")
 find_package(Catch2 REQUIRED)
 
 set(SOURCE_DIR "src")
+set(INCLUDE "include")
 
 # setting my files
 set(SOURCES
@@ -63,21 +64,21 @@ set(SOURCES
 )
 
 set(SOURCES_HEADERS
-        ${SOURCE_DIR}/Matrix.h
-        ${SOURCE_DIR}/Allocator.h
-        ${SOURCE_DIR}/Array.h
-        ${SOURCE_DIR}/ArraySequence.h
-        ${SOURCE_DIR}/complex.h
-        ${SOURCE_DIR}/ListSequence.h
-        ${SOURCE_DIR}/Logger.h
-        ${SOURCE_DIR}/Matrix.h
-        ${SOURCE_DIR}/SegmentedList.h
-        ${SOURCE_DIR}/Sequence.h
-        ${SOURCE_DIR}/Tuple.h
-        ${SOURCE_DIR}/Tree.h
-        ${SOURCE_DIR}/Pointer.h
-        ${SOURCE_DIR}/Vector.h
-        ${SOURCE_DIR}/ADT.h)
+        ${INCLUDE}/Allocator.h
+        ${INCLUDE}/Linal/Matrix.h
+        ${INCLUDE}/Sequence/Array.h
+        ${INCLUDE}/Sequence/ArraySequence.h
+        ${INCLUDE}/complex.h
+        ${INCLUDE}/Sequence/ListSequence.h
+        ${INCLUDE}/Logger.h
+        ${INCLUDE}/Sequence/SegmentedList.h
+        ${INCLUDE}/Sequence/Sequence.h
+        ${INCLUDE}/Tuple.h
+        ${INCLUDE}/Tree/ITree.h
+        ${INCLUDE}/Tree/BinaryTree.h
+        ${INCLUDE}/Pointer.h
+        ${INCLUDE}/Linal/Vector.h
+        ${INCLUDE}/ADT.h)
 
 # find_package(glfw3 REQUIRED)
 # find_package(glad REQUIRED)
@@ -121,7 +122,8 @@ add_executable(${PROJECT_NAME} ${SOURCES} ${SOURCES_HEADERS})
 # adding inlude paths to make sure I can include them in my code
 # target_include_directories(${PROJECT_NAME} PRIVATE ${IMGUI})
 # target_include_directories(${PROJECT_NAME} PRIVATE ${GLFW}/include/)
-target_include_directories(${PROJECT_NAME} PUBLIC ${SOURCE_DIR})
+target_include_directories(${PROJECT_NAME} PUBLIC ${SOURCE_DIR}/)
+target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDE}/)
 
 set(TEST_PROJECT_NAME "tests")
 
@@ -147,3 +149,4 @@ add_executable(${TEST_PROJECT_NAME}
         )
 
 target_include_directories(${TEST_PROJECT_NAME} PRIVATE ${SOURCE_DIR})
+target_include_directories(${TEST_PROJECT_NAME} PRIVATE ${INCLUDE})

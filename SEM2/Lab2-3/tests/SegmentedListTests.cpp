@@ -1,7 +1,7 @@
 #include "Logger.h"
 #include "moduleTest.h"
 
-#include "SegmentedList.h"
+#include "Sequence/SegmentedList.h"
 
 TEST_CASE("SegmentedList constructors", "[SegmentedList]")
 {
