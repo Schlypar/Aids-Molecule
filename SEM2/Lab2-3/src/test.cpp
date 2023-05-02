@@ -1,10 +1,6 @@
-
-#include "ADT.h"
-#include "Allocator.h"
-#include "Sequence/ArraySequence.h"
-#include "Pointer.h"
 #include "Tree/BinaryTree.h"
-#include "Linal/Matrix.h"
+#include <ADT.h>
+
 
 LogPriority Logger::priority = TracePriority;
 
@@ -13,13 +9,13 @@ int main()
 {
     // Logger::setPriority(ErrorPriority);
 
-    SharedPtr<BinaryTree<int>> tree = new BinaryTree<int>(1);
+    SharedPtr<BinaryTree<int, int>> tree = new BinaryTree<int, int>(1);
 
-    tree->Insert(2);
+    tree->Add(2);
 
-    tree->Insert(-1);
+    tree->Add(-1);
 
-    tree->Insert(10);
+    tree->Add(10);
 
     std::cout << *tree << "\n";
 

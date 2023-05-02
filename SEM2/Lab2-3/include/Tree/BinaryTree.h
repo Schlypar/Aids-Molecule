@@ -1,18 +1,33 @@
 #pragma once
 
 #include "ITree.h"
-
-
+#include "Pointer.h"
+#include <stdexcept>
 
 #define NOT_DONE true
 
+// template <typename T1, typename T2>
+// using Ptr = SharedPtr<TreeNode<T1, T2>>;
 
-template <typename T>
-class BinaryTree : Tree<T>
+
+template <typename Tkey, typename Tvalue>
+class BinaryTree : Tree<Tkey, Tvalue>
 {
-    
+    void CopyNodes(SharedPtr<TreeNode<Tkey, Tvalue>>& copyNode, const SharedPtr<TreeNode<Tkey, Tvalue>>& originalNode)
+    {
+        if (originalNode->left)
+        {
+            copyNode->left = SharedPtr<TreeNode<Tkey, Tvalue>>(new TreeNode<Tkey, Tvalue>(originalNode->left->data));
+            CopyNodes(copyNode->left, originalNode->left);
+        }
+        if (originalNode->right)
+        {
+            copyNode->right = SharedPtr<TreeNode<Tkey, Tvalue>>(new TreeNode<Tkey, Tvalue>(originalNode->right->data));
+            CopyNodes(copyNode->right, originalNode->right);
+        }
+    }
 
-    std::ostream& printTree(std::ostream& stream, const SharedPtr<TreeNode<T>>& startNode) const noexcept
+    std::ostream& printTree(std::ostream& stream, const SharedPtr<TreeNode<Tkey, Tvalue>>& startNode) const noexcept
     {
         if (startNode->left)
             this->printTree(stream, startNode->left);
@@ -26,7 +41,7 @@ class BinaryTree : Tree<T>
     }
 
 private:
-    SharedPtr<TreeNode<T>> root;
+    SharedPtr<TreeNode<Tkey, Tvalue>> root;
 
 public:
     BinaryTree()
@@ -35,24 +50,39 @@ public:
         Logger::Info("Default constructor of BinaryTree<T>");
     }
 
-    BinaryTree(const T& startValue)
-        : root(new TreeNode<T>(startValue))
+    BinaryTree(const Tvalue& startValue)
+        : root(new TreeNode<Tkey, Tvalue>(startValue))
     {
         Logger::Info("Starting value constructor of BinaryTree<T>");
     }
 
-    BinaryTree(const TreeNode<T>* startRoot)
+    BinaryTree(const Tvalue& startValue, KGen<Tkey, Tvalue> kGen)
+        : root(new TreeNode<Tkey, Tvalue>(startValue, kGen))
+    {
+        Logger::Info("Starting value constructor of BinaryTree<T>");
+    }
+
+    BinaryTree(const TreeNode<Tkey, Tvalue>* startRoot)
         : root(startRoot)
     {
         Logger::Info("Starting root node constructor of BinaryTree<T>");
     }
 
-    virtual ~BinaryTree()
+    BinaryTree(const BinaryTree<Tkey, Tvalue>& other)
+        : root(nullptr)
     {
-        // Logger::Info("BinaryTree<T> was destroyed");
+        if (other.root != nullptr)
+        {
+            root = new TreeNode<Tkey, Tvalue>(other.root->data, other.root->kGen);
+            CopyNodes(root, other.root);
+        }
     }
 
-    Size Depth(SharedPtr<TreeNode<T>> startNode) const noexcept override
+    virtual ~BinaryTree()
+    {
+    }
+
+    Size Depth(SharedPtr<TreeNode<Tkey, Tvalue>> startNode) const noexcept override
     {
         Size depth = 0;
         if (startNode->left)
@@ -64,7 +94,7 @@ public:
         return depth; 
     }
 
-    Size Depth(SharedPtr<TreeNode<T>> startNode, Size depth) const noexcept override
+    Size Depth(SharedPtr<TreeNode<Tkey, Tvalue>> startNode, Size depth) const noexcept override
     {
         depth++;
         Size leftDepth = 0;
@@ -96,28 +126,28 @@ public:
         return depth + std::max(leftDepth, rightDepth); 
     }
 
-    Tree<T>* Insert(const T& value) noexcept override
+    Tree<Tkey, Tvalue>* Add(const Tvalue& value) noexcept override
     {
         if (root == nullptr)
         {
-            root = SharedPtr<TreeNode<T>>(new TreeNode<T>(value));
+            root = SharedPtr<TreeNode<Tkey, Tvalue>>(new TreeNode<Tkey, Tvalue>(value));
             return this;
         }
 
-        SharedPtr<TreeNode<T>> current = root;
+        SharedPtr<TreeNode<Tkey, Tvalue>> current = root;
 
         while (NOT_DONE)
         {
             if (current->left == nullptr)
             {
-                current->left = SharedPtr<TreeNode<T>>(new TreeNode<T>(value));
+                current->left = SharedPtr<TreeNode<Tkey, Tvalue>>(new TreeNode<Tkey, Tvalue>(value));
                 current->left->parent = current;
                 return this;
             }
 
             if (current->right == nullptr)
             {
-                current->right = SharedPtr<TreeNode<T>>(new TreeNode<T>(value));
+                current->right = SharedPtr<TreeNode<Tkey, Tvalue>>(new TreeNode<Tkey, Tvalue>(value));
                 current->right->parent = current;
                 return this;
             }
@@ -130,12 +160,22 @@ public:
         return this;
     }
 
-    SharedPtr<TreeNode<T>> GetRoot() const noexcept override
+    Tree<Tkey, Tvalue>* Create() const noexcept override
+    {
+        return (Tree<Tkey, Tvalue>*) new BinaryTree<Tkey, Tvalue>();
+    }
+
+    Tree<Tkey, Tvalue>* Copy() const noexcept override
+    {
+        return (Tree<Tkey, Tvalue>*) new BinaryTree<Tkey, Tvalue>(*this);
+    }
+
+    SharedPtr<TreeNode<Tkey, Tvalue>> GetRoot() const noexcept override
     {
         return root;
     }
 
-    friend std::ostream& operator<< (std::ostream& stream, const BinaryTree<T>& tree)
+    friend std::ostream& operator<< (std::ostream& stream, const BinaryTree<Tkey, Tvalue>& tree)
     {
         tree.printTree(stream, tree.GetRoot());
 

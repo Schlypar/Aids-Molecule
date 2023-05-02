@@ -21,7 +21,7 @@ public:
     template <typename... Args>
     static List<T>* AllocateList(Args... args)
     {
-        return new List<T>(args...);
+        return new SegmentedList<T>(args...);
     }
 
     template <typename... Args>
@@ -37,20 +37,8 @@ public:
     }
 
     template <typename... Args>
-    static Sequence<T>* AllocateArraySequence(T head, Args... args)
-    {
-        return (Sequence<T>*) new ArraySequence<T>(head, args...);
-    }
-
-    template <typename... Args>
     static Sequence<T>* AllocateListSequence(Args... args)
     {
         return (Sequence<T>*) new ListSequence<T>(args...);
-    }
-
-    template <typename... Args>
-    static Sequence<T>* AllocateListSequence(T head, Args... args)
-    {
-        return (Sequence<T>*) new ListSequence<T>(head, args...);
     }
 };

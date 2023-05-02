@@ -6,3 +6,4 @@
 #include "Sequence/IIterator.h"
 #include "Allocator.h"
 #include "Linal/Matrix.h"
+#include "Tree/BinaryTree.h"

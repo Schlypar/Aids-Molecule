@@ -6,37 +6,60 @@
 #include "Logger.h"
 #include "Sequence/IContainer.h"
 
-template <typename U>
+template <typename Tkey, typename Tvalue>
+using KGen = Tkey (*)(Tvalue);
+
+template <typename Tkey, typename Tvalue>
 struct TreeNode
 {
-    U data;
+    Tkey key;
+    Tvalue data;
+    KGen<Tkey, Tvalue> kGen = nullptr;
 
-    SharedPtr<TreeNode<U>> parent;
-    SharedPtr<TreeNode<U>> left;
-    SharedPtr<TreeNode<U>> right;
+    SharedPtr<TreeNode<Tkey, Tvalue>> parent;
+    SharedPtr<TreeNode<Tkey, Tvalue>> left;
+    SharedPtr<TreeNode<Tkey, Tvalue>> right;
 
     TreeNode()
-        : data(U()), parent(nullptr), left(nullptr), right(nullptr)
+        : key(Tkey()), data(Tvalue()), kGen( [](Tvalue value) -> Tkey {return Tkey(value);} ), parent(nullptr), left(nullptr), right(nullptr)
     {
+        key = kGen(data);
     }
 
-    TreeNode(const U& value)
-        : data(value), parent(nullptr), left(nullptr), right(nullptr)
+    TreeNode(const Tvalue& value)
+        : key(Tkey(value)), data(value), kGen( [](Tvalue value) -> Tkey {return Tkey(value);} ), parent(nullptr), left(nullptr), right(nullptr)
     {
+        key = kGen(data);
     }
 
-    TreeNode(const TreeNode<U>& other)
+    TreeNode(const Tvalue& value, KGen<Tkey, Tvalue> kGen)
+        : key(Tkey(value)), data(value), kGen(kGen), parent(nullptr), left(nullptr), right(nullptr)
     {
+        key = kGen(data);
+    }
+
+    TreeNode(const Tkey& key, const Tvalue& value)
+        : key(key), data(value), kGen( [](Tvalue value) -> Tkey {return Tkey(value);} ), parent(nullptr), left(nullptr), right(nullptr)
+    {
+        key = kGen(data);
+    }
+
+    TreeNode(const Tkey& key, const Tvalue& value, KGen<Tkey, Tvalue> kGen)
+        : key(key), data(value), kGen(kGen), parent(nullptr), left(nullptr), right(nullptr)
+    {
+        key = kGen(data);
+    }
+
+    TreeNode(TreeNode<Tkey, Tvalue>&& other)
+    {
+        key = other.key;
+        other.key = Tkey();
+
         data = other.data;
-        parent = other.parent;
-        left = other.left;
-        right = other.right;
-    }
+        other.data = Tvalue();
 
-    TreeNode(TreeNode<U>&& other)
-    {
-        data = other.data;
-        other.data = U();
+        kGen = other.kGen;
+        other.kGen = nullptr;
 
         parent = other.parent;
         other.parent = nullptr;
@@ -49,7 +72,7 @@ struct TreeNode
     }
 };
 
-template <typename T>
+template <typename Tkey, typename Tvalue>
 class Tree
 {
 public:
@@ -58,10 +81,13 @@ public:
         Logger::Info("Destroyed Tree<T>");
     }
 
-    virtual Size Depth(SharedPtr<TreeNode<T>> startNode) const noexcept = 0;
-    virtual Size Depth(SharedPtr<TreeNode<T>> startNode, Size depth) const noexcept = 0;
+    virtual Size Depth(SharedPtr<TreeNode<Tkey, Tvalue>> startNode) const noexcept = 0;
+    virtual Size Depth(SharedPtr<TreeNode<Tkey, Tvalue>> startNode, Size depth) const noexcept = 0;
     virtual Size Depth() const noexcept = 0;
 
-    virtual Tree<T>* Insert(const T& value) noexcept = 0;
-    virtual SharedPtr<TreeNode<T>> GetRoot() const noexcept = 0;
+    virtual Tree<Tkey, Tvalue>* Add(const Tvalue& value) noexcept = 0;
+    virtual SharedPtr<TreeNode<Tkey, Tvalue>> GetRoot() const noexcept = 0;
+
+    virtual Tree<Tkey, Tvalue>* Create() const noexcept = 0;
+    virtual Tree<Tkey, Tvalue>* Copy() const noexcept = 0;
 };

@@ -84,12 +84,12 @@ public:
         return ptr;
     }
 
-    bool operator== (T* other)
+    bool operator== (T* other) const
     {
         return ptr == other;
     }
 
-    bool operator== (std::nullptr_t)
+    bool operator== (std::nullptr_t) const
     {
         return ptr == nullptr;
     }
@@ -203,12 +203,12 @@ public:
         return ptr;
     }
 
-    bool operator== (T* other)
+    bool operator== (T* other) const
     {
         return ptr == other;
     }
 
-    bool operator== (std::nullptr_t)
+    bool operator== (std::nullptr_t) const
     {
         return ptr == nullptr;
     }
@@ -322,12 +322,12 @@ public:
         return ptr;
     }
     
-    bool operator== (T* other)
+    bool operator== (T* other) const
     {
         return ptr == other;
     }
 
-    bool operator== (std::nullptr_t)
+    bool operator== (std::nullptr_t) const
     {
         return ptr == nullptr;
     }
