@@ -1,25 +1,28 @@
 
 #include "ADT.h"
+#include "Allocator.h"
 #include "ArraySequence.h"
 #include "Pointer.h"
+#include "Tree.h"
+
+#include <memory>
 
 LogPriority Logger::priority = TracePriority;
 
-void fn(WeakPtr<ArraySequence<int>> ptr)
-{
-    print(*ptr, '\n');
-}
 
 int main()
 {
-    Logger::setPriority(ErrorPriority);
+    // Logger::setPriority(ErrorPriority);
 
-    WeakPtr<ArraySequence<int>> ptr(new ArraySequence(5,6,7,8,8,9,10));
+    SharedPtr<BinaryTree<int>> tree = new BinaryTree<int>(1);
 
-    // errors as expected
-    fn(ptr);
-    
-    print(*ptr, '\n');
+    tree->Insert(2);
+
+    tree->Insert(-1);
+
+    tree->Insert(10);
+
+    std::cout << tree->Depth(tree->GetRoot(), 1) << "\n";
 
     return 0;        
 }

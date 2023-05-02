@@ -9,6 +9,7 @@ class UniquePtr
 {
 private:
     T* ptr;
+    
 public:
     UniquePtr() noexcept
         : ptr(nullptr)
@@ -81,6 +82,16 @@ public:
     operator bool() const
     {
         return ptr;
+    }
+
+    bool operator== (T* other)
+    {
+        return ptr == other;
+    }
+
+    bool operator== (std::nullptr_t)
+    {
+        return ptr == nullptr;
     }
 
     T* release() noexcept
@@ -159,17 +170,47 @@ public:
         return *this;
     }
 
-    SharedPtr(SharedPtr<T>&& other) = delete;
-    SharedPtr<T>& operator= (SharedPtr<T>&& other) = delete;
-
-    T& operator* () const noexcept
+    SharedPtr(SharedPtr<T>&& other)
+        : ptr(other.ptr), counter(other.counter)
     {
-        return *(this->ptr);
+        other.ptr = nullptr;
+        other.counter = 0;
     }
 
-    operator bool() const noexcept
+    SharedPtr<T>& operator= (SharedPtr<T>&& other)
     {
-        return this->ptr;
+        ptr = other.ptr;
+        counter = other.counter;
+
+        other.ptr = nullptr;
+        other.counter = 0;
+
+        return *this;
+    }
+
+    T* operator-> () const
+    {
+        return ptr;
+    }
+
+    T& operator* () const
+    {
+        return *ptr;
+    }
+
+    operator bool() const
+    {
+        return ptr;
+    }
+
+    bool operator== (T* other)
+    {
+        return ptr == other;
+    }
+
+    bool operator== (std::nullptr_t)
+    {
+        return ptr == nullptr;
     }
 
     T* release() noexcept
@@ -246,17 +287,49 @@ public:
         return *this;
     }
 
-    WeakPtr(WeakPtr<T>&& other) = delete;
-    WeakPtr<T>& operator= (WeakPtr<T>&& other) = delete;
-
-    T& operator* () const noexcept
+    WeakPtr(WeakPtr<T>&& other)
     {
-        return *(this->ptr);
+        if (this->ptr)
+            delete ptr;
+        
+        ptr = other.ptr;
+        other.ptr = nullptr;
     }
 
-    operator bool() const noexcept
+    WeakPtr<T>& operator= (WeakPtr<T>&& other)
     {
-        return this->ptr;
+        if (this->ptr)
+            delete ptr;
+
+        ptr = other.ptr;
+        other.ptr = nullptr;
+
+        return *this;
+    }
+
+    T* operator-> () const
+    {
+        return ptr;
+    }
+
+    T& operator* () const
+    {
+        return *ptr;
+    }
+
+    operator bool() const
+    {
+        return ptr;
+    }
+    
+    bool operator== (T* other)
+    {
+        return ptr == other;
+    }
+
+    bool operator== (std::nullptr_t)
+    {
+        return ptr == nullptr;
     }
 
     T* release() noexcept

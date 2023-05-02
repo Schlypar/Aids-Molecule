@@ -74,6 +74,7 @@ set(SOURCES_HEADERS
         ${SOURCE_DIR}/SegmentedList.h
         ${SOURCE_DIR}/Sequence.h
         ${SOURCE_DIR}/Tuple.h
+        ${SOURCE_DIR}/Tree.h
         ${SOURCE_DIR}/Pointer.h
         ${SOURCE_DIR}/Vector.h
         ${SOURCE_DIR}/ADT.h)
