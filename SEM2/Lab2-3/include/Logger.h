@@ -20,6 +20,7 @@ void print(T& data, Args... args)
 
 typedef int Exception;
 
+#define EXCEPTION_BAD_LOGIC 2
 #define EXCEPTION_INDEX_OUT_OF_RANGE 1
 #define EXCEPTION_BAD_POINTER -1
 #define EXCEPTION_BAD_CONTAINER -2
@@ -122,6 +123,9 @@ inline void logException(Exception e)
 		break;
 	case EXCEPTION_BAD_CONTAINER:
 		Logger::Error("Bad container");
+		break;
+	case EXCEPTION_BAD_LOGIC:
+		Logger::Fatal("Logic was ruined");
 		break;
 	default:
 		break;

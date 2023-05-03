@@ -6,6 +6,11 @@
 #include "Logger.h"
 #include "Sequence/IContainer.h"
 
+enum TraversePath
+{
+    Left, Root, Right
+};
+
 template <typename Tkey, typename Tvalue>
 using KGen = Tkey (*)(Tvalue);
 
