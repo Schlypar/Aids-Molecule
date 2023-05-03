@@ -3,7 +3,6 @@
 #include "ITree.h"
 #include "Logger.h"
 #include "Pointer.h"
-#include <functional>
 
 #define NOT_DONE true
 
@@ -37,6 +36,105 @@ class BinaryTree : Tree<Tkey, Tvalue>
         
         if (startNode->right)
             this->printTree(stream, startNode->right);
+
+        return stream;
+    }
+
+    std::ostream& printTree(std::ostream& stream, const Ptr<Tkey, Tvalue>& startNode, TraversePath first, TraversePath second, TraversePath third) const
+    {
+        if (first == second || first == third || second == third)
+        {
+            Logger::Info("At Traverse(TraversePath, TraversePath, TraversePath) at BinaryTree<T>");
+            logException(EXCEPTION_BAD_LOGIC);
+            throw EXCEPTION_BAD_LOGIC;
+        }
+
+        if (startNode == nullptr)
+            return stream;
+        
+        
+        if (first == Left)
+            printTree(stream, startNode->left, first, second, third);
+        else if (first == Root)
+            stream << startNode->data << " ";
+        else if (first == Right)
+            printTree(stream, startNode->right, first, second, third);
+            
+        if (second == Left)
+            printTree(stream, startNode->left, first, second, third);
+        else if (second == Root)
+            stream << startNode->data << " ";
+        else if (second == Right)
+            printTree(stream, startNode->right, first, second, third);
+
+        if (third == Left)
+            printTree(stream, startNode->left, first, second, third);
+        else if (third == Root)
+            stream << startNode->data << " ";
+        else if (third == Right)
+            printTree(stream, startNode->right, first, second, third);
+    }
+
+    std::ostream& Dump(std::ostream& stream, const Ptr<Tkey, Tvalue>& startNode, TraversePath first, TraversePath second, TraversePath third) const noexcept override
+    {
+        if (first == Left)
+        {
+            std::cout << "[ ";
+            printTree(std::cout, GetRoot()->left, first, second, third);
+            std::cout << "]";
+        }
+        if (first == Root)
+        {
+            std::cout << "(";
+            std::cout << GetRoot()->data;
+            std::cout << ")";
+        }
+        if (first == Right)
+        {
+            std::cout << "[ ";
+            printTree(std::cout, GetRoot()->right, first, second, third);
+            std::cout << "]";
+        }
+
+
+        if (second == Left)
+        {
+            std::cout << "[ ";
+            printTree(std::cout, GetRoot()->left, first, second, third);
+            std::cout << "]";
+        }
+        if (second == Root)
+        {
+            std::cout << "(";
+            std::cout << GetRoot()->data;
+            std::cout << ")";
+        }
+        if (second == Right)
+        {
+            std::cout << "[ ";
+            printTree(std::cout, GetRoot()->right, first, second, third);
+            std::cout << "]";
+        }
+
+
+        if (third == Left)
+        {
+            std::cout << "[ ";
+            printTree(std::cout, GetRoot()->left, first, second, third);
+            std::cout << "]";
+        }
+        if (third == Root)
+        {
+            std::cout << "(";
+            std::cout << GetRoot()->data;
+            std::cout << ")";
+        }
+        if (third == Right)
+        {
+            std::cout << "[ ";
+            printTree(std::cout, GetRoot()->right, first, second, third);
+            std::cout << "]";
+        }
 
         return stream;
     }
@@ -176,7 +274,7 @@ public:
         return root;
     }
 
-    void Traverse (Ptr<Tkey, Tvalue> startNode, TraversePath first, TraversePath second, TraversePath third, std::function<void(Tvalue)> func)
+    void Traverse (Ptr<Tkey, Tvalue> startNode, TraversePath first, TraversePath second, TraversePath third, std::function<void(Tvalue)> func) override
     {
         if (first == second || first == third || second == third)
         {
@@ -211,7 +309,7 @@ public:
 
     }
 
-    void Traverse (TraversePath first, TraversePath second, TraversePath third, std::function<void(Tvalue)> func)
+    void Traverse (TraversePath first, TraversePath second, TraversePath third, std::function<void(Tvalue)> func) override
     {
         if (first == second || first == third || second == third)
         {
@@ -225,32 +323,43 @@ public:
         
         if (first == Left)
             Traverse(root->left, first, second, third, func);
-        if (first == Root)
+        else if (first == Root)
             func(root->data);
-        if (first == Right)
+        else if (first == Right)
             Traverse(root->right, first, second, third, func);
             
         if (second == Left)
             Traverse(root->left, first, second, third, func);
-        if (second == Root)
+        else if (second == Root)
             func(root->data);
-        if (second == Right)
+        else if (second == Right)
             Traverse(root->right, first, second, third, func);
 
         if (third == Left)
             Traverse(root->left, first, second, third, func);
-        if (third == Root)
+        else if (third == Root)
             func(root->data);
-        if (third == Right)
+        else if (third == Right)
             Traverse(root->right, first, second, third, func);
 
     }
 
+    void Dump(TraversePath first, TraversePath second, TraversePath third) const noexcept override
+    {
+        Dump(std::cout, GetRoot(), first, second, third);
+    }
+
     friend std::ostream& operator<< (std::ostream& stream, const BinaryTree<Tkey, Tvalue>& tree)
     {
-        tree.printTree(stream, tree.GetRoot());
+        tree.Dump(stream, tree.GetRoot(), Left, Root, Right);
 
         return stream;
     }
 
+    friend std::ostream& operator<< (std::ostream& stream, const SharedPtr<BinaryTree<Tkey, Tvalue>>& tree)
+    {
+        tree->Dump(stream, tree->GetRoot(), Left, Root, Right);
+
+        return stream;
+    }
 };

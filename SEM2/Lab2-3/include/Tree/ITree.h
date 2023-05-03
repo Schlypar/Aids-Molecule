@@ -5,6 +5,7 @@
 #include "Pointer.h"
 #include "Logger.h"
 #include "Sequence/IContainer.h"
+#include <functional>
 
 enum TraversePath
 {
@@ -86,6 +87,8 @@ public:
         Logger::Info("Destroyed Tree<T>");
     }
 
+
+
     virtual Size Depth(SharedPtr<TreeNode<Tkey, Tvalue>> startNode) const noexcept = 0;
     virtual Size Depth(SharedPtr<TreeNode<Tkey, Tvalue>> startNode, Size depth) const noexcept = 0;
     virtual Size Depth() const noexcept = 0;
@@ -93,6 +96,26 @@ public:
     virtual Tree<Tkey, Tvalue>* Add(const Tvalue& value) noexcept = 0;
     virtual SharedPtr<TreeNode<Tkey, Tvalue>> GetRoot() const noexcept = 0;
 
+    virtual void Traverse (SharedPtr<TreeNode<Tkey, Tvalue>> startNode, TraversePath first, TraversePath second, TraversePath third, std::function<void(Tvalue)> func) = 0;
+    virtual void Traverse (TraversePath first, TraversePath second, TraversePath third, std::function<void(Tvalue)> func) = 0;
+
     virtual Tree<Tkey, Tvalue>* Create() const noexcept = 0;
     virtual Tree<Tkey, Tvalue>* Copy() const noexcept = 0;
+
+    virtual std::ostream& Dump(std::ostream& stream, const SharedPtr<TreeNode<Tkey, Tvalue>>& startNode, TraversePath first, TraversePath second, TraversePath third) const noexcept = 0;
+    virtual void Dump(TraversePath first, TraversePath second, TraversePath third) const noexcept = 0;
+
+    friend std::ostream& operator<< (std::ostream& stream, const Tree<Tkey, Tvalue>& tree)
+    {
+        tree.Dump(stream, tree.GetRoot(), Left, Root, Right);
+
+        return stream;
+    }
+
+    friend std::ostream& operator<< (std::ostream& stream, const SharedPtr<Tree<Tkey, Tvalue>>& tree)
+    {
+        tree->Dump(stream, tree->GetRoot(), Left, Root, Right);
+
+        return stream;
+    }
 };
