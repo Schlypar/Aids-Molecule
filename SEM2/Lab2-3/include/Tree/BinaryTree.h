@@ -9,27 +9,33 @@
 template <typename Tkey, typename Tvalue>
 class BinaryTree : Tree<Tkey, Tvalue>
 {
-    void CopyNodes(Ptr<Tkey, Tvalue>& copyNode, const Ptr<Tkey, Tvalue>& originalNode) const noexcept override
+    template <typename T1, typename T2>
+    using TreeNode = typename Tree<T1,T2>::TreeNode;
+
+    template <typename T1, typename T2>
+    using NodePtr = SharedPtr<TreeNode<T1, T2>>;
+
+    void CopyNodes(NodePtr<Tkey, Tvalue>& copyNode, const NodePtr<Tkey, Tvalue>& originalNode) const noexcept override
     {
         if (originalNode->left)
         {
-            copyNode->left = Ptr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->left->data, originalNode->left->kGen));
+            copyNode->left = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->left->data, originalNode->left->kGen));
             CopyNodes(copyNode->left, originalNode->left);
         }
         if (originalNode->right)
         {
-            copyNode->right = Ptr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->right->data, originalNode->right->kGen));
+            copyNode->right = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->right->data, originalNode->right->kGen));
             CopyNodes(copyNode->right, originalNode->right);
         }
     }
 
-    void CopyNodes(Ptr<Tkey, Tvalue>& copyNode, const Ptr<Tkey, Tvalue>& originalNode, bool (*filter)(Tvalue& value)) const noexcept override
+    void CopyNodes(NodePtr<Tkey, Tvalue>& copyNode, const NodePtr<Tkey, Tvalue>& originalNode, bool (*filter)(Tvalue& value)) const noexcept override
     {
         if (originalNode->left)
         {
             if (filter(originalNode->left->data)) 
             {
-                copyNode->left = Ptr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->left->data, originalNode->left->kGen));
+                copyNode->left = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->left->data, originalNode->left->kGen));
                 CopyNodes(copyNode->left, originalNode->left, filter);
             }
             else 
@@ -39,7 +45,7 @@ class BinaryTree : Tree<Tkey, Tvalue>
         {
             if (filter(originalNode->right->data)) 
             {
-                copyNode->right = Ptr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->right->data, originalNode->right->kGen));
+                copyNode->right = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->right->data, originalNode->right->kGen));
                 CopyNodes(copyNode->right, originalNode->right, filter);
             }
             else 
@@ -47,7 +53,7 @@ class BinaryTree : Tree<Tkey, Tvalue>
         }
     }
 
-    std::ostream& printTree(std::ostream& stream, const Ptr<Tkey, Tvalue>& startNode, TraverseOrder first, TraverseOrder second, TraverseOrder third) const
+    std::ostream& printTree(std::ostream& stream, const NodePtr<Tkey, Tvalue>& startNode, TraverseOrder first, TraverseOrder second, TraverseOrder third) const
     {
         if (first == second || first == third || second == third)
         {
@@ -105,7 +111,7 @@ class BinaryTree : Tree<Tkey, Tvalue>
         }
     }
 
-    std::ostream& Dump(std::ostream& stream, const Ptr<Tkey, Tvalue>& startNode, TraverseOrder first, TraverseOrder second, TraverseOrder third) const noexcept override
+    std::ostream& Dump(std::ostream& stream, const NodePtr<Tkey, Tvalue>& startNode, TraverseOrder first, TraverseOrder second, TraverseOrder third) const noexcept override
     {
         switch(first)
         {
@@ -174,7 +180,7 @@ class BinaryTree : Tree<Tkey, Tvalue>
     }
 
 private:
-    Ptr<Tkey, Tvalue> root;
+    NodePtr<Tkey, Tvalue> root;
 
 public:
     BinaryTree()
@@ -215,7 +221,7 @@ public:
     {
     }
 
-    Size Depth(Ptr<Tkey, Tvalue> startNode) const noexcept override
+    Size Depth(NodePtr<Tkey, Tvalue> startNode) const noexcept override
     {
         Size depth = 0;
         if (startNode->left)
@@ -227,7 +233,7 @@ public:
         return depth; 
     }
 
-    Size Depth(Ptr<Tkey, Tvalue> startNode, Size depth) const noexcept override
+    Size Depth(NodePtr<Tkey, Tvalue> startNode, Size depth) const noexcept override
     {
         depth++;
         Size leftDepth = 0;
@@ -263,24 +269,24 @@ public:
     {
         if (root == nullptr)
         {
-            root = Ptr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(value));
+            root = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(value));
             return this;
         }
 
-        Ptr<Tkey, Tvalue> current = root;
+        NodePtr<Tkey, Tvalue> current = root;
 
         while (NOT_DONE)
         {
             if (current->left == nullptr)
             {
-                current->left = Ptr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(value, current->kGen));
+                current->left = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(value, current->kGen));
                 current->left->parent = current;
                 return this;
             }
 
             if (current->right == nullptr)
             {
-                current->right = Ptr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(value, current->kGen));
+                current->right = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(value, current->kGen));
                 current->right->parent = current;
                 return this;
             }
@@ -308,12 +314,12 @@ public:
         return (Tree<Tkey, Tvalue>*) new BinaryTree<Tkey, Tvalue>(*this);
     }
 
-    Ptr<Tkey, Tvalue> GetRoot() const noexcept override
+    NodePtr<Tkey, Tvalue> GetRoot() const noexcept override
     {
         return root;
     }
 
-    void Traverse (Ptr<Tkey, Tvalue> startNode, TraverseOrder first, TraverseOrder second, TraverseOrder third, std::function<void(Tvalue&)> func) override
+    void Traverse (NodePtr<Tkey, Tvalue> startNode, TraverseOrder first, TraverseOrder second, TraverseOrder third, std::function<void(Tvalue&)> func) override
     {
         if (first == second || first == third || second == third)
         {
@@ -389,7 +395,7 @@ public:
             throw EXCEPTION_BAD_LOGIC;
         }
 
-        Ptr<Tkey, Tvalue> startNode = this->root;
+        NodePtr<Tkey, Tvalue> startNode = this->root;
 
         if (startNode == nullptr)
             return;
