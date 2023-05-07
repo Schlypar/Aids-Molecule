@@ -8,14 +8,7 @@
 #include "Array.h"
 #include "Logger.h"
 
-template <typename T>
-using Func = T (*)(T&);
 
-template <typename T>
-using Condition = bool (*)(T&);
-
-template <typename T>
-using Reducer = T (*)(T, T);
 
 template <typename T>
 class Sequence

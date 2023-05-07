@@ -30,7 +30,7 @@ public:
 		Logger::Info("Initialising constructor of Tuple of size %u", sizeof...(args));
 
 		Index i = 0;
-		((data[i++] = args), ...);
+		((data[i++] = std::move(args)), ...);
 	}
 
 	template <int N>

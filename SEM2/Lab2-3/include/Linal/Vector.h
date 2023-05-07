@@ -142,7 +142,6 @@ public:
     Vector<T>& operator= (const Vector<T>& other)
     {
         Logger::Info("Used assignment operator= of Vector<T>");
-        this->vector.~Array();
 
         vector = other.vector;
 
@@ -229,15 +228,7 @@ public:
     }
 
     template <typename U>
-    friend Vector<U> operator/ (const Vector<U>& left, const U& right)
-    {
-        Vector<U> result = Vector<U>(left);
-
-        for (Index i = 0; i < left.Dimension(); i++)
-            result[i] = result[i] / right;
-
-        return result;
-    }
+    friend Vector<U> operator/ (const Vector<U>& left, const U& right);
 
     friend std::ostream& operator<< (std::ostream& stream, const Vector<T>& vector)
     {
@@ -422,4 +413,15 @@ Vector<U> operator* (const U& left, const Vector<U>& right)
         data[i] = left * right[i];
 
     return Vector<U>(dim, data);
+}
+
+template <typename U>
+Vector<U> operator/ (const Vector<U>& left, const U& right)
+{
+    Vector<U> result = Vector<U>(left);
+
+    for (Index i = 0; i < left.Dimension(); i++)
+        result[i] = result[i] / right;
+
+    return result;
 }

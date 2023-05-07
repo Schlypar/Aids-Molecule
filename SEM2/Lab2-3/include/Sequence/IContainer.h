@@ -17,3 +17,12 @@ class IContainer
 
 	virtual bool isEmpty() const = 0;
 };
+
+template <typename T>
+using Func = T (*)(T&);
+
+template <typename T>
+using Condition = bool (*)(T&);
+
+template <typename T>
+using Reducer = T (*)(T, T);

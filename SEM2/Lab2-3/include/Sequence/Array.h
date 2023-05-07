@@ -151,9 +151,12 @@ public:
     {
         if (isEmpty()) return;
 
-        delete[] data;
+        if (data != NULL)
+            delete[] data;
 
         data = new T[1];
+
+        size = 0;
     }
 
     void Realloc(int newSize)

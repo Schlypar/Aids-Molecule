@@ -179,6 +179,9 @@ public:
 
     SharedPtr<T>& operator= (SharedPtr<T>&& other)
     {
+        if (this->ptr)
+            delete ptr;
+        
         ptr = other.ptr;
         counter = other.counter;
 
@@ -227,6 +230,7 @@ public:
         std::swap(counter, other.counter);
     }
 
+private:
     void reset() noexcept
     {
         T* temp = release();
