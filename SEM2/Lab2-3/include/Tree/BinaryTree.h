@@ -47,19 +47,6 @@ class BinaryTree : Tree<Tkey, Tvalue>
         }
     }
 
-    std::ostream& printTree(std::ostream& stream, const Ptr<Tkey, Tvalue>& startNode) const noexcept
-    {
-        if (startNode->left)
-            this->printTree(stream, startNode->left);
-
-        stream << startNode->data << " ";      
-        
-        if (startNode->right)
-            this->printTree(stream, startNode->right);
-
-        return stream;
-    }
-
     std::ostream& printTree(std::ostream& stream, const Ptr<Tkey, Tvalue>& startNode, TraverseOrder first, TraverseOrder second, TraverseOrder third) const
     {
         if (first == second || first == third || second == third)
@@ -72,88 +59,115 @@ class BinaryTree : Tree<Tkey, Tvalue>
         if (startNode == nullptr)
             return stream;
         
-        
-        if (first == Left)
-            printTree(stream, startNode->left, first, second, third);
-        else if (first == Root)
-            stream << startNode->data << " ";
-        else if (first == Right)
-            printTree(stream, startNode->right, first, second, third);
-            
-        if (second == Left)
-            printTree(stream, startNode->left, first, second, third);
-        else if (second == Root)
-            stream << startNode->data << " ";
-        else if (second == Right)
-            printTree(stream, startNode->right, first, second, third);
+        switch(first)
+        {
+            case Left:
+                printTree(stream, startNode->left, first, second, third);
+                break;
+            case Root:
+                stream << startNode->data << " ";
+                break;
+            case Right:
+                printTree(stream, startNode->right, first, second, third);
+                break;
+            default:
+                break;
+        }
 
-        if (third == Left)
-            printTree(stream, startNode->left, first, second, third);
-        else if (third == Root)
-            stream << startNode->data << " ";
-        else if (third == Right)
-            printTree(stream, startNode->right, first, second, third);
+        switch(second)
+        {
+            case Left:
+                printTree(stream, startNode->left, first, second, third);
+                break;
+            case Root:
+                stream << startNode->data << " ";
+                break;
+            case Right:
+                printTree(stream, startNode->right, first, second, third);
+                break;
+            default:
+                break;
+        }
+
+        switch(third)
+        {
+            case Left:
+                printTree(stream, startNode->left, first, second, third);
+                break;
+            case Root:
+                stream << startNode->data << " ";
+                break;
+            case Right:
+                printTree(stream, startNode->right, first, second, third);
+                break;
+            default:
+                break;
+        }
     }
 
     std::ostream& Dump(std::ostream& stream, const Ptr<Tkey, Tvalue>& startNode, TraverseOrder first, TraverseOrder second, TraverseOrder third) const noexcept override
     {
-        if (first == Left)
+        switch(first)
         {
-            std::cout << "{ ";
-            printTree(std::cout, GetRoot()->left, first, second, third);
-            std::cout << "}";
-        }
-        if (first == Root)
-        {
-            std::cout << "(";
-            std::cout << GetRoot()->data;
-            std::cout << ")";
-        }
-        if (first == Right)
-        {
-            std::cout << "[ ";
-            printTree(std::cout, GetRoot()->right, first, second, third);
-            std::cout << "]";
-        }
-
-
-        if (second == Left)
-        {
-            std::cout << "{ ";
-            printTree(std::cout, GetRoot()->left, first, second, third);
-            std::cout << "}";
-        }
-        if (second == Root)
-        {
-            std::cout << "(";
-            std::cout << GetRoot()->data;
-            std::cout << ")";
-        }
-        if (second == Right)
-        {
-            std::cout << "[ ";
-            printTree(std::cout, GetRoot()->right, first, second, third);
-            std::cout << "]";
+            case Left:
+                stream << "{ ";
+                printTree(stream, GetRoot()->left, first, second, third);
+                stream << "}";
+                break;
+            case Root:
+                stream << "(";
+                stream << GetRoot()->data;
+                stream << ")";
+                break;
+            case Right:
+                stream << "[ ";
+                printTree(stream, GetRoot()->right, first, second, third);
+                stream << "]";
+                break;
+            default:
+                break;
         }
 
+        switch(second)
+        {
+            case Left:
+                stream << "{ ";
+                printTree(stream, GetRoot()->left, first, second, third);
+                stream << "}";
+                break;
+            case Root:
+                stream << "(";
+                stream << GetRoot()->data;
+                stream << ")";
+                break;
+            case Right:
+                stream << "[ ";
+                printTree(stream, GetRoot()->right, first, second, third);
+                stream << "]";
+                break;
+            default:
+                break;
+        }
 
-        if (third == Left)
+        switch(third)
         {
-            std::cout << "{ ";
-            printTree(std::cout, GetRoot()->left, first, second, third);
-            std::cout << "}";
-        }
-        if (third == Root)
-        {
-            std::cout << "(";
-            std::cout << GetRoot()->data;
-            std::cout << ")";
-        }
-        if (third == Right)
-        {
-            std::cout << "[ ";
-            printTree(std::cout, GetRoot()->right, first, second, third);
-            std::cout << "]";
+            case Left:
+                stream << "{ ";
+                printTree(stream, GetRoot()->left, first, second, third);
+                stream << "}";
+                break;
+            case Root:
+                stream << "(";
+                stream << GetRoot()->data;
+                stream << ")";
+                break;
+            case Right:
+                stream << "[ ";
+                printTree(stream, GetRoot()->right, first, second, third);
+                stream << "]";
+                break;
+            default:
+                break;
         }
 
         return stream;
@@ -271,7 +285,7 @@ public:
                 return this;
             }
 
-            if (Depth(current->left) < Depth(current->right))
+            if (current->left->key < current->right->key)
                 current = current->left;
             else current = current->right;
         }
