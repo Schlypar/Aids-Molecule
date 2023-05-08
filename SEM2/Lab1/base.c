@@ -7,7 +7,7 @@
 
 Base* CreateBase()
 {
-	return (Base*)malloc(sizeof(Base));
+	return (Base*) malloc(sizeof(Base));
 }
 
 void freeBase(Base* base)
@@ -60,7 +60,6 @@ void initialisePrint(Base* base, Print print)
 {
 	base->print = print;
 }
-
 
 void initialiseDump(Base* base, Dump dump)
 {

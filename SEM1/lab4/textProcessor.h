@@ -7,5 +7,4 @@ void sort(char **sentence, int len);
 
 char *sortWordOrder(char *text);
 
-
 #endif

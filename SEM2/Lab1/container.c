@@ -2,7 +2,7 @@
 
 Container* createContainer()
 {
-	return (Container*)malloc(sizeof(Container));
+	return (Container*) malloc(sizeof(Container));
 }
 
 int getSize(Container* container)
@@ -14,4 +14,3 @@ void initialiseSize(Container* container, int size)
 {
 	container->size = size;
 }
-

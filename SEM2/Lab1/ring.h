@@ -7,7 +7,8 @@ typedef struct Base* (*Mult)(struct Base*, struct Base*);
 typedef struct Base* (*Zero)(char*);
 typedef struct Base* (*One)(char*);
 
-typedef struct Ring {
+typedef struct Ring
+{
 	Sum sum;
 	Mult mult;
 	Zero zero;
@@ -18,15 +19,15 @@ Ring* createRing();
 
 Ring* constructRing(Sum, Mult);
 
-//Ring* getRing(Base*);
+// Ring* getRing(Base*);
 
-//Base* sumBase(Base*, Base*);
+// Base* sumBase(Base*, Base*);
 //
-//Base* multBase(Base*, Base*);
+// Base* multBase(Base*, Base*);
 //
-//Base* zeroBase(Base*);
+// Base* zeroBase(Base*);
 //
-//Base* oneBase(Base*);
+// Base* oneBase(Base*);
 
 void initialiseSum(Ring*, Sum);
 

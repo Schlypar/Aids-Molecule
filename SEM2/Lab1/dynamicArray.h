@@ -14,9 +14,10 @@
 typedef struct Array;
 
 typedef int (*Comparator)(Base*, Base*);
-typedef void(*Sort)(struct Array*);
+typedef void (*Sort)(struct Array*);
 
-typedef struct Array {
+typedef struct Array
+{
 	Container container;
 	int realsize;
 	Base** data;

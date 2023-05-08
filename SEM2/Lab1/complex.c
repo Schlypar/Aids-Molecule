@@ -1,19 +1,20 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
-#include "complex.h"
+
 #include "base.h"
+#include "complex.h"
 
 Complex* createComplex()
 {
-	return (Complex*)malloc(sizeof(Complex));
+	return (Complex*) malloc(sizeof(Complex));
 }
 
 Complex* constructComplex(double real, double imaginary)
 {
 	Complex* complex = createComplex();
-	Base* complexBase = (Base*)complex;
+	Base* complexBase = (Base*) complex;
 
 	complexBase->typeName = TYPE_NAME_COMPLEX;
 	complexBase->ring = constructRing(sumComplex, multComplex);
@@ -27,12 +28,12 @@ Complex* constructComplex(double real, double imaginary)
 	initialisePrint(complex, printComplex);
 	initialiseDump(complex, dumpComplex);
 
-	return (Base*)complex;
+	return (Base*) complex;
 }
 
 void freeComplex(Base* complex)
 {
-	free((Base*)complex->ring);
+	free((Base*) complex->ring);
 	free(complex);
 }
 
@@ -56,7 +57,7 @@ double getImaginaryPart(Complex* complex)
 	return complex->imaginary;
 }
 
-Complex* copyComplex(Complex *complex)
+Complex* copyComplex(Complex* complex)
 {
 	double realPart = getRealPart(complex);
 	double imaginaryPart = getImaginaryPart(complex);
@@ -87,14 +88,10 @@ char* printComplex(Complex* complex)
 	char* result = calloc(overallLengthWithEndAndSpaces, sizeof(char));
 
 	if (snprintf(realNumber, BASE_LENGTH_OF_ONE_PART, "%lf", realPart) == EOF)
-	{
 		return NULL;
-	}
 
 	if (snprintf(imaginaryNumber, BASE_LENGTH_OF_ONE_PART, "%lf", imaginaryPart) == EOF)
-	{
 		return NULL;
-	}
 
 	if (imaginaryPart >= 0)
 	{
@@ -127,7 +124,7 @@ char* dumpComplex(Complex* complex)
 	int lengthWithEndAndSpace = strlen(typeName) + strlen(number) + 2;
 
 	char* result = calloc(lengthWithEndAndSpace, 1);
-	
+
 	strcat(result, typeName);
 	strcat(result, space);
 	strcat(result, number);

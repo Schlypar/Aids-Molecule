@@ -7,35 +7,37 @@
 
 List *readline(const char *PROMT)
 {
-    if (PROMT) printf("%s", PROMT);
+	if (PROMT)
+		printf("%s", PROMT);
 
-    List *list = createList();
+	List *list = createList();
 
-    int error = 0, symbol;
-    char prev = '\0';
+	int error = 0, symbol;
+	char prev = '\0';
 
-    if (error == EOF)
-    {
-        listDelete(list);
-        return NULL;
-    } 
+	if (error == EOF)
+	{
+		listDelete(list);
+		return NULL;
+	}
 
-    while (((symbol = getchar()) != EOF))
-    {
-        if (symbol == '\n') break;
+	while (((symbol = getchar()) != EOF))
+	{
+		if (symbol == '\n')
+			break;
 
-        error = listPushBack(list, symbol);
-        if (error)
-        {
-            listDelete(list);
-            return NULL;
-        }
-    }
+		error = listPushBack(list, symbol);
+		if (error)
+		{
+			listDelete(list);
+			return NULL;
+		}
+	}
 
-    if (symbol == EOF) 
-    {
-        free(list);
-        return NULL;
-    }
-    return list;
+	if (symbol == EOF)
+	{
+		free(list);
+		return NULL;
+	}
+	return list;
 }

@@ -10,7 +10,7 @@
 
 typedef struct Base;
 
-typedef void(*BaseF)(struct Base*);
+typedef void (*BaseF)(struct Base*);
 
 typedef void (*Free)(struct Base*);
 typedef struct Base* (*Copy)(struct Base*);
@@ -18,9 +18,10 @@ typedef char* (*toString)(struct Base*);
 typedef toString Print;
 typedef toString Dump;
 
-typedef struct Base {
+typedef struct Base
+{
 	char* typeName;
-	Ring *ring;
+	Ring* ring;
 	Free free;
 	Copy copy;
 	toString toString;

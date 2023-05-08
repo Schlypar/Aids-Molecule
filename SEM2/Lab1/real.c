@@ -1,6 +1,7 @@
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+
 
 #include "ring.h"
 
@@ -8,13 +9,13 @@
 
 Real* createReal()
 {
-	return (Real*)malloc(sizeof(Real));
+	return (Real*) malloc(sizeof(Real));
 }
 
 Real* constructReal(double value)
 {
 	Real* real = createReal();
-	Base* realBase = (Base*)real;
+	Base* realBase = (Base*) real;
 
 	realBase->typeName = TYPE_NAME_REAL;
 	realBase->ring = constructRing(sumReal, multReal);
@@ -26,7 +27,7 @@ Real* constructReal(double value)
 	initialisePrint(realBase, printReal);
 	initialiseDump(realBase, dumpReal);
 
-	return (Base*)real;
+	return (Base*) real;
 }
 
 Real* copyReal(Real* real)
@@ -58,9 +59,7 @@ char* printReal(Real* real)
 	double realPart = getReal(real);
 	char* string = calloc(BASE_LENGTH_OF_REAL_WORD, sizeof(char));
 	if (snprintf(string, BASE_LENGTH_OF_REAL_WORD, "%lf", realPart) != EOF)
-	{
 		return string;
-	}
 }
 
 char* dumpReal(Real* real)

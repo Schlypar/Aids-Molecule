@@ -6,14 +6,15 @@
 
 #define TYPE_NAME_CONTAINER "Container"
 
-typedef void(*Append)(struct Container*, Base*);
+typedef void (*Append)(struct Container*, Base*);
 typedef Base* (*Get)(struct Container*, int);
-typedef void(*Resize)(struct Container*, int);
-typedef void(*Map)(struct Container*, BaseF);
-typedef void(*Where)(struct Container*, int (*) (Base*), BaseF);
-typedef void(*Concat)(struct Container*, struct Container*);
+typedef void (*Resize)(struct Container*, int);
+typedef void (*Map)(struct Container*, BaseF);
+typedef void (*Where)(struct Container*, int (*)(Base*), BaseF);
+typedef void (*Concat)(struct Container*, struct Container*);
 
-typedef struct Container {
+typedef struct Container
+{
 	Base base;
 	int size;
 	Append append;

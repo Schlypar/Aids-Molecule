@@ -8,11 +8,13 @@
 #define DELIM " \t"
 #define SEPARATOR "---"
 
-char **parser(char *string, int *len) {
+char **parser(char *string, int *len)
+{
 	*len = 0;
 	char *word = strtok(string, DELIM);
-	char **sentence = (char **)calloc(1, sizeof(char *));
-	while (word != NULL) {
+	char **sentence = (char **) calloc(1, sizeof(char *));
+	while (word != NULL)
+	{
 		if (word[0] == '\0')
 		{
 			word = strtok(NULL, DELIM);
@@ -28,10 +30,8 @@ char **parser(char *string, int *len) {
 
 void sort(char **sentence, int len)
 {
-	if (len == 1) 
-	{
+	if (len == 1)
 		return;
-	}
 	int len1, len2, minLen, index;
 	char *tmp;
 	for (int i = 0; i < len - 1; i++)
@@ -41,17 +41,17 @@ void sort(char **sentence, int len)
 		for (int j = i + 1; j < len; j++)
 		{
 			len2 = strlen(sentence[j]);
-			if (len2 <= minLen) 
+			if (len2 <= minLen)
 			{
 				minLen = len2;
 				index = j;
 			}
 		}
-			printf("|%-13d %8s %19d|\n|%-13s %8s %19s|\n", minLen, SEPARATOR, len1, sentence[index], SEPARATOR, sentence[i]);
-			printf("--------------------------------------------\n");
-			tmp = sentence[i];
-			sentence[i] = sentence[index];
-			sentence[index] = tmp;
+		printf("|%-13d %8s %19d|\n|%-13s %8s %19s|\n", minLen, SEPARATOR, len1, sentence[index], SEPARATOR, sentence[i]);
+		printf("--------------------------------------------\n");
+		tmp = sentence[i];
+		sentence[i] = sentence[index];
+		sentence[index] = tmp;
 	}
 }
 
@@ -67,14 +67,12 @@ char *sortWordOrder(char *text)
 	int i;
 	for (i = 0; i < len; i++)
 	{
-		if (strlen(words[i]) == 0) 
-		{
+		if (strlen(words[i]) == 0)
 			continue;
-		}
 		memcpy(string + strlen(string), words[i], strlen(words[i]));
 		memcpy(string + strlen(string), space, strlen(space) + 1);
 	}
-	string[strlen(string)-1] = '\0';
+	string[strlen(string) - 1] = '\0';
 	string = realloc(string, (strlen(string) + 1) * sizeof(char));
 	free(words);
 	string = realloc(string, (strlen(string) + 1) * sizeof(char));

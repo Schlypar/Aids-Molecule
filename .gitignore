@@ -27,3 +27,5 @@ bindings/
 .vscode/
 
 external/
+
+.*

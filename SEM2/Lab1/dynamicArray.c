@@ -1,21 +1,22 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+
 
 #include "dynamicArray.h"
 #include "sort.h"
 
 Array* createArray()
 {
-	return (Array*)malloc(sizeof(Array));
+	return (Array*) malloc(sizeof(Array));
 }
 
 Array* constructArray(int size)
 {
 	Array* array = createArray(size);
-	array->data = (Base**)malloc(size * sizeof(Base*));
+	array->data = (Base**) malloc(size * sizeof(Base*));
 
-	Base* arrayBase = (Base*)array;
+	Base* arrayBase = (Base*) array;
 
 	arrayBase->typeName = TYPE_NAME_ARRAY;
 	setRealSize(array, 0);
@@ -78,19 +79,17 @@ void setComparator(Array* array, Comparator comparator)
 void resizeArray(Array* array)
 {
 	int realSize = getRealSize(array);
-	Container* container = (Container*)array;
+	Container* container = (Container*) array;
 	container->resize(array, realSize * SIZE_TO_REAL_SIZE);
 }
 
 void appendArray(Array* array, Base* base)
 {
 	int realSize = getRealSize(array);
-	int m_size = getSize((Container*)array);
+	int m_size = getSize((Container*) array);
 
 	if (realSize >= m_size)
-	{
 		resizeArray(array);
-	}
 	if (array->data[realSize])
 	{
 		array->data[realSize] = base;
@@ -101,7 +100,8 @@ void appendArray(Array* array, Base* base)
 Base* getBase(Array* array, int index)
 {
 	int realSize = getRealSize(array);
-	if (index >= realSize) return NULL;
+	if (index >= realSize)
+		return NULL;
 
 	return array->data[index];
 }
@@ -118,7 +118,8 @@ void map(Array* array, BaseF BaseF)
 			free(typeName);
 			map(current, BaseF);
 		}
-		else free(typeName), BaseF(current);
+		else
+			free(typeName), BaseF(current);
 	}
 }
 
@@ -147,12 +148,10 @@ void concatTwoArrays(Array* arrayOne, Array* arrayTwo)
 	int realSizeOne = getRealSize(arrayOne);
 	int realSizeTwo = getRealSize(arrayTwo);
 	int newRealSizeOne = realSizeOne + realSizeTwo;
-	int sizeOne = getSize((Container*)arrayOne);
+	int sizeOne = getSize((Container*) arrayOne);
 
 	if (newRealSizeOne >= sizeOne)
-	{
 		resizeArray(arrayOne, newRealSizeOne * SIZE_TO_REAL_SIZE);
-	}
 
 	for (int i = 0; i < realSizeTwo; i++)
 	{
@@ -164,7 +163,8 @@ void concatTwoArrays(Array* arrayOne, Array* arrayTwo)
 
 void sort(Array* array)
 {
-	if (!array->comparator) return;
+	if (!array->comparator)
+		return;
 
 	Comparator comparator = getComparator(array);
 	binaryInsertionSort(array, comparator);
@@ -172,7 +172,7 @@ void sort(Array* array)
 
 void initialiseCopyArray(Array* array, Copy copy)
 {
-	Base* arrayBase = (Base*)array;
+	Base* arrayBase = (Base*) array;
 	arrayBase->copy = copy;
 }
 
@@ -183,34 +183,34 @@ void setRealSize(Array* array, int realSize)
 
 void initialiseResizeArray(Array* array, Resize resize)
 {
-	Container* container = (Container*)array;
+	Container* container = (Container*) array;
 	container->resize = resize;
 }
 
 void initialiseAppendArray(Array* array, Append append)
 {
-	Container* container = (Container*)array;
+	Container* container = (Container*) array;
 	container->append = append;
 }
 
 void initialiseConcat(Array* array, Concat concat)
 {
-	Container* container = (Container*)array;
+	Container* container = (Container*) array;
 	container->concat = concat;
 }
 
 void initialiseGet(Array* array, Get get)
 {
-	Container* container = (Container*)array;
+	Container* container = (Container*) array;
 	container->get = get;
 }
 
 void resizeArrayMethod(Array* array, int m_size)
 {
-	Container* container = (Container*)array;
+	Container* container = (Container*) array;
 	initialiseSize(container, m_size);
 
-	array->data = (Base**)realloc(array->data, m_size * sizeof(Base*));
+	array->data = (Base**) realloc(array->data, m_size * sizeof(Base*));
 }
 
 char* toStringArray(Array* array)
@@ -244,7 +244,6 @@ char* toStringArray(Array* array)
 		free(item);
 
 		return result;
-
 	}
 
 	for (int i = 0; i < sizeWithoutLast; i++)
@@ -283,7 +282,7 @@ char* printArray(Array* array)
 	strcat(result, leftBracket);
 
 	int sizeWithoutLast = realSize - 1;
-	
+
 	if (sizeWithoutLast == 0)
 	{
 		int indexOfFirst = sizeWithoutLast;
@@ -295,7 +294,6 @@ char* printArray(Array* array)
 		free(item);
 
 		return result;
-
 	}
 
 	for (int i = 0; i < sizeWithoutLast; i++)
@@ -354,7 +352,6 @@ char* dumpArray(Array* array)
 		free(item);
 
 		return result;
-
 	}
 
 	for (int i = 0; i < sizeWithoutLast; i++)
@@ -378,4 +375,3 @@ char* dumpArray(Array* array)
 
 	return result;
 }
-

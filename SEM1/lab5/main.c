@@ -6,17 +6,17 @@
 #include "sort.h"
 #include "structReader.h"
 
-int main(int argc, char **argv) {
-    int error;
-    size_t lines;
-    Voter *voters = structReader(&lines);
-    if (!voters) {
-        return 1;
-    }
-    error = 0;
+int main(int argc, char **argv)
+{
+	int error;
+	size_t lines;
+	Voter *voters = structReader(&lines);
+	if (!voters)
+		return 1;
+	error = 0;
 
-    int menu, compar;
-//	(int(const Voter *, const Voter *)) *comparator;
+	int menu, compar;
+	//	(int(const Voter *, const Voter *)) *comparator;
 	void *comparator;
 	printf("Possible comparators: \n1 - name\n2 - name revesed\n");
 	printf("3 - id\n4 - id reversed\n");
@@ -24,7 +24,8 @@ int main(int argc, char **argv) {
 
 	inputInt(&compar);
 
-	switch(compar) {
+	switch (compar)
+	{
 		case 1:
 			comparator = &compareName;
 			break;
@@ -47,12 +48,13 @@ int main(int argc, char **argv) {
 			printf("Такого компаратора не существует\n");
 			return 1;
 	}
-	
+
 	printf("Possible sorts:\n1 - odd-even sort\n2 - binary search with insertion sort\n3 - qsort\n");
 
 	inputInt(&menu);
 
-	switch(menu) {
+	switch (menu)
+	{
 		case 1:
 			oddEvenSort(voters, lines, comparator);
 			votersPrint(voters, lines);
@@ -70,6 +72,6 @@ int main(int argc, char **argv) {
 			break;
 	}
 
-  	structFree(voters, lines);
- 	 return 0;
+	structFree(voters, lines);
+	return 0;
 }

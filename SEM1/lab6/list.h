@@ -3,15 +3,15 @@
 
 typedef struct Node
 {
-    char symbol;
-    struct Node *next;
-}Node;
+	char symbol;
+	struct Node *next;
+} Node;
 
 typedef struct List
 {
-    Node *head;
-    Node *tail;
-}List;
+	Node *head;
+	Node *tail;
+} List;
 
 List *createList(void);
 

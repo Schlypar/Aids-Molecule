@@ -5,10 +5,10 @@
 
 typedef struct Voter
 {
-    char *fullName;
-    char idPolling[8];
-    int age;
-}Voter;
+	char *fullName;
+	char idPolling[8];
+	int age;
+} Voter;
 
 char *fullNameGiver(char *, int *);
 

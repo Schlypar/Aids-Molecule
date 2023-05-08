@@ -7,8 +7,8 @@
 #define TYPE_NAME_REAL "Real"
 #define BASE_LENGTH_OF_REAL_WORD 15
 
-
-typedef struct Real {
+typedef struct Real
+{
 	Base base;
 	double real;
 } Real;

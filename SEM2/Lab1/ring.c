@@ -1,10 +1,12 @@
+#include "ring.h"
 #include <stdlib.h>
 #include <string.h>
-#include "ring.h"
 
-#include "real.h"
+
 #include "complex.h"
 #include "dynamicArray.h"
+#include "real.h"
+
 
 Ring* createRing()
 {
@@ -38,15 +40,17 @@ Base* sumBase(Base* first, Base* second)
 		free(typeNameSecond);
 		return ring->sum(first, second);
 	}
-	
-	if ((strcmp(typeNameFirst, TYPE_NAME_ARRAY) == STRING_EQUALS) || (strcmp(typeNameSecond, TYPE_NAME_ARRAY) == STRING_EQUALS))
+
+	if ((strcmp(typeNameFirst, TYPE_NAME_ARRAY) == STRING_EQUALS)
+		|| (strcmp(typeNameSecond, TYPE_NAME_ARRAY) == STRING_EQUALS))
 	{
 		free(typeNameFirst);
 		free(typeNameSecond);
 		return first;
 	}
 
-	if ((strcmp(typeNameFirst, TYPE_NAME_REAL) == STRING_EQUALS) && (strcmp(typeNameSecond, TYPE_NAME_COMPLEX) == STRING_EQUALS))
+	if ((strcmp(typeNameFirst, TYPE_NAME_REAL) == STRING_EQUALS)
+		&& (strcmp(typeNameSecond, TYPE_NAME_COMPLEX) == STRING_EQUALS))
 	{
 		Ring* ring = getRing(second);
 		free(typeNameFirst);
@@ -55,7 +59,8 @@ Base* sumBase(Base* first, Base* second)
 		Complex* complex = constructComplex(real, 0);
 		return ring->sum(complex, second);
 	}
-	if ((strcmp(typeNameFirst, TYPE_NAME_COMPLEX) == STRING_EQUALS) && (strcmp(typeNameSecond, TYPE_NAME_REAL) == STRING_EQUALS))
+	if ((strcmp(typeNameFirst, TYPE_NAME_COMPLEX) == STRING_EQUALS)
+		&& (strcmp(typeNameSecond, TYPE_NAME_REAL) == STRING_EQUALS))
 	{
 		Ring* ring = getRing(first);
 		free(typeNameFirst);
@@ -79,14 +84,16 @@ Base* multBase(Base* first, Base* second)
 		return ring->mult(first, second);
 	}
 
-	if ((strcmp(typeNameFirst, TYPE_NAME_ARRAY) == STRING_EQUALS) || (strcmp(typeNameSecond, TYPE_NAME_ARRAY) == STRING_EQUALS))
+	if ((strcmp(typeNameFirst, TYPE_NAME_ARRAY) == STRING_EQUALS)
+		|| (strcmp(typeNameSecond, TYPE_NAME_ARRAY) == STRING_EQUALS))
 	{
 		free(typeNameFirst);
 		free(typeNameSecond);
 		return first;
 	}
 
-	if ((strcmp(typeNameFirst, TYPE_NAME_REAL) == STRING_EQUALS) && (strcmp(typeNameSecond, TYPE_NAME_COMPLEX) == STRING_EQUALS))
+	if ((strcmp(typeNameFirst, TYPE_NAME_REAL) == STRING_EQUALS)
+		&& (strcmp(typeNameSecond, TYPE_NAME_COMPLEX) == STRING_EQUALS))
 	{
 		Ring* ring = getRing(second);
 		free(typeNameFirst);
@@ -95,7 +102,8 @@ Base* multBase(Base* first, Base* second)
 		Complex* complex = constructComplex(real, 0);
 		return ring->mult(complex, second);
 	}
-	if ((strcmp(typeNameFirst, TYPE_NAME_COMPLEX) == STRING_EQUALS) && (strcmp(typeNameSecond, TYPE_NAME_REAL) == STRING_EQUALS))
+	if ((strcmp(typeNameFirst, TYPE_NAME_COMPLEX) == STRING_EQUALS)
+		&& (strcmp(typeNameSecond, TYPE_NAME_REAL) == STRING_EQUALS))
 	{
 		Ring* ring = getRing(first);
 		free(typeNameFirst);
