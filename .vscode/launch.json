@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Linux-Debug Lab2-3",
+            "name": "Linux-Debug Lab2-3-4",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/SEM2/Lab2-3/build/Lab2-3",
+            "program": "${workspaceFolder}/SEM2/Lab2-3-4/build/Lab2-3-4",
             "args": [],
             "cwd": "${workspaceFolder}",
             "environment": [],

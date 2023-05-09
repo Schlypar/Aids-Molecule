@@ -15,7 +15,7 @@ rm *.filters
 rm *.vcxproj
 rm *.bat
 rm *.dir
-rm Lab2-3
+rm Lab2-3-4
 rm tests
 rm -rf Debug/
 rm -rf x64/

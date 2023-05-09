@@ -8,4 +8,4 @@ cmake --build .
 
 cd ../
 
-valgrind ./build/Lab2-3
+valgrind ./build/Lab2-3-4

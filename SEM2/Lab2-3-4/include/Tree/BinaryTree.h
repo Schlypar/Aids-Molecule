@@ -13,181 +13,10 @@ class BinaryTree : Tree<Tkey, Tvalue>
 	using TreeNode = typename Tree<T1, T2>::TreeNode;
 
 	template <typename T1, typename T2>
-	using NodePtr = SharedPtr<TreeNode<T1, T2>>;
-
-	void CopyNodes(NodePtr<Tkey, Tvalue>& copyNode, const NodePtr<Tkey, Tvalue>& originalNode) const noexcept override
-	{
-		if (originalNode->left)
-		{
-			copyNode->left = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->left->data,
-				originalNode->left->kGen));
-			CopyNodes(copyNode->left, originalNode->left);
-		}
-		if (originalNode->right)
-		{
-			copyNode->right = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->right->data,
-				originalNode->right->kGen));
-			CopyNodes(copyNode->right, originalNode->right);
-		}
-	}
-
-	void CopyNodes(NodePtr<Tkey, Tvalue>& copyNode, const NodePtr<Tkey, Tvalue>& originalNode,
-		bool (*filter)(Tvalue& value)) const noexcept override
-	{
-		if (originalNode->left)
-		{
-			if (filter(originalNode->left->data))
-			{
-				copyNode->left = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->left->data,
-					originalNode->left->kGen));
-				CopyNodes(copyNode->left, originalNode->left, filter);
-			}
-			else
-				CopyNodes(copyNode, originalNode->left, filter);
-		}
-		if (originalNode->right)
-		{
-			if (filter(originalNode->right->data))
-			{
-				copyNode->right = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->right->data,
-					originalNode->right->kGen));
-				CopyNodes(copyNode->right, originalNode->right, filter);
-			}
-			else
-				CopyNodes(copyNode, originalNode->right, filter);
-		}
-	}
-
-	std::ostream& printTree(std::ostream& stream, const NodePtr<Tkey, Tvalue>& startNode, TraverseOrder first,
-		TraverseOrder second, TraverseOrder third) const
-	{
-		if (first == second || first == third || second == third)
-		{
-			Logger::Info("At Traverse(TraverseOrder, TraverseOrder, TraverseOrder) at BinaryTree<T>");
-			logException(EXCEPTION_BAD_LOGIC);
-			throw EXCEPTION_BAD_LOGIC;
-		}
-
-		if (startNode == nullptr)
-			return stream;
-
-		switch (first)
-		{
-			case Left:
-				printTree(stream, startNode->left, first, second, third);
-				break;
-			case Root:
-				stream << startNode->data << " ";
-				break;
-			case Right:
-				printTree(stream, startNode->right, first, second, third);
-				break;
-			default:
-				break;
-		}
-
-		switch (second)
-		{
-			case Left:
-				printTree(stream, startNode->left, first, second, third);
-				break;
-			case Root:
-				stream << startNode->data << " ";
-				break;
-			case Right:
-				printTree(stream, startNode->right, first, second, third);
-				break;
-			default:
-				break;
-		}
-
-		switch (third)
-		{
-			case Left:
-				printTree(stream, startNode->left, first, second, third);
-				break;
-			case Root:
-				stream << startNode->data << " ";
-				break;
-			case Right:
-				printTree(stream, startNode->right, first, second, third);
-				break;
-			default:
-				break;
-		}
-	}
-
-	std::ostream& Dump(std::ostream& stream, const NodePtr<Tkey, Tvalue>& startNode, TraverseOrder first,
-		TraverseOrder second, TraverseOrder third) const noexcept override
-	{
-		switch (first)
-		{
-			case Left:
-				stream << "{ ";
-				printTree(stream, GetRoot()->left, first, second, third);
-				stream << "}";
-				break;
-			case Root:
-				stream << "(";
-				stream << GetRoot()->data;
-				stream << ")";
-				break;
-			case Right:
-				stream << "[ ";
-				printTree(stream, GetRoot()->right, first, second, third);
-				stream << "]";
-				break;
-			default:
-				break;
-		}
-
-		switch (second)
-		{
-			case Left:
-				stream << "{ ";
-				printTree(stream, GetRoot()->left, first, second, third);
-				stream << "}";
-				break;
-			case Root:
-				stream << "(";
-				stream << GetRoot()->data;
-				stream << ")";
-				break;
-			case Right:
-				stream << "[ ";
-				printTree(stream, GetRoot()->right, first, second, third);
-				stream << "]";
-				break;
-			default:
-				break;
-		}
-
-		switch (third)
-		{
-			case Left:
-				stream << "{ ";
-				printTree(stream, GetRoot()->left, first, second, third);
-				stream << "}";
-				break;
-			case Root:
-				stream << "(";
-				stream << GetRoot()->data;
-				stream << ")";
-				break;
-			case Right:
-				stream << "[ ";
-				printTree(stream, GetRoot()->right, first, second, third);
-				stream << "]";
-				break;
-			default:
-				break;
-		}
-
-		return stream;
-	}
+	using NodePtr = TreeNode<T1, T2>*;
 
 private:
-	NodePtr<Tkey, Tvalue> root;
+	UniquePtr<TreeNode<Tkey, Tvalue>> root;
 
 public:
 	BinaryTree()
@@ -220,22 +49,23 @@ public:
 		if (other.root != nullptr)
 		{
 			root = new TreeNode<Tkey, Tvalue>(other.root->data, other.root->kGen);
-			CopyNodes(root, other.root);
+			CopyNodes(root.Get(), other.root.Get());
 		}
 	}
 
 	virtual ~BinaryTree()
 	{
+		Logger::Info("Destroyed BinaryTree<T>");
 	}
 
 	Size Depth(NodePtr<Tkey, Tvalue> startNode) const noexcept override
 	{
 		Size depth = 0;
 		if (startNode->left)
-			depth = std::max(depth, Depth(startNode->left, depth));
+			depth = std::max(depth, Depth(startNode->left.Get(), depth));
 
 		if (startNode->right)
-			depth = std::max(depth, Depth(startNode->right, depth));
+			depth = std::max(depth, Depth(startNode->right.Get(), depth));
 
 		return depth;
 	}
@@ -247,27 +77,27 @@ public:
 		Size rightDepth = 0;
 
 		if (startNode->left)
-			leftDepth = std::max(depth, Depth(startNode->left, leftDepth));
+			leftDepth = std::max(depth, Depth(startNode->left.Get(), leftDepth));
 
 		if (startNode->right)
-			rightDepth = std::max(depth, Depth(startNode->right, rightDepth));
+			rightDepth = std::max(depth, Depth(startNode->right.Get(), rightDepth));
 
 		return depth + std::max(leftDepth, rightDepth);
 	}
 
 	Size Depth() const noexcept override
 	{
-		auto startNode = this->root;
+		auto startNode = this->root.Get();
 
 		Size depth = 1;
 		Size leftDepth = 0;
 		Size rightDepth = 0;
 
 		if (startNode->left)
-			leftDepth = std::max(depth, Depth(startNode->left, leftDepth));
+			leftDepth = std::max(depth, Depth(startNode->left.Get(), leftDepth));
 
 		if (startNode->right)
-			rightDepth = std::max(depth, Depth(startNode->right, rightDepth));
+			rightDepth = std::max(depth, Depth(startNode->right.Get(), rightDepth));
 
 		return depth + std::max(leftDepth, rightDepth);
 	}
@@ -280,29 +110,33 @@ public:
 			return this;
 		}
 
-		NodePtr<Tkey, Tvalue> current = root;
+		Tkey valueKey = root->kGen(value);
+
+		NodePtr<Tkey, Tvalue> current = this->root.Get();
 
 		while (NOT_DONE)
 		{
 			if (current->left == nullptr)
 			{
-				current->left = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(value, current->kGen));
+				current->left = new TreeNode<Tkey, Tvalue>(value, current->kGen);
 				current->left->parent = current;
 				return this;
 			}
 
 			if (current->right == nullptr)
 			{
-				current->right = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(value, current->kGen));
+				current->right = new TreeNode<Tkey, Tvalue>(value, current->kGen);
 				current->right->parent = current;
 				return this;
 			}
 
-			if (current->left->key < current->right->key)
-				current = current->left;
+			if (valueKey < current->right->key)
+				current = current->left.Get();
 			else
-				current = current->right;
+				current = current->right.Get();
 		}
+
+		Balance();
 
 		return this;
 	}
@@ -324,7 +158,7 @@ public:
 
 	NodePtr<Tkey, Tvalue> GetRoot() const noexcept override
 	{
-		return root;
+		return root.Get();
 	}
 
 	void Traverse(NodePtr<Tkey, Tvalue> startNode, TraverseOrder first, TraverseOrder second, TraverseOrder third,
@@ -343,13 +177,13 @@ public:
 		switch (first)
 		{
 			case Left:
-				Traverse(startNode->left, first, second, third, func);
+				Traverse(startNode->left.Get(), first, second, third, func);
 				break;
 			case Root:
 				func(startNode->data);
 				break;
 			case Right:
-				Traverse(startNode->right, first, second, third, func);
+				Traverse(startNode->right.Get(), first, second, third, func);
 				break;
 			default:
 				break;
@@ -358,13 +192,13 @@ public:
 		switch (second)
 		{
 			case Left:
-				Traverse(startNode->left, first, second, third, func);
+				Traverse(startNode->left.Get(), first, second, third, func);
 				break;
 			case Root:
 				func(startNode->data);
 				break;
 			case Right:
-				Traverse(startNode->right, first, second, third, func);
+				Traverse(startNode->right.Get(), first, second, third, func);
 				break;
 			default:
 				break;
@@ -373,13 +207,13 @@ public:
 		switch (third)
 		{
 			case Left:
-				Traverse(startNode->left, first, second, third, func);
+				Traverse(startNode->left.Get(), first, second, third, func);
 				break;
 			case Root:
 				func(startNode->data);
 				break;
 			case Right:
-				Traverse(startNode->right, first, second, third, func);
+				Traverse(startNode->right.Get(), first, second, third, func);
 				break;
 			default:
 				break;
@@ -405,7 +239,7 @@ public:
 			throw EXCEPTION_BAD_LOGIC;
 		}
 
-		NodePtr<Tkey, Tvalue> startNode = this->root;
+		NodePtr<Tkey, Tvalue> startNode = this->root.Get();
 
 		if (startNode == nullptr)
 			return;
@@ -413,13 +247,13 @@ public:
 		switch (first)
 		{
 			case Left:
-				Traverse(startNode->left, first, second, third, func);
+				Traverse(startNode->left.Get(), first, second, third, func);
 				break;
 			case Root:
 				func(startNode->data);
 				break;
 			case Right:
-				Traverse(startNode->right, first, second, third, func);
+				Traverse(startNode->right.Get(), first, second, third, func);
 				break;
 			default:
 				break;
@@ -428,13 +262,13 @@ public:
 		switch (second)
 		{
 			case Left:
-				Traverse(startNode->left, first, second, third, func);
+				Traverse(startNode->left.Get(), first, second, third, func);
 				break;
 			case Root:
 				func(startNode->data);
 				break;
 			case Right:
-				Traverse(startNode->right, first, second, third, func);
+				Traverse(startNode->right.Get(), first, second, third, func);
 				break;
 			default:
 				break;
@@ -443,13 +277,13 @@ public:
 		switch (third)
 		{
 			case Left:
-				Traverse(startNode->left, first, second, third, func);
+				Traverse(startNode->left.Get(), first, second, third, func);
 				break;
 			case Root:
 				func(startNode->data);
 				break;
 			case Right:
-				Traverse(startNode->right, first, second, third, func);
+				Traverse(startNode->right.Get(), first, second, third, func);
 				break;
 			default:
 				break;
@@ -473,5 +307,298 @@ public:
 		tree->Dump(stream, tree->GetRoot(), Left, Root, Right);
 
 		return stream;
+	}
+
+	void LeftLeftRotation() noexcept
+	{
+		root = LeftLeftRotation(root.Get());
+	}
+
+	void RightRightRotation() noexcept
+	{
+		root = RightRightRotation(root.Get());
+	}
+
+	void RightLeftRotation() noexcept
+	{
+		root = RightLeftRotation(root.Get());
+	}
+
+	void LeftRightRotation() noexcept
+	{
+		root = LeftRightRotation(root.Get());
+	}
+
+private:
+	void CopyNodes(NodePtr<Tkey, Tvalue> copyNode, const NodePtr<Tkey, Tvalue> originalNode) const noexcept override
+	{
+		if (originalNode->left)
+		{
+			copyNode->left = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->left->data,
+				originalNode->left->kGen));
+			copyNode->left->parent = copyNode;
+			CopyNodes(copyNode->left.Get(), originalNode->left.Get());
+		}
+		if (originalNode->right)
+		{
+			copyNode->right = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->right->data,
+				originalNode->right->kGen));
+			copyNode->right->parent = copyNode;
+			CopyNodes(copyNode->right.Get(), originalNode->right.Get());
+		}
+	}
+
+	void CopyNodes(NodePtr<Tkey, Tvalue> copyNode, const NodePtr<Tkey, Tvalue> originalNode,
+		bool (*filter)(Tvalue& value)) const noexcept override
+	{
+		if (originalNode->left)
+		{
+			if (filter(originalNode->left->data))
+			{
+				copyNode->left = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->left->data,
+					originalNode->left->kGen));
+				copyNode->left->parent = copyNode;
+				CopyNodes(copyNode->left.Get(), originalNode->left.Get(), filter);
+			}
+			else
+				CopyNodes(copyNode, originalNode->left.Get(), filter);
+		}
+		if (originalNode->right)
+		{
+			if (filter(originalNode->right->data))
+			{
+				copyNode->right = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->right->data,
+					originalNode->right->kGen));
+				copyNode->right->parent = copyNode;
+				CopyNodes(copyNode->right.Get(), originalNode->right.Get(), filter);
+			}
+			else
+				CopyNodes(copyNode, originalNode->right.Get(), filter);
+		}
+	}
+
+	std::ostream& printTree(std::ostream& stream, const NodePtr<Tkey, Tvalue>& startNode, TraverseOrder first,
+		TraverseOrder second, TraverseOrder third) const
+	{
+		if (first == second || first == third || second == third)
+		{
+			Logger::Info("At Traverse(TraverseOrder, TraverseOrder, TraverseOrder) at BinaryTree<T>");
+			logException(EXCEPTION_BAD_LOGIC);
+			throw EXCEPTION_BAD_LOGIC;
+		}
+
+		if (startNode == nullptr)
+			return stream;
+
+		switch (first)
+		{
+			case Left:
+				printTree(stream, startNode->left.Get(), first, second, third);
+				break;
+			case Root:
+				stream << startNode->data << " ";
+				break;
+			case Right:
+				printTree(stream, startNode->right.Get(), first, second, third);
+				break;
+			default:
+				break;
+		}
+
+		switch (second)
+		{
+			case Left:
+				printTree(stream, startNode->left.Get(), first, second, third);
+				break;
+			case Root:
+				stream << startNode->data << " ";
+				break;
+			case Right:
+				printTree(stream, startNode->right.Get(), first, second, third);
+				break;
+			default:
+				break;
+		}
+
+		switch (third)
+		{
+			case Left:
+				printTree(stream, startNode->left.Get(), first, second, third);
+				break;
+			case Root:
+				stream << startNode->data << " ";
+				break;
+			case Right:
+				printTree(stream, startNode->right.Get(), first, second, third);
+				break;
+			default:
+				break;
+		}
+	}
+
+	std::ostream& Dump(std::ostream& stream, const NodePtr<Tkey, Tvalue> startNode, TraverseOrder first, TraverseOrder second,
+		TraverseOrder third) const noexcept override
+	{
+		switch (first)
+		{
+			case Left:
+				stream << "{ ";
+				printTree(stream, GetRoot()->left.Get(), first, second, third);
+				stream << "}";
+				break;
+			case Root:
+				stream << "(";
+				stream << GetRoot()->data;
+				stream << ")";
+				break;
+			case Right:
+				stream << "[ ";
+				printTree(stream, GetRoot()->right.Get(), first, second, third);
+				stream << "]";
+				break;
+			default:
+				break;
+		}
+
+		switch (second)
+		{
+			case Left:
+				stream << "{ ";
+				printTree(stream, GetRoot()->left.Get(), first, second, third);
+				stream << "}";
+				break;
+			case Root:
+				stream << "(";
+				stream << GetRoot()->data;
+				stream << ")";
+				break;
+			case Right:
+				stream << "[ ";
+				printTree(stream, GetRoot()->right.Get(), first, second, third);
+				stream << "]";
+				break;
+			default:
+				break;
+		}
+
+		switch (third)
+		{
+			case Left:
+				stream << "{ ";
+				printTree(stream, GetRoot()->left.Get(), first, second, third);
+				stream << "}";
+				break;
+			case Root:
+				stream << "(";
+				stream << GetRoot()->data;
+				stream << ")";
+				break;
+			case Right:
+				stream << "[ ";
+				printTree(stream, GetRoot()->right.Get(), first, second, third);
+				stream << "]";
+				break;
+			default:
+				break;
+		}
+
+		return stream;
+	}
+
+	NodePtr<Tkey, Tvalue> LeftLeftRotation(NodePtr<Tkey, Tvalue> node) noexcept
+	{
+		auto son = node->left.Get();
+
+		son->parent = node->parent;
+		node->parent = son;
+
+		node->left = std::move(son->right);
+		son->right = node;
+
+		return son;
+	}
+
+	NodePtr<Tkey, Tvalue> RightRightRotation(NodePtr<Tkey, Tvalue> node) noexcept
+	{
+		NodePtr<Tkey, Tvalue> son = node->right.Get();
+
+		son->parent = node->parent;
+		node->parent = son;
+
+		node->right = std::move(son->left);
+		son->right = node;
+
+		return son;
+	}
+
+	NodePtr<Tkey, Tvalue> RightLeftRotation(NodePtr<Tkey, Tvalue> node) noexcept
+	{
+		NodePtr<Tkey, Tvalue> son = node->right.Get();
+		NodePtr<Tkey, Tvalue> grandSon = son->left.Get();
+
+		grandSon->parent = node->parent;
+		son->parent = grandSon;
+		node->parent = grandSon;
+
+		node->right = std::move(grandSon->left);
+		son->left = std::move(grandSon->right);
+
+		grandSon->left = node;
+		grandSon->right = son;
+
+		return grandSon;
+	}
+
+	NodePtr<Tkey, Tvalue> LeftRightRotation(NodePtr<Tkey, Tvalue> node) noexcept
+	{
+		NodePtr<Tkey, Tvalue> son = node->right.Get();
+		NodePtr<Tkey, Tvalue> grandSon = son->left.Get();
+
+		grandSon->parent = node->parent;
+		son->parent = grandSon;
+		node->parent = grandSon;
+
+		node->left = std::move(grandSon->right);
+		son->right = std::move(grandSon->left);
+
+		grandSon->left = son;
+		grandSon->right = node;
+
+		return grandSon;
+	}
+
+	Size BalanceFactor() const noexcept override
+	{
+		return BalanceFactor(root.Get());
+	}
+
+	Size BalanceFactor(NodePtr<Tkey, Tvalue> startNode) const noexcept override
+	{
+		if (startNode == nullptr)
+			return 0;
+
+		if (startNode->left != nullptr && startNode->right != nullptr)
+			return Depth(startNode->left.Get()) - Depth(startNode->right.Get());
+		else if (startNode->left != nullptr && startNode->right == nullptr)
+			return Depth(startNode->left.Get());
+		else if (startNode->left == nullptr && startNode->right != nullptr)
+			return Depth(startNode->right.Get());
+
+		return 0;
+	}
+
+	void Balance() noexcept override
+	{
+		if (root == nullptr)
+			return;
+
+		if (BalanceFactor(root.Get()) == 2 && BalanceFactor(root->left.Get()) == 1)
+			root = LeftLeftRotation(root.Get());
+		else if (BalanceFactor(root.Get()) == -2 && BalanceFactor(root->left.Get()) == -1)
+			root = RightRightRotation(root.Get());
+		else if (BalanceFactor(root.Get()) == -2 && BalanceFactor(root->left.Get()) == 1)
+			root = RightLeftRotation(root.Get());
+		else if (BalanceFactor(root.Get()) == 2 && BalanceFactor(root->left.Get()) == -1)
+			root = LeftRightRotation(root.Get());
 	}
 };

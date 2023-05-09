@@ -10,4 +10,4 @@ cmake --build .
 
 cd ../
 
-./build/Lab2-3
+./build/Lab2-3-4

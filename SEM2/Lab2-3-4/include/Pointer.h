@@ -33,7 +33,8 @@ public:
 
 	~UniquePtr()
 	{
-		delete ptr;
+		if (this->ptr != nullptr)
+			delete ptr;
 	}
 
 	UniquePtr<T>& operator=(UniquePtr<T>&& other) noexcept
@@ -93,6 +94,11 @@ public:
 		return ptr == nullptr;
 	}
 
+	T* Get() const noexcept
+	{
+		return this->ptr;
+	}
+
 	T* release() noexcept
 	{
 		T* result = nullptr;
@@ -123,12 +129,12 @@ class SharedPtr
 {
 private:
 	T* ptr;
-	int counter;
+	int* counter;
 
 public:
 	SharedPtr() noexcept
 	    : ptr()
-	    , counter(0)
+	    , counter(new int(0))
 	{
 	}
 
@@ -140,28 +146,38 @@ public:
 
 	SharedPtr(T* object) noexcept
 	    : ptr(object)
-	    , counter(1)
+	    , counter(new int(1))
 	{
 	}
 
 	SharedPtr(const SharedPtr<T>& other) noexcept
 	    : ptr(other.ptr)
-	    , counter(other.counter + 1)
+	    , counter(other.counter)
 	{
+		if (other.counter)
+			(*counter)++;
 	}
 
 	~SharedPtr() noexcept
 	{
-		counter--;
-
-		if (counter <= 0)
-			delete ptr;
+		cleanup();
 	}
 
 	SharedPtr<T>& operator=(const SharedPtr<T>& other) noexcept
 	{
+		// if (this->ptr && this->ptr != other.ptr && *(this->counter) <= 1)
+		// {
+		// 	delete counter;
+		// 	delete ptr;
+		// }
+
+		cleanup();
+
 		this->ptr = other.ptr;
-		this->counter = other.counter + 1;
+		// *(this->counter) = (*other.counter) + 1;
+		this->counter = other.counter;
+		if (counter)
+			(*counter)++;
 
 		return *this;
 	}
@@ -178,19 +194,18 @@ public:
 	    , counter(other.counter)
 	{
 		other.ptr = nullptr;
-		other.counter = 0;
+		other.counter = nullptr;
 	}
 
 	SharedPtr<T>& operator=(SharedPtr<T>&& other)
 	{
-		if (this->ptr)
-			delete ptr;
+		cleanup();
 
 		ptr = other.ptr;
 		counter = other.counter;
 
 		other.ptr = nullptr;
-		other.counter = 0;
+		other.counter = nullptr;
 
 		return *this;
 	}
@@ -220,11 +235,16 @@ public:
 		return ptr == nullptr;
 	}
 
+	T* Get() const noexcept
+	{
+		return this->ptr;
+	}
+
 	T* release() noexcept
 	{
 		T* result = nullptr;
 		std::swap(result, ptr);
-		counter = 0;
+		*counter = 0;
 		return result;
 	}
 
@@ -238,8 +258,24 @@ private:
 	void reset() noexcept
 	{
 		T* temp = release();
-		counter = 0;
+		*counter = 0;
 		delete temp;
+	}
+
+	void cleanup() noexcept
+	{
+		if (counter)
+		{
+			(*counter)--;
+
+			if (*counter <= 0)
+			{
+				if (ptr != nullptr)
+					delete ptr;
+
+				delete counter;
+			}
+		}
 	}
 };
 
@@ -338,6 +374,11 @@ public:
 	bool operator==(std::nullptr_t) const
 	{
 		return ptr == nullptr;
+	}
+
+	T* Get() const noexcept
+	{
+		return this->ptr;
 	}
 
 	T* release() noexcept
