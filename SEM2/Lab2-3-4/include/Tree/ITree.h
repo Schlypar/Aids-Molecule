@@ -28,8 +28,8 @@ protected:
 		KGen<Tkey, Tvalue> kGen = nullptr;
 
 		TreeNode* parent;
-		UniquePtr<TreeNode> left;
-		UniquePtr<TreeNode> right;
+		WeakPtr<TreeNode> left;
+		WeakPtr<TreeNode> right;
 
 		TreeNode()
 		    : key(Tkey())
@@ -137,13 +137,34 @@ public:
 		return result;
 	}
 
-	Tree<Tkey, Tvalue>* Where(Condition<Tvalue> condition) const
+	Tree<Tkey, Tvalue>* Where(Condition<Tvalue> condition) const noexcept
 	{
-		NodePtr<Tkey, Tvalue> root = new TreeNode(this->GetRoot()->data, this->GetRoot()->kGen);
+		Tree<Tkey, Tvalue>* result = Create();
 
-		CopyNodes(root, this->GetRoot(), condition);
+		auto copy = this->Traverse(Root, Left, Right,
+			[result, condition](Tvalue& val) -> void
+			{
+				if (condition(val))
+					result->Add(val);
+			});
 
-		return this->Create(root);
+		delete copy;
+
+		return result;
+	}
+
+	Tree<Tkey, Tvalue>* Where(Condition<Tvalue> condition) noexcept
+	{
+		Tree<Tkey, Tvalue>* result = Create();
+
+		this->Traverse(Root, Left, Right,
+			[result, condition](Tvalue& val) -> void
+			{
+				if (condition(val))
+					result->Add(val);
+			});
+
+		return result;
 	}
 
 	virtual Size Depth(NodePtr<Tkey, Tvalue> startNode) const noexcept = 0;
@@ -155,11 +176,15 @@ public:
 
 	virtual void Traverse(NodePtr<Tkey, Tvalue> startNode, TraverseOrder first, TraverseOrder second, TraverseOrder third, std::function<void(Tvalue&)> func) = 0;
 	virtual void Traverse(TraverseOrder first, TraverseOrder second, TraverseOrder third, std::function<void(Tvalue&)> func) = 0;
+
+	virtual void Traverse(TraverseOrder first, TraverseOrder second, TraverseOrder third, std::function<void(NodePtr<Tkey, Tvalue>)> func) = 0;
+	virtual void Traverse(NodePtr<Tkey, Tvalue> startNode, TraverseOrder first, TraverseOrder second, TraverseOrder third, std::function<void(NodePtr<Tkey, Tvalue>)> func) = 0;
+
 	virtual Tree<Tkey, Tvalue>*
 	Traverse(TraverseOrder first, TraverseOrder second, TraverseOrder third, std::function<void(Tvalue&)> func) const = 0;
 
-	virtual Size BalanceFactor() const noexcept = 0;
-	virtual Size BalanceFactor(NodePtr<Tkey, Tvalue> startNode) const noexcept = 0;
+	virtual int BalanceFactor() const noexcept = 0;
+	virtual int BalanceFactor(NodePtr<Tkey, Tvalue> startNode) const noexcept = 0;
 	virtual void Balance() noexcept = 0;
 
 	virtual Tree<Tkey, Tvalue>* Create() const noexcept = 0;

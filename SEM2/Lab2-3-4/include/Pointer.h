@@ -326,15 +326,16 @@ public:
 
 	WeakPtr<T>& operator=(std::nullptr_t) noexcept
 	{
-		reset();
+		// reset();
+		ptr = nullptr;
 
 		return *this;
 	}
 
 	WeakPtr(WeakPtr<T>&& other)
 	{
-		if (this->ptr)
-			delete ptr;
+		// if (this->ptr)
+		// 	delete ptr;
 
 		ptr = other.ptr;
 		other.ptr = nullptr;
@@ -342,8 +343,8 @@ public:
 
 	WeakPtr<T>& operator=(WeakPtr<T>&& other)
 	{
-		if (this->ptr)
-			delete ptr;
+		// if (this->ptr)
+		// 	delete ptr;
 
 		ptr = other.ptr;
 		other.ptr = nullptr;
@@ -393,6 +394,7 @@ public:
 		std::swap(ptr, other.ptr);
 	}
 
+private:
 	void reset() noexcept
 	{
 		T* temp = release();
