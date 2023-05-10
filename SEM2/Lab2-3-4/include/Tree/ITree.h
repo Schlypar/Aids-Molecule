@@ -5,6 +5,7 @@
 #include "Logger.h"
 #include "Pointer.h"
 #include "Sequence/IContainer.h"
+#include "Sequence/Sequence.h"
 #include <functional>
 
 enum TraverseOrder
@@ -110,6 +111,32 @@ protected:
 		~TreeNode()
 		{
 		}
+
+		friend TreeNode* MostRight(TreeNode* startNode) noexcept
+		{
+			if (startNode == nullptr)
+				return nullptr;
+
+			TreeNode* current = startNode;
+
+			while (current->right != nullptr)
+				current = current->right.Get();
+
+			return (current != startNode) ? current : nullptr;
+		}
+
+		friend TreeNode* MostLeft(TreeNode* startNode) noexcept
+		{
+			if (startNode == nullptr)
+				return nullptr;
+
+			TreeNode* current = startNode;
+
+			while (current->left != nullptr)
+				current = current->left.Get();
+
+			return (current != startNode) ? current : nullptr;
+		}
 	};
 
 public:
@@ -167,11 +194,34 @@ public:
 		return result;
 	}
 
+	Tree<Tkey, Tvalue>* Merge(Tree<Tkey, Tvalue>* other) noexcept
+	{
+		auto result = this->Copy();
+
+		auto isUnique = [this, other, result](Tvalue& value) -> void
+		{
+			if (!(this->isThere(value)) && other->isThere(value))
+				result->Add(value);
+		};
+
+		other->Traverse(Left, Root, Right, isUnique);
+
+		result->Balance();
+
+		return result;
+	}
+
+	virtual NodePtr<Tkey, Tvalue> Find(const Tvalue& value) const noexcept = 0;
+	virtual bool isThere(const Tvalue& value) const noexcept = 0;
+
+	virtual NodePtr<Tkey, Tvalue> Find(Sequence<TraverseOrder>* sequenceOfTraversion) const = 0;
+
 	virtual Size Depth(NodePtr<Tkey, Tvalue> startNode) const noexcept = 0;
 	virtual Size Depth(NodePtr<Tkey, Tvalue> startNode, Size depth) const noexcept = 0;
 	virtual Size Depth() const noexcept = 0;
 
 	virtual Tree<Tkey, Tvalue>* Add(const Tvalue& value) noexcept = 0;
+	virtual void Delete(const Tvalue& value) noexcept = 0;
 	virtual NodePtr<Tkey, Tvalue> GetRoot() const noexcept = 0;
 
 	virtual void Traverse(NodePtr<Tkey, Tvalue> startNode, TraverseOrder first, TraverseOrder second, TraverseOrder third, std::function<void(Tvalue&)> func) = 0;

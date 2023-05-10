@@ -1,4 +1,7 @@
+#include "Logger.h"
+#include "Sequence/Sequence.h"
 #include "Tree/BinaryTree.h"
+#include "Tree/ITree.h"
 #include <ADT.h>
 
 LogPriority Logger::priority = TracePriority;
@@ -16,39 +19,49 @@ int main()
 {
 	// Logger::setPriority(ErrorPriority);
 
-	BinTreePtr<int, int> tree = (BinaryTree<int, int>*) new BinaryTree<int, int>(1, [](int value) -> int { return value; });
+	auto startKGen = [](int value) -> int { return value; };
+
+	BinTreePtr<int, int> tree = (BinaryTree<int, int>*) new BinaryTree<int, int>(1, startKGen);
 	tree->Add(-1)->Add(-2);
 	tree->Add(-3);
 	tree->Add(-4)->Add(-5)->Add(-6)->Add(-7);
 	tree->Add(-8)->Add(-9)->Add(-10)->Add(-11);
+
 	print(tree, '\n');
 
-	// auto rootbf = tree->BalanceFactor(tree->GetRoot());
-	// print(rootbf, '\n');
+	tree->Delete(-3);
+	print(tree, '\n');
 
-	// ConstTreePtr<int, int> copy = tree->Copy();
+	auto resNode = tree->isThere(-4);
+	print(resNode, '\n');
 
-	// print(*copy, '\n');
+	Sequence<TraverseOrder>* seq = Allocator<TraverseOrder>::AllocateArraySequence(Right, Right, Left);
 
-	// TreePtr<int, int> res = copy->Map(
-	// 	[](int& value) -> int
-	// 	{
-	// 		value = value * 10;
-	// 		return value;
-	// 	});
+	try
+	{
+		auto res = tree->Find(seq);
+		print(res->data, '\n');
+	}
+	catch (Exception e)
+	{
+		print("Error was made\n");
+	}
 
-	// print(*copy, '\n');
-	// print(res, '\n');
+	TreePtr<int, int> secondTree = (Tree<int, int>*) new BinaryTree<int, int>(1, startKGen);
 
-	// BinTreePtr<int, int> res2 = (BinaryTree<int, int>*) tree->Where([](int& value) -> bool { return value % 2 == 0;
-	// });
+	secondTree->Add(10)->Add(12)->Add(-1)->Add(-2)->Add(0);
 
-	// print(res2, '\n');
+	print(secondTree, '\n');
 
-	// print(tree, '\n');
-	// tree->LeftRightRotation();
-	// // tree->Test();
-	// print(tree, '\n');
+	BinTreePtr<int, int> res = (BinaryTree<int, int>*) tree->Merge(secondTree.Get());
 
+	print(res, '\n');
+
+	auto bfLeft = res->Depth(res->GetRoot()->left.Get());
+	auto bfRight = res->Depth(res->GetRoot()->right.Get());
+
+	print(bfLeft, " <- left depth | right depth -> ", bfRight, '\n');
+
+	delete seq;
 	return 0;
 }

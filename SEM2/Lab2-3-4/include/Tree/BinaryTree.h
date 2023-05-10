@@ -3,6 +3,7 @@
 #include "ITree.h"
 #include "Logger.h"
 #include "Pointer.h"
+#include "Sequence/Sequence.h"
 
 #define NOT_DONE true
 
@@ -107,6 +108,43 @@ public:
 		return depth + std::max(leftDepth, rightDepth);
 	}
 
+	NodePtr<Tkey, Tvalue> Find(const Tvalue& value) const noexcept override
+	{
+		if (root == nullptr)
+			return nullptr;
+
+		Tkey keyValue = root->kGen(value);
+
+		NodePtr<Tkey, Tvalue> current = this->root.Get();
+
+		while (NOT_DONE)
+			if (current != nullptr && keyValue < current->key)
+				current = current->left.Get();
+			else if (current != nullptr && keyValue > current->key)
+				current = current->right.Get();
+			else if (current != nullptr && keyValue == current->key)
+				return current;
+			else if (current == nullptr)
+				return nullptr;
+	}
+
+	NodePtr<Tkey, Tvalue> Find(Sequence<TraverseOrder>* sequence) const override
+	{
+		if (!(sequence->isEmpty()) && root == nullptr)
+		{
+			Logger::Trace("At Find(Sequence<TraverseOrder>*) at BinaryTree<T>");
+			logException(EXCEPTION_BAD_CONTAINER);
+			throw EXCEPTION_BAD_CONTAINER;
+		}
+
+		return Find(sequence, 0, GetRoot());
+	}
+
+	bool isThere(const Tvalue& value) const noexcept override
+	{
+		return (Find(value) == nullptr) ? false : true;
+	}
+
 	Tree<Tkey, Tvalue>* Add(const Tvalue& value) noexcept override
 	{
 		if (root == nullptr)
@@ -125,30 +163,17 @@ public:
 			{
 				current->left = new TreeNode<Tkey, Tvalue>(value, current->kGen);
 				current->left->parent = current;
-				auto curDepth = Depth();
 
-				auto rootBF = this->BalanceFactor(this->GetRoot());
-				auto leftBF = this->BalanceFactor(this->GetRoot()->left.Get());
-				auto rightBF = this->BalanceFactor(this->GetRoot()->right.Get());
-
-				print("VALUE: ", value, "\nDEPTH: ", curDepth, "\nROOT: ", rootBF, "\nLEFT: ", leftBF,
-					"\nRIGHT: ", rightBF, "\n========================\n");
 				Balance();
 				return this;
 			}
 
 			if (current->right == nullptr && valueKey >= current->data)
 			{
+
 				current->right = new TreeNode<Tkey, Tvalue>(value, current->kGen);
 				current->right->parent = current;
-				auto curDepth = Depth();
 
-				auto rootBF = this->BalanceFactor(this->GetRoot());
-				auto leftBF = this->BalanceFactor(this->GetRoot()->left.Get());
-				auto rightBF = this->BalanceFactor(this->GetRoot()->right.Get());
-
-				print("VALUE: ", value, "\nDEPTH: ", curDepth, "\nROOT: ", rootBF, "\nLEFT: ", leftBF,
-					"\nRIGHT: ", rightBF, "\n========================\n");
 				Balance();
 				return this;
 			}
@@ -161,6 +186,101 @@ public:
 
 		Balance();
 		return this;
+	}
+
+	void Delete(const Tvalue& value) noexcept override
+	{
+		if (root == nullptr)
+			return;
+
+		NodePtr<Tkey, Tvalue> current = GetRoot();
+
+		Tkey keyValue = root->kGen(value);
+
+		while (NOT_DONE)
+		{
+			if (keyValue < current->key)
+				current = current->left.Get();
+			else if (keyValue > current->key)
+				current = current->right.Get();
+			else
+			{
+				if (Depth(current->left.Get()) < Depth(current->right.Get()))
+				{
+					if (MostLeft(current->right.Get()) != nullptr)
+					{
+						UniquePtr<TreeNode<Tkey, Tvalue>> nodeToBeDeleted = MostLeft(current->right.Get());
+
+						nodeToBeDeleted->parent->left = nodeToBeDeleted->right;
+						nodeToBeDeleted->parent = nullptr;
+						nodeToBeDeleted->left = nullptr;
+
+						current->data = std::move(nodeToBeDeleted->data);
+						current->key = std::move(nodeToBeDeleted->key);
+
+						Balance();
+						return;
+					}
+					else if (MostRight(current->left.Get()) != nullptr)
+					{
+						UniquePtr<TreeNode<Tkey, Tvalue>> nodeToBeDeleted = MostRight(current->left.Get());
+
+						nodeToBeDeleted->parent->right = nodeToBeDeleted->left;
+						nodeToBeDeleted->parent = nullptr;
+						nodeToBeDeleted->left = nullptr;
+
+						current->data = std::move(nodeToBeDeleted->data);
+						current->key = std::move(nodeToBeDeleted->key);
+
+						Balance();
+						return;
+					}
+
+					current->parent = nullptr;
+
+					delete current;
+					Balance();
+					return;
+				}
+				else
+				{
+					if (MostRight(current->left.Get()) != nullptr)
+					{
+						UniquePtr<TreeNode<Tkey, Tvalue>> nodeToBeDeleted = MostRight(current->left.Get());
+
+						nodeToBeDeleted->parent->right = nodeToBeDeleted->left;
+						nodeToBeDeleted->parent = nullptr;
+						nodeToBeDeleted->left = nullptr;
+
+						current->data = std::move(nodeToBeDeleted->data);
+						current->key = std::move(nodeToBeDeleted->key);
+
+						Balance();
+						return;
+					}
+					else if (MostLeft(current->right.Get()) != nullptr)
+					{
+						UniquePtr<TreeNode<Tkey, Tvalue>> nodeToBeDeleted = MostLeft(current->right.Get());
+
+						nodeToBeDeleted->parent->left = nodeToBeDeleted->right;
+						nodeToBeDeleted->parent = nullptr;
+						nodeToBeDeleted->left = nullptr;
+
+						current->data = std::move(nodeToBeDeleted->data);
+						current->key = std::move(nodeToBeDeleted->key);
+
+						Balance();
+						return;
+					}
+
+					current->parent = nullptr;
+
+					delete current;
+					Balance();
+					return;
+				}
+			}
+		}
 	}
 
 	Tree<Tkey, Tvalue>* Create() const noexcept override
@@ -520,6 +640,32 @@ private:
 			}
 			else
 				CopyNodes(copyNode, originalNode->right.Get(), filter);
+		}
+	}
+
+	NodePtr<Tkey, Tvalue> Find(Sequence<TraverseOrder>* sequence, const Index index, NodePtr<Tkey, Tvalue> node) const
+	{
+		if (node == nullptr)
+		{
+			Logger::Trace("At Find(Sequence<TraverseOrder>*, const Index, NodePtr) at BinaryTree<T>");
+			logException(EXCEPTION_BAD_LOGIC);
+			throw EXCEPTION_BAD_LOGIC;
+		}
+
+		if (sequence->GetLength() == index)
+			return node;
+
+		switch (sequence->Get(index))
+		{
+			case Left:
+				return Find(sequence, index + 1, node->left.Get());
+				break;
+			case Right:
+				return Find(sequence, index + 1, node->right.Get());
+			default:
+				Logger::Trace("At Find(Sequence<TraverseOrder>*, const Index, NodePtr) at BinaryTree<T>");
+				logException(EXCEPTION_BAD_LOGIC);
+				throw EXCEPTION_BAD_LOGIC;
 		}
 	}
 
