@@ -54,6 +54,16 @@ public:
 		}
 	}
 
+	BinaryTree(const BinaryTree<Tkey, Tvalue>* other)
+	    : root(nullptr)
+	{
+		if (other->root != nullptr)
+		{
+			root = new TreeNode<Tkey, Tvalue>(other->root->data, other->root->kGen);
+			CopyNodes(root.Get(), other->root.Get());
+		}
+	}
+
 	virtual ~BinaryTree()
 	{
 	}
@@ -221,7 +231,9 @@ public:
 					root->data = std::move(nodeToBeDeleted->data);
 					root->key = std::move(nodeToBeDeleted->key);
 
-					nodeToBeDeleted->parent->left = nullptr;
+					if (nodeToBeDeleted->parent != nullptr)
+						nodeToBeDeleted->parent->left = nullptr;
+
 					nodeToBeDeleted = nullptr;
 				}
 				else
@@ -229,12 +241,16 @@ public:
 					UniquePtr<TreeNode<Tkey, Tvalue>> nodeToBeDeleted = GetRoot();
 					root->right->left = root->left.Get();
 
+					this->root = nodeToBeDeleted->right.Get();
+
 					nodeToBeDeleted->left = nullptr;
 					nodeToBeDeleted->right = nullptr;
 
-					this->root = nodeToBeDeleted->right.Get();
+					if (nodeToBeDeleted->parent != nullptr)
+						nodeToBeDeleted->parent->right = nullptr;
 
-					nodeToBeDeleted->parent->right = nullptr;
+					nodeToBeDeleted->left = nullptr;
+					nodeToBeDeleted->right = nullptr;
 					nodeToBeDeleted = nullptr;
 				}
 			}
@@ -246,7 +262,9 @@ public:
 					root->data = std::move(nodeToBeDeleted->data);
 					root->key = std::move(nodeToBeDeleted->key);
 
-					nodeToBeDeleted->parent->left = nullptr;
+					if (nodeToBeDeleted->parent != nullptr)
+						nodeToBeDeleted->parent->left = nullptr;
+
 					nodeToBeDeleted = nullptr;
 				}
 				else
@@ -254,12 +272,16 @@ public:
 					UniquePtr<TreeNode<Tkey, Tvalue>> nodeToBeDeleted = GetRoot();
 					root->left->right = root->right.Get();
 
+					this->root = nodeToBeDeleted->left.Get();
+
 					nodeToBeDeleted->left = nullptr;
 					nodeToBeDeleted->right = nullptr;
 
-					this->root = nodeToBeDeleted->left.Get();
+					if (nodeToBeDeleted->parent != nullptr)
+						nodeToBeDeleted->parent->right = nullptr;
 
-					nodeToBeDeleted->parent->right = nullptr;
+					nodeToBeDeleted->left = nullptr;
+					nodeToBeDeleted->right = nullptr;
 					nodeToBeDeleted = nullptr;
 				}
 			}
@@ -641,14 +663,16 @@ public:
 
 	friend std::ostream& operator<<(std::ostream& stream, const BinaryTree<Tkey, Tvalue>& tree)
 	{
-		tree.Dump(stream, tree.GetRoot(), Left, Root, Right);
+		if (tree.root != nullptr)
+			tree.Dump(stream, tree.GetRoot(), Left, Root, Right);
 
 		return stream;
 	}
 
 	friend std::ostream& operator<<(std::ostream& stream, const SharedPtr<BinaryTree<Tkey, Tvalue>>& tree)
 	{
-		tree->Dump(stream, tree->GetRoot(), Left, Root, Right);
+		if (tree->root != nullptr)
+			tree->Dump(stream, tree->GetRoot(), Left, Root, Right);
 
 		return stream;
 	}
