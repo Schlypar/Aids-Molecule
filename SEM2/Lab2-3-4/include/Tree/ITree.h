@@ -212,9 +212,9 @@ public:
 	}
 
 	virtual NodePtr<Tkey, Tvalue> Find(const Tvalue& value) const noexcept = 0;
-	virtual bool isThere(const Tvalue& value) const noexcept = 0;
-
 	virtual NodePtr<Tkey, Tvalue> Find(Sequence<TraverseOrder>* sequenceOfTraversion) const = 0;
+
+	virtual bool isThere(const Tvalue& value) const noexcept = 0;
 
 	virtual Size Depth(NodePtr<Tkey, Tvalue> startNode) const noexcept = 0;
 	virtual Size Depth(NodePtr<Tkey, Tvalue> startNode, Size depth) const noexcept = 0;
@@ -230,8 +230,8 @@ public:
 	virtual void Traverse(TraverseOrder first, TraverseOrder second, TraverseOrder third, std::function<void(NodePtr<Tkey, Tvalue>)> func) = 0;
 	virtual void Traverse(NodePtr<Tkey, Tvalue> startNode, TraverseOrder first, TraverseOrder second, TraverseOrder third, std::function<void(NodePtr<Tkey, Tvalue>)> func) = 0;
 
-	virtual Tree<Tkey, Tvalue>*
-	Traverse(TraverseOrder first, TraverseOrder second, TraverseOrder third, std::function<void(Tvalue&)> func) const = 0;
+	virtual Tree<Tkey, Tvalue>* Traverse(TraverseOrder first, TraverseOrder second, TraverseOrder third,
+		std::function<void(Tvalue&)> func) const = 0;
 
 	virtual int BalanceFactor() const noexcept = 0;
 	virtual int BalanceFactor(NodePtr<Tkey, Tvalue> startNode) const noexcept = 0;

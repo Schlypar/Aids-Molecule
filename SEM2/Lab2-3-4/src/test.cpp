@@ -56,11 +56,10 @@ int main()
 	BinTreePtr<int, int> res = (BinaryTree<int, int>*) tree->Merge(secondTree.Get());
 
 	print(res, '\n');
-
-	auto bfLeft = res->Depth(res->GetRoot()->left.Get());
-	auto bfRight = res->Depth(res->GetRoot()->right.Get());
-
-	print(bfLeft, " <- left depth | right depth -> ", bfRight, '\n');
+	res->Delete(-7);
+	print(res, '\n');
+	res->Delete(-5);
+	print(res, '\n');
 
 	delete seq;
 	return 0;

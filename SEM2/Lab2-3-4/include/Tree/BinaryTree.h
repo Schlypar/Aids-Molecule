@@ -188,14 +188,99 @@ public:
 		return this;
 	}
 
+	void DeleteRoot() noexcept
+	{
+		if (root->left == nullptr && root->right == nullptr)
+		{
+			delete GetRoot();
+			this->root = nullptr;
+		}
+		else if (root->left != nullptr && root->right == nullptr)
+		{
+			UniquePtr<TreeNode<Tkey, Tvalue>> nodeToBeDeleted = GetRoot();
+			this->root = root->left.Get();
+
+			nodeToBeDeleted->left = nullptr;
+			nodeToBeDeleted->right = nullptr;
+		}
+		else if (root->left == nullptr && root->right != nullptr)
+		{
+			UniquePtr<TreeNode<Tkey, Tvalue>> nodeToBeDeleted = GetRoot();
+			this->root = root->right.Get();
+
+			nodeToBeDeleted->left = nullptr;
+			nodeToBeDeleted->right = nullptr;
+		}
+		else
+		{
+			if (Depth(root->left.Get()) < Depth(root->right.Get()))
+			{
+				if (MostLeft(root->right.Get()) != nullptr)
+				{
+					UniquePtr<TreeNode<Tkey, Tvalue>> nodeToBeDeleted = MostLeft(root->right.Get());
+					root->data = std::move(nodeToBeDeleted->data);
+					root->key = std::move(nodeToBeDeleted->key);
+
+					nodeToBeDeleted->parent->left = nullptr;
+					nodeToBeDeleted = nullptr;
+				}
+				else
+				{
+					UniquePtr<TreeNode<Tkey, Tvalue>> nodeToBeDeleted = GetRoot();
+					root->right->left = root->left.Get();
+
+					nodeToBeDeleted->left = nullptr;
+					nodeToBeDeleted->right = nullptr;
+
+					this->root = nodeToBeDeleted->right.Get();
+
+					nodeToBeDeleted->parent->right = nullptr;
+					nodeToBeDeleted = nullptr;
+				}
+			}
+			else
+			{
+				if (MostRight(root->left.Get()) != nullptr)
+				{
+					UniquePtr<TreeNode<Tkey, Tvalue>> nodeToBeDeleted = MostRight(root->left.Get());
+					root->data = std::move(nodeToBeDeleted->data);
+					root->key = std::move(nodeToBeDeleted->key);
+
+					nodeToBeDeleted->parent->left = nullptr;
+					nodeToBeDeleted = nullptr;
+				}
+				else
+				{
+					UniquePtr<TreeNode<Tkey, Tvalue>> nodeToBeDeleted = GetRoot();
+					root->left->right = root->right.Get();
+
+					nodeToBeDeleted->left = nullptr;
+					nodeToBeDeleted->right = nullptr;
+
+					this->root = nodeToBeDeleted->left.Get();
+
+					nodeToBeDeleted->parent->right = nullptr;
+					nodeToBeDeleted = nullptr;
+				}
+			}
+		}
+	}
+
 	void Delete(const Tvalue& value) noexcept override
 	{
 		if (root == nullptr)
 			return;
 
-		NodePtr<Tkey, Tvalue> current = GetRoot();
-
 		Tkey keyValue = root->kGen(value);
+
+		if (keyValue == root->key)
+		{
+			DeleteRoot();
+			Balance();
+			return;
+		}
+
+		NodePtr<Tkey, Tvalue> current = GetRoot();
 
 		while (NOT_DONE)
 		{
@@ -212,8 +297,6 @@ public:
 						UniquePtr<TreeNode<Tkey, Tvalue>> nodeToBeDeleted = MostLeft(current->right.Get());
 
 						nodeToBeDeleted->parent->left = nodeToBeDeleted->right;
-						nodeToBeDeleted->parent = nullptr;
-						nodeToBeDeleted->left = nullptr;
 
 						current->data = std::move(nodeToBeDeleted->data);
 						current->key = std::move(nodeToBeDeleted->key);
@@ -226,8 +309,6 @@ public:
 						UniquePtr<TreeNode<Tkey, Tvalue>> nodeToBeDeleted = MostRight(current->left.Get());
 
 						nodeToBeDeleted->parent->right = nodeToBeDeleted->left;
-						nodeToBeDeleted->parent = nullptr;
-						nodeToBeDeleted->left = nullptr;
 
 						current->data = std::move(nodeToBeDeleted->data);
 						current->key = std::move(nodeToBeDeleted->key);
@@ -238,7 +319,10 @@ public:
 
 					current->parent = nullptr;
 
-					delete current;
+					NodePtr<Tkey, Tvalue> parent = current->parent;
+					(parent->left.Get() == current) ? parent->left = nullptr : parent->right = nullptr;
+					current->parent = nullptr;
+
 					Balance();
 					return;
 				}
@@ -249,8 +333,6 @@ public:
 						UniquePtr<TreeNode<Tkey, Tvalue>> nodeToBeDeleted = MostRight(current->left.Get());
 
 						nodeToBeDeleted->parent->right = nodeToBeDeleted->left;
-						nodeToBeDeleted->parent = nullptr;
-						nodeToBeDeleted->left = nullptr;
 
 						current->data = std::move(nodeToBeDeleted->data);
 						current->key = std::move(nodeToBeDeleted->key);
@@ -263,8 +345,6 @@ public:
 						UniquePtr<TreeNode<Tkey, Tvalue>> nodeToBeDeleted = MostLeft(current->right.Get());
 
 						nodeToBeDeleted->parent->left = nodeToBeDeleted->right;
-						nodeToBeDeleted->parent = nullptr;
-						nodeToBeDeleted->left = nullptr;
 
 						current->data = std::move(nodeToBeDeleted->data);
 						current->key = std::move(nodeToBeDeleted->key);
@@ -273,6 +353,8 @@ public:
 						return;
 					}
 
+					NodePtr<Tkey, Tvalue> parent = current->parent;
+					(parent->left.Get() == current) ? parent->left = nullptr : parent->right = nullptr;
 					current->parent = nullptr;
 
 					delete current;
@@ -362,8 +444,8 @@ public:
 		}
 	}
 
-	Tree<Tkey, Tvalue>*
-	Traverse(TraverseOrder first, TraverseOrder second, TraverseOrder third, std::function<void(Tvalue&)> func) const override
+	Tree<Tkey, Tvalue>* Traverse(TraverseOrder first, TraverseOrder second, TraverseOrder third,
+		std::function<void(Tvalue&)> func) const override
 	{
 		BinaryTree<Tkey, Tvalue>* result = new BinaryTree<Tkey, Tvalue>(*this);
 
