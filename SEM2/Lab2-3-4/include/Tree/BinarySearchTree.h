@@ -48,4 +48,18 @@ public:
 	    : BinaryTree<T, T>((BinaryTree<T, T>*) other)
 	{
 	}
+
+	friend std::ostream& operator<<(std::ostream& stream, SharedPtr<BinarySearchTree<T>> tree)
+	{
+		stream << (BinaryTree<T, T>*) tree.Get();
+
+		return stream;
+	}
+
+	friend std::ostream& operator<<(std::ostream& stream, const BinarySearchTree<T>& tree)
+	{
+		stream << ((BinaryTree<T, T>*) (&tree));
+
+		return stream;
+	}
 };

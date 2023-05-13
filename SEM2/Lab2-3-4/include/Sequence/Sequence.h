@@ -7,6 +7,7 @@
 #include "Logger.h"
 #include "SegmentedList.h"
 #include "Tuple.h"
+#include "concepts.h"
 
 template <typename T>
 class Sequence
@@ -21,6 +22,9 @@ public:
 
 	virtual IIterator<T>* _Begin() = 0;
 	virtual IIterator<T>* _End() = 0;
+
+	Iterator auto begin();
+	Iterator auto end();
 
 	virtual T& GetFirst() const = 0;
 	virtual T& GetLast() const = 0;
@@ -67,11 +71,11 @@ template <typename T>
 Sequence<T>* Sequence<T>::Map(Func<T> func)
 {
 	if (this->isEmpty())
-	{
-		Logger::Trace("At Map() at Sequence.h");
-		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-		throw(EXCEPTION_INDEX_OUT_OF_RANGE);
-	}
+		{
+			Logger::Trace("At Map() at Sequence.h");
+			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+			throw(EXCEPTION_INDEX_OUT_OF_RANGE);
+		}
 
 	Sequence<T>* result = this->Create();
 
@@ -85,11 +89,11 @@ template <typename T>
 Sequence<T>* Sequence<T>::Where(Condition<T> condition)
 {
 	if (this->isEmpty())
-	{
-		Logger::Trace("At Where() at Sequence.h");
-		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-		throw(EXCEPTION_INDEX_OUT_OF_RANGE);
-	}
+		{
+			Logger::Trace("At Where() at Sequence.h");
+			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+			throw(EXCEPTION_INDEX_OUT_OF_RANGE);
+		}
 
 	Sequence<T>* result = this->Create();
 
@@ -104,11 +108,11 @@ template <typename T>
 Sequence<T>* Sequence<T>::GetSubsequence(const Index start, const Index end)
 {
 	if (this->isEmpty() || end >= this->GetLength())
-	{
-		Logger::Trace("At GetSubsequence() at Sequence.h");
-		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-		throw(EXCEPTION_INDEX_OUT_OF_RANGE);
-	}
+		{
+			Logger::Trace("At GetSubsequence() at Sequence.h");
+			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+			throw(EXCEPTION_INDEX_OUT_OF_RANGE);
+		}
 
 	Sequence<T>* result = this->Create();
 
@@ -122,11 +126,11 @@ template <typename T>
 Sequence<T>* Sequence<T>::Concat(Sequence<T>* other)
 {
 	if (this->isEmpty() || other->isEmpty())
-	{
-		Logger::Trace("At Concat() at Sequence.h");
-		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-		throw(EXCEPTION_INDEX_OUT_OF_RANGE);
-	}
+		{
+			Logger::Trace("At Concat() at Sequence.h");
+			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+			throw(EXCEPTION_INDEX_OUT_OF_RANGE);
+		}
 
 	Sequence<T>* result = this->Create();
 
@@ -155,36 +159,36 @@ template <typename T>
 Sequence<T>* Sequence<T>::Slice(const Index index, Size size, Sequence<T>* other)
 {
 	if (this->isEmpty() || index >= this->GetLength())
-	{
-		Logger::Trace("At Slice(1) at Sequence.h");
-		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-		throw(EXCEPTION_INDEX_OUT_OF_RANGE);
-	}
-	if (other != NULL)
-	{
-		if (size > other->GetLength() || index + size > this->GetLength())
 		{
-			Logger::Trace("At Slice(2) at Sequence.h");
+			Logger::Trace("At Slice(1) at Sequence.h");
 			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
 			throw(EXCEPTION_INDEX_OUT_OF_RANGE);
 		}
-	}
+	if (other != NULL)
+		{
+			if (size > other->GetLength() || index + size > this->GetLength())
+				{
+					Logger::Trace("At Slice(2) at Sequence.h");
+					logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+					throw(EXCEPTION_INDEX_OUT_OF_RANGE);
+				}
+		}
 
 	Sequence<T>* result = this->Create();
 
 	if (other != NULL)
-	{
-		for (Index i = 0; i < size; i++)
-			result->Get(i + index) = other->Get(i);
-	}
+		{
+			for (Index i = 0; i < size; i++)
+				result->Get(i + index) = other->Get(i);
+		}
 	else
-	{
-		for (Index i = 0; i < index; i++)
-			result->Append(this->Get(i));
+		{
+			for (Index i = 0; i < index; i++)
+				result->Append(this->Get(i));
 
-		for (Index i = index + size; i < this->GetLength(); i++)
-			result->Append(this->Get(i));
-	}
+			for (Index i = index + size; i < this->GetLength(); i++)
+				result->Append(this->Get(i));
+		}
 	return result;
 }
 
@@ -192,11 +196,11 @@ template <typename T>
 T Sequence<T>::Reduce(Reducer<T> reducer, T base)
 {
 	if (this->isEmpty())
-	{
-		Logger::Trace("At Reduce() at Sequence.h");
-		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-		throw(EXCEPTION_INDEX_OUT_OF_RANGE);
-	}
+		{
+			Logger::Trace("At Reduce() at Sequence.h");
+			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+			throw(EXCEPTION_INDEX_OUT_OF_RANGE);
+		}
 
 	for (Index i = this->GetLength() - 1; i > 0; i--)
 		base = reducer(this->Get(i), base);

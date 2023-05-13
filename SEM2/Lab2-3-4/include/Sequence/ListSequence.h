@@ -19,19 +19,19 @@ public:
 		Iterator()
 		    : current(nullptr)
 		{
-			Logger::Info("Used default constructor of ArraySequence<T>::Iterator");
+			Logger::Info("Used default constructor of ListSequence<T>::Iterator");
 		}
 
 		Iterator(Node<T>* data)
 		    : current(data)
 		{
-			Logger::Info("Used T* constructor of ArraySequence<T>::Iterator");
+			Logger::Info("Used T* constructor of ListSequence<T>::Iterator");
 		}
 
 		Iterator(IIterator<T>* other)
 		    : current(((Iterator*) other)->current)
 		{
-			Logger::Info("Used IIterator* constructor of ArraySequence<T>::Iterator");
+			Logger::Info("Used IIterator* constructor of ListSequence<T>::Iterator");
 			Logger::Info("Deleted heap pointer of IIterator<T>*");
 			delete other;
 		}
@@ -39,10 +39,10 @@ public:
 		Iterator& operator+(int n)
 		{
 			while (n > 0)
-			{
-				this->Next();
-				n--;
-			}
+				{
+					this->Next();
+					n--;
+				}
 
 			return *this;
 		}
@@ -50,23 +50,23 @@ public:
 		Iterator& operator-(int n)
 		{
 			while (n > 0)
-			{
-				this->Prev();
-				n--;
-			}
+				{
+					current = current->prev;
+					n--;
+				}
 
 			return *this;
 		}
 
-		Iterator operator++()
+		Iterator& operator++()
 		{
-			this->_Next();
+			current = current->next;
 			return *this;
 		}
 
-		Iterator operator--()
+		Iterator& operator--()
 		{
-			this->_Prev();
+			current = current->prev;
 			return *this;
 		}
 
@@ -167,11 +167,11 @@ public:
 	T& GetFirst() const override
 	{
 		if (isEmpty())
-		{
-			Logger::Trace("At Get() at ArraySequence.h");
-			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-			exit(EXIT_FAILURE);
-		}
+			{
+				Logger::Trace("At Get() at ArraySequence.h");
+				logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+				exit(EXIT_FAILURE);
+			}
 
 		return container.GetFirst();
 	}
@@ -179,11 +179,11 @@ public:
 	T& GetLast() const override
 	{
 		if (isEmpty())
-		{
-			Logger::Trace("At Get() at ArraySequence.h");
-			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-			exit(EXIT_FAILURE);
-		}
+			{
+				Logger::Trace("At Get() at ArraySequence.h");
+				logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+				exit(EXIT_FAILURE);
+			}
 
 		return container.GetLast();
 	}
@@ -191,11 +191,11 @@ public:
 	T& Get(const Index index) const override
 	{
 		if (isEmpty())
-		{
-			Logger::Trace("At Get() at ArraySequence.h");
-			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-			exit(EXIT_FAILURE);
-		}
+			{
+				Logger::Trace("At Get() at ArraySequence.h");
+				logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+				exit(EXIT_FAILURE);
+			}
 
 		return container.Get(index);
 	}
@@ -278,11 +278,11 @@ public:
 	friend std::ostream& operator<<(std::ostream& stream, ListSequence<T>& list)
 	{
 		if (list.isEmpty())
-		{
-			Logger::Trace("At operator<< overload at Array.h");
-			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-			return stream;
-		}
+			{
+				Logger::Trace("At operator<< overload at Array.h");
+				logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+				return stream;
+			}
 
 		stream << list.container;
 
@@ -292,11 +292,11 @@ public:
 	friend std::ostream& operator<<(std::ostream& stream, ListSequence<T>* list)
 	{
 		if (list->isEmpty())
-		{
-			Logger::Trace("At operator<< overload at Array.h");
-			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-			return stream;
-		}
+			{
+				Logger::Trace("At operator<< overload at Array.h");
+				logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+				return stream;
+			}
 
 		stream << list->container;
 
