@@ -2,7 +2,6 @@
 
 #include "Allocator.h"
 #include "Sequence/ArraySequence.h"
-#include <catch2/catch.hpp>
 
 TEST_CASE("Sequence::Map applies function to every element")
 {

@@ -23,8 +23,8 @@ public:
 	virtual IIterator<T>* _Begin() = 0;
 	virtual IIterator<T>* _End() = 0;
 
-	Iterator auto begin();
-	Iterator auto end();
+	Iter decltype(auto) begin();
+	Iter decltype(auto) end();
 
 	virtual T& GetFirst() const = 0;
 	virtual T& GetLast() const = 0;

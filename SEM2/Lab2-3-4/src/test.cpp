@@ -1,4 +1,5 @@
 #include "Logger.h"
+#include "Sequence/ArraySequence.h"
 #include "Sequence/Sequence.h"
 #include "Tree/BinaryHeap.h"
 #include "Tree/BinarySearchTree.h"
@@ -39,11 +40,6 @@ int main()
 	BinTreePtr<int, int> heap = (BinaryTree<int, int>*) new BinaryHeap<int, int>(1, startKGen);
 	heap->Add(2)->Add(-1)->Add(5)->Add(-2)->Add(-3)->Add(-7)->Add(0)->Add(6)->Add(-2);
 	print(heap, '\n');
-
-	// for (auto& data : *heap)
-	// 	std::cout << data << " ";
-
-	// auto iter = heap->end();
 
 	return 0;
 }

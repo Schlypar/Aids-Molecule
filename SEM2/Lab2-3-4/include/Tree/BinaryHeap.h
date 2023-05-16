@@ -4,7 +4,7 @@
 #include "Sequence/List.h"
 #include "Tree/ITree.h"
 
-template <typename T, typename P>
+template <Comparible P, typename T>
 class BinaryHeap : protected BinaryTree<P, T>
 {
 	template <typename T1, typename T2>
@@ -106,8 +106,7 @@ public:
 
 	void Delete(const T& value) noexcept override
 	{
-		auto deleter = [this](NodePtr<T, P> node) -> void
-		{
+		auto deleter = [this](NodePtr<T, P> node) -> void {
 			while (node->left != nullptr || node->right != nullptr)
 			{
 				NodePtr<T, P> withMaxValue = nullptr;
@@ -134,12 +133,10 @@ public:
 			delete node;
 		};
 
-		this->Traverse(Left, Right, Root,
-			[deleter, value](NodePtr<T, P> node) -> void
-			{
-				if (node->data == value)
-					deleter(node);
-			});
+		this->Traverse(Left, Right, Root, [deleter, value](NodePtr<T, P> node) -> void {
+			if (node->data == value)
+				deleter(node);
+		});
 	}
 
 private:
@@ -165,8 +162,7 @@ private:
 
 	void Balance() noexcept override
 	{
-		auto pushUp = [this](NodePtr<T, P> node) -> void
-		{
+		auto pushUp = [this](NodePtr<T, P> node) -> void {
 			while (node->parent != nullptr && node->parent->key < node->key)
 			{
 				this->PushUp(node);
@@ -174,8 +170,7 @@ private:
 			}
 		};
 
-		auto pushDown = [this](NodePtr<T, P> node) -> void
-		{
+		auto pushDown = [this](NodePtr<T, P> node) -> void {
 			while ((node->left != nullptr && node->key < node->left->key)
 				|| (node->right != nullptr && node->key < node->right->key))
 			{
@@ -193,11 +188,9 @@ private:
 			}
 		};
 
-		this->Traverse(Left, Right, Root,
-			[pushUp, pushDown](NodePtr<T, P> node) -> void
-			{
-				pushUp(node);
-				pushDown(node);
-			});
+		this->Traverse(Left, Right, Root, [pushUp, pushDown](NodePtr<T, P> node) -> void {
+			pushUp(node);
+			pushDown(node);
+		});
 	}
 };

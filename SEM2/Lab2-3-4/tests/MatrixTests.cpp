@@ -2,7 +2,6 @@
 #include "moduleTest.h"
 
 #include "Linal/Matrix.h"
-#include <catch2/catch.hpp>
 
 TEST_CASE("Matrix constructors", "[Matrix]")
 {

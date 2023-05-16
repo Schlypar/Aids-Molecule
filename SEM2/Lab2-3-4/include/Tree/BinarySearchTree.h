@@ -2,8 +2,9 @@
 
 #include "BinaryTree.h"
 #include "Tree/ITree.h"
+#include "concepts.h"
 
-template <typename T>
+template <Comparible T>
 class BinarySearchTree : public BinaryTree<T, T>
 {
 

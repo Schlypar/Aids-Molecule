@@ -25,7 +25,7 @@
 # If you are using Unix-like OS you can use launch.sh to configure, compile and run this project for you
 
 
-cmake_minimum_required(VERSION 3.22.1)
+cmake_minimum_required(VERSION 3.18.4)
 
 project(Lab2-3-4)
 
@@ -73,9 +73,12 @@ set(SOURCES_HEADERS
         ${INCLUDE}/Logger.h
         ${INCLUDE}/Sequence/SegmentedList.h
         ${INCLUDE}/Sequence/Sequence.h
+        ${INCLUDE}/Sequence/Stack.h
         ${INCLUDE}/Tuple.h
         ${INCLUDE}/Tree/ITree.h
         ${INCLUDE}/Tree/BinaryTree.h
+        ${INCLUDE}/Tree/BinarySearchTree.h
+        ${INCLUDE}/Tree/BinaryHeap.h
         ${INCLUDE}/Pointer.h
         ${INCLUDE}/Linal/Vector.h
         ${INCLUDE}/ADT.h)
@@ -150,3 +153,9 @@ add_executable(${TEST_PROJECT_NAME}
 
 target_include_directories(${TEST_PROJECT_NAME} PRIVATE ${SOURCE_DIR})
 target_include_directories(${TEST_PROJECT_NAME} PRIVATE ${INCLUDE})
+# target_link_libraries(${TEST_PROJECT_NAME} PRIVATE Catch2::Catch2WithMain)
+#
+# include(CTest)
+# include(Catch)
+# catch_discover_tests(${TEST_PROJECT_NAME})
+# enable_testing()
