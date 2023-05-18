@@ -19,141 +19,76 @@ class BinaryTree : public Tree<Tkey, Tvalue>
 
 protected:
 	WeakPtr<TreeNode<Tkey, Tvalue>> root;
+	KGen<Tkey, Tvalue> kGen = nullptr;
 
 public:
 	BinaryTree()
 	    : root(nullptr)
+	    , kGen(nullptr)
 	{
-		Logger::Info("Default constructor of BinaryTree<T>");
-	}
-
-	BinaryTree(const Tvalue& startValue)
-	    : root(new TreeNode<Tkey, Tvalue>(startValue))
-	{
-		Logger::Info("Starting value constructor of BinaryTree<T>");
+		Logger::Warn("Default constructor of BinaryTree<T>");
 	}
 
 	BinaryTree(const Tvalue& startValue, KGen<Tkey, Tvalue> kGen)
-	    : root(new TreeNode<Tkey, Tvalue>(startValue, kGen))
+	    : root(new TreeNode<Tkey, Tvalue>(startValue))
+	    , kGen(kGen)
+	{
+		root->key = this->kGen(startValue);
+		Logger::Info("Starting value constructor of BinaryTree<T>");
+	}
+
+	BinaryTree(KGen<Tkey, Tvalue> kGen)
+	    : root()
+	    , kGen(kGen)
 	{
 		Logger::Info("Starting value constructor of BinaryTree<T>");
 	}
 
-	BinaryTree(TreeNode<Tkey, Tvalue>* startRoot)
+	BinaryTree(TreeNode<Tkey, Tvalue>* startRoot, KGen<Tkey, Tvalue> kGen)
 	    : root(startRoot)
+	    , kGen(kGen)
 	{
 		Logger::Info("Starting root node constructor of BinaryTree<T>");
 	}
 
 	BinaryTree(const BinaryTree<Tkey, Tvalue>& other)
 	    : root(nullptr)
+	    , kGen(other.kGen)
 	{
 		if (other.root != nullptr)
 		{
-			root = new TreeNode<Tkey, Tvalue>(other.root->data, other.root->kGen);
+			root = new TreeNode<Tkey, Tvalue>(other.root->data);
 			CopyNodes(root.Get(), other.root.Get());
 		}
 	}
 
 	BinaryTree(const BinaryTree<Tkey, Tvalue>* other)
 	    : root(nullptr)
+	    , kGen(other->kGen)
 	{
 		if (other->root != nullptr)
 		{
-			root = new TreeNode<Tkey, Tvalue>(other->root->data, other->root->kGen);
+			root = new TreeNode<Tkey, Tvalue>(other->root->data);
+			root->key = other->root->key;
 			CopyNodes(root.Get(), other->root.Get());
 		}
 	}
 
+	BinaryTree(BinaryTree<Tkey, Tvalue>* other)
+	    : root(nullptr)
+	    , kGen(other->kGen)
+	{
+		if (other->root != nullptr)
+		{
+			root = other->root;
+			other->root = nullptr;
+		}
+
+		delete other;
+	}
+
 	virtual ~BinaryTree()
 	{
-	}
-
-	template <typename K, typename T>
-	friend class TreeIterator;
-
-	class TreeIterator
-	{
-	private:
-		ArraySequence<Tvalue> sequence;
-		typename ArraySequence<Tvalue>::Iterator it;
-
-	public:
-		TreeIterator()
-		    : sequence(nullptr)
-		{
-		}
-
-		TreeIterator(BinaryTree<Tkey, Tvalue>* tree, bool isEnd)
-		    : sequence()
-		{
-			auto& seqRef = this->sequence;
-			tree->Traverse(Left, Root, Right, [this](Tvalue& value) -> void { this->sequence.Append(value); });
-
-			if (isEnd)
-				it = sequence.end();
-			else
-				it = sequence.begin();
-		}
-
-		~TreeIterator()
-		{
-		}
-
-		TreeIterator& operator++() noexcept
-		{
-			++it;
-
-			return *this;
-		}
-
-		TreeIterator& operator++(int) noexcept
-		{
-			++it;
-
-			return *this;
-		}
-
-		// TreeIterator& operator--() noexcept
-		// {
-		// 	it--;
-
-		// 	return *this;
-		// }
-
-		TreeIterator& operator--(int) noexcept
-		{
-			--it;
-
-			return *this;
-		}
-
-		Tvalue& operator*() noexcept
-		{
-			return *it;
-		}
-
-		bool operator==(TreeIterator& other) noexcept
-		{
-			return this->it == other.it;
-		}
-
-		bool operator!=(TreeIterator& other) noexcept
-		{
-			return this->it != other.it;
-		}
-	};
-
-	TreeIterator begin()
-	{
-		return TreeIterator(this, false);
-	}
-
-	TreeIterator end()
-	{
-		TreeIterator res = TreeIterator(this, true);
-
-		return res;
 	}
 
 	Size Depth(NodePtr<Tkey, Tvalue> startNode) const noexcept override
@@ -211,7 +146,7 @@ public:
 		if (root == nullptr)
 			return nullptr;
 
-		Tkey keyValue = root->kGen(value);
+		Tkey keyValue = this->kGen(value);
 
 		NodePtr<Tkey, Tvalue> current = this->root.Get();
 
@@ -248,28 +183,31 @@ public:
 		if (root == nullptr)
 		{
 			root = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(value));
+			root->key = this->kGen(value);
 			return this;
 		}
 
-		Tkey valueKey = root->kGen(value);
+		Tkey valueKey = this->kGen(value);
 
 		NodePtr<Tkey, Tvalue> current = this->root.Get();
 
 		while (NOT_DONE)
 		{
-			if (current->left == nullptr && valueKey < current->data)
+			if (current->left == nullptr && valueKey < current->key)
 			{
-				current->left = new TreeNode<Tkey, Tvalue>(value, current->kGen);
+				current->left = new TreeNode<Tkey, Tvalue>(value);
+				current->left->key = this->kGen(value);
 				current->left->parent = current;
 
 				Balance();
 				return this;
 			}
 
-			if (current->right == nullptr && valueKey >= current->data)
+			if (current->right == nullptr && valueKey >= current->key)
 			{
 
-				current->right = new TreeNode<Tkey, Tvalue>(value, current->kGen);
+				current->right = new TreeNode<Tkey, Tvalue>(value);
+				current->right->key = this->kGen(value);
 				current->right->parent = current;
 
 				Balance();
@@ -375,7 +313,7 @@ public:
 		if (root == nullptr)
 			return;
 
-		Tkey keyValue = root->kGen(value);
+		Tkey keyValue = this->kGen(value);
 
 		if (keyValue == root->key)
 		{
@@ -468,12 +406,12 @@ public:
 
 	Tree<Tkey, Tvalue>* Create() const noexcept override
 	{
-		return (Tree<Tkey, Tvalue>*) new BinaryTree<Tkey, Tvalue>();
+		return (Tree<Tkey, Tvalue>*) new BinaryTree<Tkey, Tvalue>(this->kGen);
 	}
 
 	Tree<Tkey, Tvalue>* Create(TreeNode<Tkey, Tvalue>* root) const noexcept override
 	{
-		return (Tree<Tkey, Tvalue>*) new BinaryTree<Tkey, Tvalue>(root);
+		return (Tree<Tkey, Tvalue>*) new BinaryTree<Tkey, Tvalue>(root, kGen);
 	}
 
 	Tree<Tkey, Tvalue>* Copy() const noexcept override
@@ -784,21 +722,19 @@ public:
 		root = LeftRightRotation(root.Get());
 	}
 
-private:
+protected:
 	void CopyNodes(NodePtr<Tkey, Tvalue> copyNode, const NodePtr<Tkey, Tvalue> originalNode) const noexcept override
 	{
 		if (originalNode->left)
 		{
-			copyNode->left = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->left->data,
-				originalNode->left->kGen));
+			copyNode->left = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->left->data));
 
 			copyNode->left->parent = copyNode;
 			CopyNodes(copyNode->left.Get(), originalNode->left.Get());
 		}
 		if (originalNode->right)
 		{
-			copyNode->right = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->right->data,
-				originalNode->right->kGen));
+			copyNode->right = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->right->data));
 
 			copyNode->right->parent = copyNode;
 			CopyNodes(copyNode->right.Get(), originalNode->right.Get());
@@ -812,8 +748,7 @@ private:
 		{
 			if (filter(originalNode->left->data))
 			{
-				copyNode->left = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->left->data,
-					originalNode->left->kGen));
+				copyNode->left = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->left->data));
 
 				copyNode->left->parent = copyNode;
 				CopyNodes(copyNode->left.Get(), originalNode->left.Get(), filter);
@@ -825,8 +760,7 @@ private:
 		{
 			if (filter(originalNode->right->data))
 			{
-				copyNode->right = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->right->data,
-					originalNode->right->kGen));
+				copyNode->right = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->right->data));
 
 				copyNode->right->parent = copyNode;
 				CopyNodes(copyNode->right.Get(), originalNode->right.Get(), filter);
@@ -952,7 +886,7 @@ private:
 				if (startNode->right != nullptr)
 				{
 					stream << "[";
-					printTree(stream, startNode->left.Get(), first, second, third);
+					printTree(stream, startNode->right.Get(), first, second, third);
 					stream << "]";
 				}
 				break;
@@ -1063,6 +997,9 @@ private:
 		NodePtr<Tkey, Tvalue> son = node->right.Get();
 		NodePtr<Tkey, Tvalue> grandSon = son->left.Get();
 
+		if (grandSon == nullptr || son == nullptr)
+			return GetRoot();
+
 		grandSon->parent = node->parent;
 		son->parent = grandSon;
 		node->parent = grandSon;
@@ -1080,6 +1017,9 @@ private:
 	{
 		NodePtr<Tkey, Tvalue> son = node->left.Get();
 		NodePtr<Tkey, Tvalue> grandSon = son->right.Get();
+
+		if (grandSon == nullptr || son == nullptr)
+			return GetRoot();
 
 		grandSon->parent = node->parent;
 		son->parent = grandSon;
@@ -1162,5 +1102,3 @@ private:
 			this->LeftRightRotation();
 	}
 };
-
-// template <typename Tkey, Tvalue>

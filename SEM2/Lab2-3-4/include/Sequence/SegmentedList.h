@@ -531,12 +531,12 @@ public:
 		return this->size;
 	}
 
-	Node<T>* GetHead()
+	Node<T>* GetHead() const
 	{
 		return (this->head) ? this->head->head : nullptr;
 	}
 
-	Node<T>* GetTail()
+	Node<T>* GetTail() const
 	{
 		return (this->tail) ? this->tail->tail : nullptr;
 	}

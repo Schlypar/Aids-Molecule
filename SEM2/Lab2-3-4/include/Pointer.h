@@ -94,6 +94,11 @@ public:
 		return ptr == nullptr;
 	}
 
+	operator T()
+	{
+		return ptr;
+	}
+
 	T* Get() const noexcept
 	{
 		return this->ptr;
@@ -233,6 +238,11 @@ public:
 	bool operator==(std::nullptr_t) const
 	{
 		return ptr == nullptr;
+	}
+
+	operator T()
+	{
+		return ptr;
 	}
 
 	T* Get() const noexcept
@@ -375,6 +385,11 @@ public:
 	bool operator==(std::nullptr_t) const
 	{
 		return ptr == nullptr;
+	}
+
+	operator T()
+	{
+		return ptr;
 	}
 
 	T* Get() const noexcept

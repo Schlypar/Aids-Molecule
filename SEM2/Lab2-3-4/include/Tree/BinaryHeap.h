@@ -71,7 +71,7 @@ public:
 			return this;
 		}
 
-		P valueKey = this->root->kGen(value);
+		P valueKey = this->kGen(value);
 
 		NodePtr<T, P> current = this->root.Get();
 
@@ -80,6 +80,7 @@ public:
 			if (current->left == nullptr)
 			{
 				current->left = new TreeNode<T, P>(value);
+				current->left->key = valueKey;
 				current->left->parent = current;
 
 				this->Balance();
@@ -88,6 +89,7 @@ public:
 			if (current->right == nullptr)
 			{
 				current->right = new TreeNode<T, P>(value);
+				current->right->key = valueKey;
 				current->right->parent = current;
 
 				this->Balance();

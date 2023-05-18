@@ -43,10 +43,10 @@ public:
 		Iterator& operator+(int n)
 		{
 			while (n > 0)
-				{
-					this->Next();
-					n--;
-				}
+			{
+				this->Next();
+				n--;
+			}
 
 			return *this;
 		}
@@ -54,10 +54,10 @@ public:
 		Iterator& operator-(int n)
 		{
 			while (n > 0)
-				{
-					this->Prev();
-					n--;
-				}
+			{
+				this->Prev();
+				n--;
+			}
 
 			return *this;
 		}
@@ -112,12 +112,12 @@ public:
 		}
 	};
 
-	IIterator<T>* _Begin() override
+	IIterator<T>* _Begin() const override
 	{
 		return (IIterator<T>*) new (Iterator)(GetFirstPointer());
 	}
 
-	IIterator<T>* _End() override
+	IIterator<T>* _End() const override
 	{
 		return (IIterator<T>*) new (Iterator)(GetEndPointer());
 	}
@@ -172,11 +172,11 @@ public:
 	T& GetFirst() const override
 	{
 		if (isEmpty())
-			{
-				Logger::Trace("At Get() at ArraySequence.h");
-				logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-				throw EXCEPTION_INDEX_OUT_OF_RANGE;
-			}
+		{
+			Logger::Trace("At Get() at ArraySequence.h");
+			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+			throw EXCEPTION_INDEX_OUT_OF_RANGE;
+		}
 
 		return container.Get(0);
 	}
@@ -184,11 +184,11 @@ public:
 	T& GetLast() const override
 	{
 		if (isEmpty())
-			{
-				Logger::Trace("At Get() at ArraySequence.h");
-				logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-				throw EXCEPTION_INDEX_OUT_OF_RANGE;
-			}
+		{
+			Logger::Trace("At Get() at ArraySequence.h");
+			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+			throw EXCEPTION_INDEX_OUT_OF_RANGE;
+		}
 
 		return container.Get(GetLength() - 1);
 	}
@@ -196,11 +196,11 @@ public:
 	T& Get(const Index index) const override
 	{
 		if (isEmpty() || index > GetLength())
-			{
-				Logger::Trace("At Get() at ArraySequence.h");
-				logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-				throw EXCEPTION_INDEX_OUT_OF_RANGE;
-			}
+		{
+			Logger::Trace("At Get() at ArraySequence.h");
+			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+			throw EXCEPTION_INDEX_OUT_OF_RANGE;
+		}
 
 		return container.Get(index);
 	}
@@ -249,11 +249,11 @@ public:
 	void InsertAt(const Index index, const T& data) override
 	{
 		if (index >= GetLength())
-			{
-				Logger::Trace("At InsertAt() at ArraySequence.h");
-				logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-				throw EXCEPTION_INDEX_OUT_OF_RANGE;
-			}
+		{
+			Logger::Trace("At InsertAt() at ArraySequence.h");
+			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+			throw EXCEPTION_INDEX_OUT_OF_RANGE;
+		}
 
 		container.Realloc(container.GetLength() + 1);
 
@@ -280,22 +280,22 @@ public:
 		return GetLength() == 0;
 	}
 
-	T* GetFirstPointer() override
+	T* GetFirstPointer() const override
 	{
 		return &(GetFirst());
 	}
 
-	T* GetEndPointer() override
+	T* GetEndPointer() const override
 	{
 		return (&(GetLast()) + 1);
 	}
 
-	Sequence<T>* Create() override
+	Sequence<T>* Create() const override
 	{
 		return (Sequence<T>*) new ArraySequence<T>();
 	}
 
-	Sequence<T>* Copy() override
+	Sequence<T>* Copy() const override
 	{
 		return (Sequence<T>*) new ArraySequence<T>(*this);
 	}
@@ -308,11 +308,11 @@ public:
 	friend std::ostream& operator<<(std::ostream& stream, ArraySequence<T>& array)
 	{
 		if (array.isEmpty())
-			{
-				Logger::Trace("At operator<< overload at Array.h");
-				logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-				return stream;
-			}
+		{
+			Logger::Trace("At operator<< overload at Array.h");
+			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+			return stream;
+		}
 
 		stream << array.container;
 
@@ -322,11 +322,11 @@ public:
 	friend std::ostream& operator<<(std::ostream& stream, ArraySequence<T>* array)
 	{
 		if (array->isEmpty())
-			{
-				Logger::Trace("At operator<< overload at Array.h");
-				logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-				return stream;
-			}
+		{
+			Logger::Trace("At operator<< overload at Array.h");
+			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+			return stream;
+		}
 
 		stream << array->container;
 

@@ -2,6 +2,9 @@
 
 #include "Logger.h"
 
+#include "Sequence/Stack.h"
+#include "concepts.h"
+
 #include "Logger.h"
 #include "Pointer.h"
 #include "Sequence/IContainer.h"
@@ -16,17 +19,27 @@ enum TraverseOrder
 };
 
 template <typename Tkey, typename Tvalue>
-using KGen = Tkey (*)(Tvalue);
+using KGen = Tkey (*)(const Tvalue&);
+
+template <typename T>
+using Multi = Stack<T>;
+
+template <typename T>
+using MultiRaw = Stack<T>*;
+
+// template <typename Tkey, typename Tvalue>
+// using KGenMulti = Tkey (*)(const Tvalue&);
 
 template <typename Tkey, typename Tvalue>
 class Tree
 {
-protected:
+public:
 	struct TreeNode
 	{
 		Tkey key;
 		Tvalue data;
-		KGen<Tkey, Tvalue> kGen = nullptr;
+		// KGen<Tkey, Tvalue> kGen = nullptr;
+		// KGen<Tkey, Tvalue> kGenMulti = nullptr;
 
 		TreeNode* parent;
 		WeakPtr<TreeNode> left;
@@ -35,7 +48,6 @@ protected:
 		TreeNode()
 		    : key(Tkey())
 		    , data(Tvalue())
-		    , kGen([](Tvalue value) -> Tkey { return Tkey(value); })
 		    , parent(nullptr)
 		    , left(nullptr)
 		    , right(nullptr)
@@ -44,48 +56,78 @@ protected:
 		}
 
 		TreeNode(const Tvalue& value)
-		    : key(Tkey(value))
+		    : key(Tkey())
 		    , data(value)
-		    , kGen([](Tvalue value) -> Tkey { return Tkey(value); })
 		    , parent(nullptr)
 		    , left(nullptr)
 		    , right(nullptr)
 		{
-			key = kGen(data);
 		}
 
-		TreeNode(const Tvalue& value, KGen<Tkey, Tvalue> kGen)
-		    : key(Tkey(value))
-		    , data(value)
-		    , kGen(kGen)
+		TreeNode(Tvalue&& value)
+		    : key(Tkey())
+		    , data(std::move(value))
 		    , parent(nullptr)
 		    , left(nullptr)
 		    , right(nullptr)
 		{
-			key = kGen(data);
 		}
 
-		TreeNode(const Tkey& key, const Tvalue& value)
-		    : key(key)
-		    , data(value)
-		    , kGen([](Tvalue value) -> Tkey { return Tkey(value); })
-		    , parent(nullptr)
-		    , left(nullptr)
-		    , right(nullptr)
-		{
-			key = kGen(data);
-		}
+		// TreeNode(const Tvalue& value, KGen<Tkey, Tvalue> kGen)
+		//     : key(Tkey())
+		//     , data(value)
+		//     , parent(nullptr)
+		//     , left(nullptr)
+		//     , right(nullptr)
+		// {
+		// 	key = kGen(data);
+		// }
 
-		TreeNode(const Tkey& key, const Tvalue& value, KGen<Tkey, Tvalue> kGen)
-		    : key(key)
-		    , data(value)
-		    , kGen(kGen)
-		    , parent(nullptr)
-		    , left(nullptr)
-		    , right(nullptr)
-		{
-			key = kGen(data);
-		}
+		// TreeNode(const Tvalue& value, KGenMulti<Tkey, Tvalue> kGen)
+		//     : key(Tkey(value))
+		//     , data(value)
+		//     , parent(nullptr)
+		//     , left(nullptr)
+		//     , right(nullptr)
+		// {
+		// 	key = kGenMulti(data);
+		// }
+
+		// TreeNode(const Tkey& key, const Tvalue& value)
+		//     : key(key)
+		//     , data(value)
+		//     , kGen([](Tvalue value) -> Tkey { return Tkey(value); })
+		//     , kGenMulti([](Stack<Tvalue> stack) -> Tkey { return Tkey(stack.Peek(0)); })
+		//     , parent(nullptr)
+		//     , left(nullptr)
+		//     , right(nullptr)
+		// {
+		// 	key = kGen(data);
+		// }
+
+		// TreeNode(const Tkey& key, const Tvalue& value, KGen<Tkey, Tvalue> kGen)
+		//     : key(key)
+		//     , data(value)
+		//     , kGen(kGen)
+		//     , kGenMulti([](Stack<Tvalue> stack) -> Tkey { return Tkey(stack.Peek(0)); })
+		//     , parent(nullptr)
+		//     , left(nullptr)
+		//     , right(nullptr)
+		// {
+		// 	// key = kGen(data);
+		// }
+
+		// TreeNode(const Tkey& key, const Tvalue& value, KGenMulti<Tkey, Tvalue> kGen)
+		//     : key(key)
+		//     , data(value)
+		//     , kGen(nullptr)
+		//     , kGenMulti(kGen)
+		//     , parent(nullptr)
+		//     , left(nullptr)
+		//     , right(nullptr)
+		// {
+		// 	// key = kGenMulti(data);
+		// }
 
 		TreeNode(TreeNode&& other)
 		{
@@ -94,9 +136,6 @@ protected:
 
 			data = other.data;
 			other.data = Tvalue();
-
-			kGen = other.kGen;
-			other.kGen = nullptr;
 
 			parent = other.parent;
 			other.parent = nullptr;
@@ -168,12 +207,10 @@ public:
 	{
 		Tree<Tkey, Tvalue>* result = Create();
 
-		auto copy = this->Traverse(Root, Left, Right,
-			[result, condition](Tvalue& val) -> void
-			{
-				if (condition(val))
-					result->Add(val);
-			});
+		auto copy = this->Traverse(Root, Left, Right, [result, condition](Tvalue& val) -> void {
+			if (condition(val))
+				result->Add(val);
+		});
 
 		delete copy;
 
@@ -184,12 +221,10 @@ public:
 	{
 		Tree<Tkey, Tvalue>* result = Create();
 
-		this->Traverse(Root, Left, Right,
-			[result, condition](Tvalue& val) -> void
-			{
-				if (condition(val))
-					result->Add(val);
-			});
+		this->Traverse(Root, Left, Right, [result, condition](Tvalue& val) -> void {
+			if (condition(val))
+				result->Add(val);
+		});
 
 		return result;
 	}
@@ -198,8 +233,7 @@ public:
 	{
 		auto result = this->Copy();
 
-		auto isUnique = [this, other, result](Tvalue& value) -> void
-		{
+		auto isUnique = [this, other, result](Tvalue& value) -> void {
 			if (!(this->isThere(value)) && other->isThere(value))
 				result->Add(value);
 		};
@@ -230,8 +264,7 @@ public:
 	virtual void Traverse(TraverseOrder first, TraverseOrder second, TraverseOrder third, std::function<void(NodePtr<Tkey, Tvalue>)> func) = 0;
 	virtual void Traverse(NodePtr<Tkey, Tvalue> startNode, TraverseOrder first, TraverseOrder second, TraverseOrder third, std::function<void(NodePtr<Tkey, Tvalue>)> func) = 0;
 
-	virtual Tree<Tkey, Tvalue>* Traverse(TraverseOrder first, TraverseOrder second, TraverseOrder third,
-		std::function<void(Tvalue&)> func) const = 0;
+	virtual Tree<Tkey, Tvalue>* Traverse(TraverseOrder first, TraverseOrder second, TraverseOrder third, std::function<void(Tvalue&)> func) const = 0;
 
 	virtual int BalanceFactor() const noexcept = 0;
 	virtual int BalanceFactor(NodePtr<Tkey, Tvalue> startNode) const noexcept = 0;
@@ -242,11 +275,9 @@ public:
 	virtual Tree<Tkey, Tvalue>* Copy() const noexcept = 0;
 
 	virtual void CopyNodes(NodePtr<Tkey, Tvalue> copyNode, const NodePtr<Tkey, Tvalue> originalNode) const noexcept = 0;
-	virtual void CopyNodes(NodePtr<Tkey, Tvalue> copyNode, const NodePtr<Tkey, Tvalue> originalNode,
-		bool (*filter)(Tvalue&)) const noexcept = 0;
+	virtual void CopyNodes(NodePtr<Tkey, Tvalue> copyNode, const NodePtr<Tkey, Tvalue> originalNode, bool (*filter)(Tvalue&)) const noexcept = 0;
 
-	virtual std::ostream& Dump(std::ostream& stream, const NodePtr<Tkey, Tvalue> startNode, TraverseOrder first,
-		TraverseOrder second, TraverseOrder third) const noexcept = 0;
+	virtual std::ostream& Dump(std::ostream& stream, const NodePtr<Tkey, Tvalue> startNode, TraverseOrder first, TraverseOrder second, TraverseOrder third) const noexcept = 0;
 	virtual void Dump(TraverseOrder first, TraverseOrder second, TraverseOrder third) const noexcept = 0;
 
 	friend std::ostream& operator<<(std::ostream& stream, const Tree<Tkey, Tvalue>& tree)

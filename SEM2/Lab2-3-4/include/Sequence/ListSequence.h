@@ -39,10 +39,10 @@ public:
 		Iterator& operator+(int n)
 		{
 			while (n > 0)
-				{
-					this->Next();
-					n--;
-				}
+			{
+				this->Next();
+				n--;
+			}
 
 			return *this;
 		}
@@ -50,10 +50,10 @@ public:
 		Iterator& operator-(int n)
 		{
 			while (n > 0)
-				{
-					current = current->prev;
-					n--;
-				}
+			{
+				current = current->prev;
+				n--;
+			}
 
 			return *this;
 		}
@@ -70,17 +70,17 @@ public:
 			return *this;
 		}
 
-		bool operator!=(Iterator& other)
+		bool operator!=(Iterator& other) const
 		{
 			return this->current != other.current;
 		}
 
-		bool operator==(Iterator& other)
+		bool operator==(Iterator& other) const
 		{
 			return this->current == other.current;
 		}
 
-		T& operator*()
+		T& operator*() const
 		{
 			return this->current->data;
 		}
@@ -113,22 +113,22 @@ public:
 		}
 	};
 
-	IIterator<T>* _Begin() override
+	IIterator<T>* _Begin() const override
 	{
 		return (IIterator<T>*) new (Iterator)(container.GetHead());
 	}
 
-	IIterator<T>* _End() override
+	IIterator<T>* _End() const override
 	{
 		return (IIterator<T>*) new (Iterator)();
 	}
 
-	Iterator begin()
+	Iterator begin() const
 	{
 		return (Iterator) (this->_Begin());
 	}
 
-	Iterator end()
+	Iterator end() const
 	{
 		return (Iterator) (this->_End());
 	}
@@ -143,6 +143,16 @@ public:
 	{
 	}
 
+	ListSequence(const ListSequence<T>& other)
+	    : container(other.container)
+	{
+	}
+
+	ListSequence(ListSequence<T>&& other)
+	    : container(std::move(other.container))
+	{
+	}
+
 	ListSequence(const Sequence<T>& other)
 	    : container(other)
 	{
@@ -154,8 +164,8 @@ public:
 	}
 
 	template <typename... Args>
-	ListSequence(Args... args)
-	    : container(args...)
+	ListSequence(T head, Args... args)
+	    : container(head, args...)
 	{
 	}
 
@@ -167,11 +177,11 @@ public:
 	T& GetFirst() const override
 	{
 		if (isEmpty())
-			{
-				Logger::Trace("At Get() at ArraySequence.h");
-				logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-				exit(EXIT_FAILURE);
-			}
+		{
+			Logger::Trace("At Get() at ArraySequence.h");
+			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+			exit(EXIT_FAILURE);
+		}
 
 		return container.GetFirst();
 	}
@@ -179,11 +189,11 @@ public:
 	T& GetLast() const override
 	{
 		if (isEmpty())
-			{
-				Logger::Trace("At Get() at ArraySequence.h");
-				logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-				exit(EXIT_FAILURE);
-			}
+		{
+			Logger::Trace("At Get() at ArraySequence.h");
+			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+			exit(EXIT_FAILURE);
+		}
 
 		return container.GetLast();
 	}
@@ -191,11 +201,11 @@ public:
 	T& Get(const Index index) const override
 	{
 		if (isEmpty())
-			{
-				Logger::Trace("At Get() at ArraySequence.h");
-				logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-				exit(EXIT_FAILURE);
-			}
+		{
+			Logger::Trace("At Get() at ArraySequence.h");
+			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+			exit(EXIT_FAILURE);
+		}
 
 		return container.Get(index);
 	}
@@ -250,22 +260,22 @@ public:
 		return GetLength() == 0;
 	}
 
-	T* GetFirstPointer() override
+	T* GetFirstPointer() const override
 	{
 		return &container.GetFirst();
 	}
 
-	T* GetEndPointer() override
+	T* GetEndPointer() const override
 	{
 		return nullptr;
 	}
 
-	Sequence<T>* Create() override
+	Sequence<T>* Create() const override
 	{
 		return (Sequence<T>*) new ListSequence<T>();
 	}
 
-	Sequence<T>* Copy() override
+	Sequence<T>* Copy() const override
 	{
 		return (Sequence<T>*) new ListSequence<T>(*this);
 	}
@@ -275,14 +285,28 @@ public:
 		return container[index];
 	}
 
-	friend std::ostream& operator<<(std::ostream& stream, ListSequence<T>& list)
+	ListSequence<T>& operator=(const ListSequence<T>& other)
+	{
+		this->container = other.container;
+
+		return *this;
+	}
+
+	ListSequence<T>& operator=(ListSequence<T>&& other)
+	{
+		this->container = std::move(other.container);
+
+		return *this;
+	}
+
+	friend std::ostream& operator<<(std::ostream& stream, const ListSequence<T>& list)
 	{
 		if (list.isEmpty())
-			{
-				Logger::Trace("At operator<< overload at Array.h");
-				logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-				return stream;
-			}
+		{
+			Logger::Trace("At operator<< overload at Array.h");
+			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+			return stream;
+		}
 
 		stream << list.container;
 
@@ -292,11 +316,11 @@ public:
 	friend std::ostream& operator<<(std::ostream& stream, ListSequence<T>* list)
 	{
 		if (list->isEmpty())
-			{
-				Logger::Trace("At operator<< overload at Array.h");
-				logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-				return stream;
-			}
+		{
+			Logger::Trace("At operator<< overload at Array.h");
+			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+			return stream;
+		}
 
 		stream << list->container;
 
