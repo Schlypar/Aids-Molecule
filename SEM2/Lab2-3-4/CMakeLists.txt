@@ -64,24 +64,28 @@ set(SOURCES
 )
 
 set(SOURCES_HEADERS
+        ${INCLUDE}/ADT.h
+        ${INCLUDE}/Pointer.h
+        ${INCLUDE}/concepts.h
         ${INCLUDE}/Allocator.h
-        ${INCLUDE}/Linal/Matrix.h
-        ${INCLUDE}/Sequence/Array.h
-        ${INCLUDE}/Sequence/ArraySequence.h
         ${INCLUDE}/complex.h
-        ${INCLUDE}/Sequence/ListSequence.h
         ${INCLUDE}/Logger.h
+        ${INCLUDE}/CString.h
+        ${INCLUDE}/Pair.h
+        ${INCLUDE}/Tuple.h
+        ${INCLUDE}/Sequence/ListSequence.h
         ${INCLUDE}/Sequence/SegmentedList.h
         ${INCLUDE}/Sequence/Sequence.h
         ${INCLUDE}/Sequence/Stack.h
-        ${INCLUDE}/Tuple.h
+        ${INCLUDE}/Sequence/Array.h
+        ${INCLUDE}/Sequence/ArraySequence.h
         ${INCLUDE}/Tree/ITree.h
         ${INCLUDE}/Tree/BinaryTree.h
         ${INCLUDE}/Tree/BinarySearchTree.h
         ${INCLUDE}/Tree/BinaryHeap.h
-        ${INCLUDE}/Pointer.h
-        ${INCLUDE}/Linal/Vector.h
-        ${INCLUDE}/ADT.h)
+        ${INCLUDE}/Tree/MultiSearchTree.h
+        ${INCLUDE}/Linal/Matrix.h
+        ${INCLUDE}/Linal/Vector.h)
 
 # find_package(glfw3 REQUIRED)
 # find_package(glad REQUIRED)

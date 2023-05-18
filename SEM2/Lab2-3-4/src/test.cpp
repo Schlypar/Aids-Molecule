@@ -1,13 +1,3 @@
-#include "Logger.h"
-#include "Sequence/ArraySequence.h"
-#include "Sequence/Sequence.h"
-#include "Sequence/Stack.h"
-
-#include "Tree/BinaryHeap.h"
-#include "Tree/BinarySearchTree.h"
-#include "Tree/BinaryTree.h"
-#include "Tree/ITree.h"
-#include "Tree/MultiSearchTree.h"
 
 #include <ADT.h>
 
@@ -35,19 +25,36 @@ int main()
 {
 	Logger::setPriority(ErrorPriority);
 
-	auto startKGen = [](const int& value) -> int { return value; };
+	String lol = "abcd ";
+	print(lol, '\n');
 
-	// BinTreePtr<int, int> tree = (BinaryTree<int, int>*) new BinaryTree<int, int>(1, startKGen);
-	// tree->Add(-1)->Add(-2)->Add(-10);
-	// print(tree, '\n');
+	String lol1 = lol + " _<====>__---><---  ";
+	print(lol1, '\n');
 
-	MultiBinSearchPtr<int> search = new MultiSearchTree<int>(1, [](const Multi<int>& stack) -> int { return stack.Peek(0); });
-	search->Add(-1)->Add(-2)->Add(-3)->Add(-4)->Add(-5)->Add(-6);
-	print(search, '\n');
+	String lol2 = lol * 2;
+	print(lol2, '\n');
 
-	// BinTreePtr<int, int> heap = (BinaryTree<int, int>*) new BinaryHeap<int, int>(1, startKGen);
-	// heap->Add(2)->Add(-1)->Add(5)->Add(-2)->Add(-3)->Add(-7)->Add(0)->Add(6)->Add(-2);
-	// print(heap, '\n');
+	Size index = lol2.LFind('a');
+	print(index, '\n');
+
+	auto p = lol2.Split(' ');
+	String left = p.GetLeft();
+	String right = p.GetRight();
+	print(left, " | ", right, '\n');
+
+	if (lol2.isThere(" abc"))
+		print("Wow\n");
+	else
+		print("Not so wow\n");
+
+	lol1.Slice(6, "AAAAAAA");
+	print(lol1, '\n');
+
+	Size countA = lol2.Count('a');
+	print(countA, '\n');
+
+	lol1.Replace('A', 'a', lol1.Count('A'));
+	print(lol1, '\n');
 
 	return 0;
 }

@@ -77,7 +77,7 @@ public:
 		}
 
 		// add exeption
-		T& operator*()
+		T& operator*() const
 		{
 			return *(current);
 		}
@@ -296,7 +296,7 @@ public:
 		return *this;
 	}
 
-	friend std::ostream& operator<<(std::ostream& stream, Array<T>& array)
+	friend std::ostream& operator<<(std::ostream& stream, const Array<T>& array)
 	{
 		if (array.isEmpty())
 		{
