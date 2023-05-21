@@ -460,7 +460,7 @@ public:
 	}
 
 	// append by copying
-	void Append(const T& data)
+	List<T>& Append(const T& data)
 	{
 		Node<T>* pointer = new Node<T>;
 
@@ -483,10 +483,12 @@ public:
 
 			size++;
 		}
+
+		return *this;
 	}
 
 	// append by moving
-	void Append(T&& data)
+	List<T>& Append(T&& data)
 	{
 		Node<T>* pointer = new Node<T>;
 
@@ -509,6 +511,7 @@ public:
 
 			size++;
 		}
+		return *this;
 	}
 
 	// Prepend by copying

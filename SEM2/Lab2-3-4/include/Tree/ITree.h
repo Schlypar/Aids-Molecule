@@ -229,7 +229,43 @@ public:
 		return result;
 	}
 
+	Tree<Tkey, Tvalue>* Concat(Tree<Tkey, Tvalue>* other) noexcept
+	{
+		auto addEvery = [this, other](const Tvalue& value) -> void { this->Add(value); };
+
+		other->Traverse(Left, Root, Right, addEvery);
+
+		return this;
+	}
+
+	Tree<Tkey, Tvalue>* Concat(Tree<Tkey, Tvalue>* other) const noexcept
+	{
+		auto result = this->Copy();
+
+		auto addEvery = [result, other](const Tvalue& value) -> void { result->Add(value); };
+
+		other->Traverse(Left, Right, Root, addEvery);
+
+		result->Balance();
+
+		return result;
+	}
+
 	Tree<Tkey, Tvalue>* Merge(Tree<Tkey, Tvalue>* other) noexcept
+	{
+		auto isUnique = [this, other](Tvalue& value) -> void {
+			if (!(this->isThere(value)) && other->isThere(value))
+				this->Add(value);
+		};
+
+		other->Traverse(Left, Root, Right, isUnique);
+
+		this->Balance();
+
+		return this;
+	}
+
+	Tree<Tkey, Tvalue>* Merge(Tree<Tkey, Tvalue>* other) const noexcept
 	{
 		auto result = this->Copy();
 

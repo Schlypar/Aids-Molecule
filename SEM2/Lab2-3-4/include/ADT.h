@@ -19,4 +19,6 @@
 #include "Tree/BinarySearchTree.h"
 #include "Tree/BinaryTree.h"
 #include "Tree/ITree.h"
+#include "Tree/MultiBinaryTree.h"
 #include "Tree/MultiSearchTree.h"
+#include "Tree/OrderedSet.h"

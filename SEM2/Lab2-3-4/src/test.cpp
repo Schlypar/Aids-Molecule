@@ -1,4 +1,10 @@
 
+#include "Tree/BinaryHeap.h"
+#include "Tree/BinaryTree.h"
+#include "Tree/MultiBinaryTree.h"
+#include "Tree/OrderedSet.h"
+#include "Tuple.h"
+#include "functional/Algorithms.h"
 #include <ADT.h>
 
 LogPriority Logger::priority = TracePriority;
@@ -18,43 +24,42 @@ using BinHeapPtr = SharedPtr<BinaryHeap<T1, T2>>;
 template <typename T>
 using BinSearchPtr = SharedPtr<BinarySearchTree<T>>;
 
-template <typename T>
-using MultiBinSearchPtr = SharedPtr<MultiSearchTree<T>>;
+template <typename T1, typename T2>
+using MultiBinTreePtr = SharedPtr<MultiBinaryTree<T1, T2>>;
+
+template <typename T1>
+using SetPtr = SharedPtr<OrderedSet<T1>>;
 
 int main()
 {
 	Logger::setPriority(ErrorPriority);
 
-	String lol = "abcd ";
-	print(lol, '\n');
+	// TreePtr<int, int> Tree = (BinaryTree<int, int>*) new BinarySearchTree<int>(1);
 
-	String lol1 = lol + " _<====>__---><---  ";
-	print(lol1, '\n');
+	// Tree->Add(5);
+	// print(Tree, '\n');
 
-	String lol2 = lol * 2;
-	print(lol2, '\n');
+	// BinTreePtr<int, int> Tree1 = (BinaryTree<int, int>*) new BinarySearchTree<int>(2);
+	// Tree1->Add(5);
 
-	Size index = lol2.LFind('a');
-	print(index, '\n');
+	// Tree->Concat(Tree1.Get());
+	// print(Tree, '\n');
 
-	auto p = lol2.Split(' ');
-	String left = p.GetLeft();
-	String right = p.GetRight();
-	print(left, " | ", right, '\n');
+	SetPtr<int> set = new OrderedSet<int>(1);
+	set->Append(5)->Append(5);
+	print(set, '\n');
 
-	if (lol2.isThere(" abc"))
-		print("Wow\n");
-	else
-		print("Not so wow\n");
+	SetPtr<int> set1 = new OrderedSet<int>(2);
+	set1->Append(5);
 
-	lol1.Slice(6, "AAAAAAA");
-	print(lol1, '\n');
+	SetPtr<int> un = set->Union(set1.Get());
+	print(un, '\n');
 
-	Size countA = lol2.Count('a');
-	print(countA, '\n');
+	SetPtr<int> intersection = set->Intersection(set1.Get());
+	print(intersection, '\n');
 
-	lol1.Replace('A', 'a', lol1.Count('A'));
-	print(lol1, '\n');
+	SetPtr<int> diff = set->Difference(set1.Get());
+	print(diff, '\n');
 
 	return 0;
 }

@@ -23,6 +23,12 @@ public:
 	BinarySearchTree(const T& startValue)
 	    : BinaryTree<T, T>(startValue)
 	{
+		this->root->key = this->kGen(startValue);
+	}
+
+	BinarySearchTree(KGen<T, T> kGen)
+	    : BinaryTree<T, T>(kGen)
+	{
 	}
 
 	BinarySearchTree(const T& startValue, KGen<T, T> kGen)
@@ -48,6 +54,16 @@ public:
 	BinarySearchTree(const BinarySearchTree<T>* other)
 	    : BinaryTree<T, T>((BinaryTree<T, T>*) other)
 	{
+	}
+
+	Tree<T, T>* Create() const noexcept override
+	{
+		return (Tree<T, T>*) new BinarySearchTree<T>(this->kGen);
+	}
+
+	Tree<T, T>* Copy() const noexcept override
+	{
+		return (Tree<T, T>*) new BinarySearchTree<T>(*this);
 	}
 
 	friend std::ostream& operator<<(std::ostream& stream, SharedPtr<BinarySearchTree<T>> tree)

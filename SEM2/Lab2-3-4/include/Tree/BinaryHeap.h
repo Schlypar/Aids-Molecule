@@ -141,6 +141,21 @@ public:
 		});
 	}
 
+	Tree<P, T>* Create() const noexcept override
+	{
+		return (Tree<P, T>*) new BinaryHeap<P, T>(this->kGen);
+	}
+
+	Tree<P, T>* Create(TreeNode<P, T>* root) const noexcept override
+	{
+		return (Tree<P, T>*) new BinaryHeap<P, T>(root, this->kGen);
+	}
+
+	Tree<P, T>* Copy() const noexcept override
+	{
+		return (Tree<P, T>*) new BinaryHeap<P, T>(*this);
+	}
+
 private:
 	void PushUp(NodePtr<T, P> node) noexcept
 	{

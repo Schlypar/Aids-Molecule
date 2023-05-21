@@ -5,37 +5,36 @@
 #include "Logger.h"
 #include "Pair.h"
 #include "Sequence/Array.h"
-#include "Sequence/IContainer.h"
 
 class String
 {
 private:
 	Array<char> string;
-	Size length;
+	// Size length;
 
 public:
 	String()
 	    : string()
-	    , length(0)
+	// , length(0)
 	{
 	}
 
 	String(const Array<char>& string)
 	    : string(string)
-	    , length(string.GetLength())
+	// , length(string.GetLength())
 	{
 	}
 
 	String(char* data, Size count)
-	    : string(data, count + 1)
-	    , length(count)
+	    : string(data, count)
+	// , length(count)
 	{
-		this->string[length] = '\0';
+		// this->string[length] = '\0';
 	}
 
 	String(const char* string)
-	    : string(std::strlen(string) + 1)
-	    , length(std::strlen(string))
+	    : string(std::strlen(string))
+	// , length(std::strlen(string))
 	{
 		Index i = 0;
 
@@ -45,27 +44,27 @@ public:
 			i++;
 		}
 
-		this->string[length] = '\0';
+		// this->string[length] = '\0';
 	}
 
 	String(Size count)
 	    : string(count)
-	    , length(0)
+	// , length(0)
 	{
 	}
 
 	String(const String& other)
 	    : string(other.string)
-	    , length(other.length)
+	// , length(other.length)
 	{
 	}
 
 	String(String&& other)
 	    : string(std::move(other.string))
-	    , length(std::move(other.length))
+	// , length(std::move(other.length))
 	{
 		other.string = Array<char>();
-		other.length = 0;
+		// other.length = 0;
 	}
 
 	~String()
@@ -74,7 +73,8 @@ public:
 
 	Size Length() const noexcept
 	{
-		return length;
+		// return length;
+		return string.GetLength();
 	}
 
 	Size Count(char suspect)
@@ -83,7 +83,7 @@ public:
 			return 0;
 
 		Size count = 0;
-		for (Index i = 0; i < length; i++)
+		for (Index i = 0; i < string.GetLength(); i++)
 			if (this->string[i] == suspect)
 				count++;
 
@@ -116,7 +116,7 @@ public:
 
 	bool isEmpty() const noexcept
 	{
-		return length == 0;
+		return Length() == 0;
 	}
 
 	bool isThere(char suspect) const noexcept
@@ -138,11 +138,11 @@ public:
 		if (isEmpty() && suspect.isEmpty())
 			return true;
 
-		if (this->length < suspect.length)
+		if (this->Length() < suspect.Length())
 			return false;
 
 		Index suspectStart = LFind(suspect[0]);
-		Index suspectEnd = suspectStart + suspect.length - 1;
+		Index suspectEnd = suspectStart + suspect.Length() - 1;
 		Size segmentLength = suspectEnd - suspectStart;
 
 		if (segmentLength == 0)
@@ -159,18 +159,18 @@ public:
 			{
 				suspectStart++;
 
-				if (suspectStart == this->length)
+				if (suspectStart == this->Length())
 					return false;
 			}
 
-			Index suspectEnd = suspectStart + suspect.length - 1;
+			Index suspectEnd = suspectStart + suspect.Length() - 1;
 			Size segmentLength = suspectEnd - suspectStart;
 		}
 	}
 
 	void Slice(Index start, const String& toBeInserted)
 	{
-		if (start >= length || start + toBeInserted.length >= length)
+		if (start >= Length() || start + toBeInserted.Length() >= Length())
 		{
 			Logger::Trace("At String at Slice(Index, const String&)");
 			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
@@ -179,19 +179,19 @@ public:
 
 		if (toBeInserted.isEmpty())
 		{
-			for (Index i = start; i < length - 1; i++)
+			for (Index i = start; i < Length() - 1; i++)
 				this->string[i] = this->string[i + 1];
 
 			return;
 		}
 
-		for (Index i = 0; i < toBeInserted.length; i++)
+		for (Index i = 0; i < toBeInserted.Length(); i++)
 			this->string[start + i] = toBeInserted[i];
 	}
 
 	String Slice(Index start, const String& toBeInserted) const
 	{
-		if (start >= length || start + toBeInserted.length >= length)
+		if (start >= Length() || start + toBeInserted.Length() >= Length())
 		{
 			Logger::Trace("At String at Slice(Index, const String&)");
 			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
@@ -202,13 +202,13 @@ public:
 
 		if (toBeInserted.isEmpty())
 		{
-			for (Index i = start; i < length - 1; i++)
+			for (Index i = start; i < Length() - 1; i++)
 				result.string[i] = result.string[i + 1];
 
 			return result;
 		}
 
-		for (Index i = 0; i < toBeInserted.length; i++)
+		for (Index i = 0; i < toBeInserted.Length(); i++)
 			result.string[start + i] = toBeInserted[i];
 
 		return result;
@@ -219,7 +219,7 @@ public:
 		if (isEmpty())
 			return 0;
 
-		for (Index i = 0; i < length; i++)
+		for (Index i = 0; i < Length(); i++)
 			if (this->string[i] == suspect)
 				return i;
 
@@ -231,7 +231,7 @@ public:
 		if (isEmpty())
 			return 0;
 
-		for (Index i = length - 1; i > 0; i--)
+		for (Index i = Length() - 1; i > 0; i--)
 			if (this->string[i] == suspect)
 				return i;
 
@@ -255,7 +255,7 @@ public:
 
 	String GetSubString(Index start, Index end) const
 	{
-		if (start > end || start < 0 || end >= length)
+		if (start > end || start < 0 || end >= Length())
 		{
 			Logger::Trace("At String at GetSubString(Index, Index)");
 			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
@@ -263,12 +263,12 @@ public:
 		}
 
 		String result = String(size_t(end - start + 2));
-		result.length = end - start + 1;
+		// result.Length() = end - start + 1;
 
 		for (Index i = start; i <= end; i++)
 			result[i - start] = this->string[i];
 
-		result[result.length] = '\0';
+		// result[result.Length()] = '\0';
 
 		return result;
 	}
@@ -281,47 +281,66 @@ public:
 		Index pivotIndex = LFind(pivot);
 
 		String left = GetSubString(0, pivotIndex);
-		String right = GetSubString(pivotIndex + 1, length - 1);
+		String right = GetSubString(pivotIndex + 1, Length() - 1);
 
 		return Pair<String, String>(left, right);
 	}
 
 	friend String operator+(const String& left, const String& rigth)
 	{
-		String result = String(size_t(left.length + rigth.length + 1));
+		String result = String(size_t(left.Length() + rigth.Length() + 1));
 
-		for (Index i = 0; i < left.length; i++)
+		for (Index i = 0; i < left.Length(); i++)
 			result[i] = left[i];
 
-		for (Index i = 0; i <= rigth.length; i++)
-			result[left.length + i] = rigth[i];
+		for (Index i = 0; i < rigth.Length(); i++)
+			result.string[left.Length() + i] = rigth.string[i];
 
-		result.length = left.length + rigth.length;
-		result[result.length] = '\0';
+		// result.Length() = left.Length() + rigth.Length();
+		// result[result.Length()] = '\0';
 
 		return result;
 	}
 
 	friend String operator*(const String& left, const int& right)
 	{
-		String result = String(size_t(left.length * right + 1));
+		String result = String(size_t(left.Length() * right + 1));
 
 		int counter = right;
 		while (counter > 0)
 		{
-			for (Index i = 0; i < left.length; i++)
-				result[i + left.length * (right - counter)] = left[i];
+			for (Index i = 0; i < left.Length(); i++)
+				result[i + left.Length() * (right - counter)] = left[i];
 
 			counter--;
 		}
 
-		result.length = left.length * right;
-		result[result.length] = '\0';
+		// result.Length() = left.Length() * right;
+		// result[result.Length()] = '\0';
 
 		return result;
 	}
 
-	char& operator[](const Index index) const noexcept
+	friend String operator*(int left, const String& right)
+	{
+		String result = String(size_t(right.Length() * left + 1));
+
+		int counter = left;
+		while (counter > 0)
+		{
+			for (Index i = 0; i < right.Length(); i++)
+				result[i + right.Length() * (left - counter)] = right[i];
+
+			counter--;
+		}
+
+		// result.Length() = right.Length() * left;
+		// result[result.Length()] = '\0';
+
+		return result;
+	}
+
+	char& operator[](Index index) const noexcept
 	{
 		return string.Get(index);
 	}
@@ -330,7 +349,7 @@ public:
 	{
 		stream << "\"";
 
-		for (Index i = 0; i < string.length; i++)
+		for (Index i = 0; i < string.Length(); i++)
 			if (string.string[i] != '\0')
 				stream << string[i];
 			else

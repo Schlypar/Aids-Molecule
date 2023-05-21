@@ -29,6 +29,14 @@ public:
 		Logger::Warn("Default constructor of BinaryTree<T>");
 	}
 
+	BinaryTree(const Tvalue& startValue)
+	    : root(new TreeNode<Tkey, Tvalue>(startValue))
+	    , kGen([](const Tvalue& val) -> Tkey { return Tkey(val); })
+	{
+		root->key = this->kGen(startValue);
+		Logger::Info("Starting value constructor of BinaryTree<T>");
+	}
+
 	BinaryTree(const Tvalue& startValue, KGen<Tkey, Tvalue> kGen)
 	    : root(new TreeNode<Tkey, Tvalue>(startValue))
 	    , kGen(kGen)
@@ -69,23 +77,23 @@ public:
 		if (other->root != nullptr)
 		{
 			root = new TreeNode<Tkey, Tvalue>(other->root->data);
-			root->key = other->root->key;
+			root->key = this->kGen(other->root->data);
 			CopyNodes(root.Get(), other->root.Get());
 		}
 	}
 
-	BinaryTree(BinaryTree<Tkey, Tvalue>* other)
-	    : root(nullptr)
-	    , kGen(other->kGen)
-	{
-		if (other->root != nullptr)
-		{
-			root = other->root;
-			other->root = nullptr;
-		}
+	// BinaryTree(BinaryTree<Tkey, Tvalue>* other)
+	//     : root(nullptr)
+	//     , kGen(other->kGen)
+	// {
+	// 	if (other->root != nullptr)
+	// 	{
+	// 		root = other->root;
+	// 		other->root = nullptr;
+	// 	}
 
-		delete other;
-	}
+	// 	delete other;
+	// }
 
 	virtual ~BinaryTree()
 	{
@@ -193,6 +201,9 @@ public:
 
 		while (NOT_DONE)
 		{
+			if (current->key == valueKey)
+				return this;
+
 			if (current->left == nullptr && valueKey < current->key)
 			{
 				current->left = new TreeNode<Tkey, Tvalue>(value);
@@ -411,7 +422,7 @@ public:
 
 	Tree<Tkey, Tvalue>* Create(TreeNode<Tkey, Tvalue>* root) const noexcept override
 	{
-		return (Tree<Tkey, Tvalue>*) new BinaryTree<Tkey, Tvalue>(root, kGen);
+		return (Tree<Tkey, Tvalue>*) new BinaryTree<Tkey, Tvalue>(root, this->kGen);
 	}
 
 	Tree<Tkey, Tvalue>* Copy() const noexcept override
@@ -728,6 +739,7 @@ protected:
 		if (originalNode->left)
 		{
 			copyNode->left = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->left->data));
+			copyNode->left->key = originalNode->left->key;
 
 			copyNode->left->parent = copyNode;
 			CopyNodes(copyNode->left.Get(), originalNode->left.Get());
@@ -735,6 +747,7 @@ protected:
 		if (originalNode->right)
 		{
 			copyNode->right = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->right->data));
+			copyNode->right->key = originalNode->right->key;
 
 			copyNode->right->parent = copyNode;
 			CopyNodes(copyNode->right.Get(), originalNode->right.Get());
@@ -749,6 +762,7 @@ protected:
 			if (filter(originalNode->left->data))
 			{
 				copyNode->left = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->left->data));
+				copyNode->left->key = originalNode->left->key;
 
 				copyNode->left->parent = copyNode;
 				CopyNodes(copyNode->left.Get(), originalNode->left.Get(), filter);
@@ -761,6 +775,7 @@ protected:
 			if (filter(originalNode->right->data))
 			{
 				copyNode->right = NodePtr<Tkey, Tvalue>(new TreeNode<Tkey, Tvalue>(originalNode->right->data));
+				copyNode->right->key = originalNode->right->key;
 
 				copyNode->right->parent = copyNode;
 				CopyNodes(copyNode->right.Get(), originalNode->right.Get(), filter);

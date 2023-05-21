@@ -73,6 +73,7 @@ set(SOURCES_HEADERS
         ${INCLUDE}/CString.h
         ${INCLUDE}/Pair.h
         ${INCLUDE}/Tuple.h
+        ${INCLUDE}/functional/Algorithms.h
         ${INCLUDE}/Sequence/ListSequence.h
         ${INCLUDE}/Sequence/SegmentedList.h
         ${INCLUDE}/Sequence/Sequence.h
@@ -82,8 +83,10 @@ set(SOURCES_HEADERS
         ${INCLUDE}/Tree/ITree.h
         ${INCLUDE}/Tree/BinaryTree.h
         ${INCLUDE}/Tree/BinarySearchTree.h
-        ${INCLUDE}/Tree/BinaryHeap.h
+        ${INCLUDE}/Tree/OrderedSet.h
         ${INCLUDE}/Tree/MultiSearchTree.h
+        ${INCLUDE}/Tree/BinaryHeap.h
+        ${INCLUDE}/Tree/MultiBinaryTree.h
         ${INCLUDE}/Linal/Matrix.h
         ${INCLUDE}/Linal/Vector.h)
 

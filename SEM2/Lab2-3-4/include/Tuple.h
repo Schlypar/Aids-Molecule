@@ -39,9 +39,20 @@ public:
 		return std::get<N>(data[N]);
 	}
 
+	template <typename... Args>
+	friend Tuple<Args...> Zip(Args... args);
+
 	template <typename Head, typename... Rest>
 	friend std::ostream& operator<<(std::ostream& stream, Tuple<Head, Rest...>& tuple);
 };
+
+template <typename... Args>
+Tuple<Args...> Zip(Args... args)
+{
+	Tuple<Args...> result = Tuple<Args...>(args...);
+
+	return result;
+}
 
 template <typename Head, typename... Rest>
 std::ostream& operator<<(std::ostream& stream, Tuple<Head, Rest...>& tuple)
