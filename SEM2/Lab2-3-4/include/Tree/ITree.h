@@ -265,16 +265,17 @@ public:
 		return this;
 	}
 
+	// only becomes useful for Multi<T> cases
 	Tree<Tkey, Tvalue>* Merge(Tree<Tkey, Tvalue>* other) const noexcept
 	{
 		auto result = this->Copy();
 
-		auto isUnique = [this, other, result](Tvalue& value) -> void {
+		auto addIfUnique = [this, other, result](Tvalue& value) -> void {
 			if (!(this->isThere(value)) && other->isThere(value))
 				result->Add(value);
 		};
 
-		other->Traverse(Left, Root, Right, isUnique);
+		other->Traverse(Left, Root, Right, addIfUnique);
 
 		result->Balance();
 

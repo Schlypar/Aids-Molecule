@@ -155,6 +155,9 @@ add_executable(${TEST_PROJECT_NAME}
         ${TEST_DIR}/SegmentedListTests.cpp
         ${TEST_DIR}/SequenceTests.cpp
         ${TEST_DIR}/MatrixTests.cpp
+        ${TEST_DIR}/BinaryTreeTests.cpp
+        ${TEST_DIR}/BinaryHeapTests.cpp
+        ${TEST_DIR}/OrderedSetTests.cpp
         ${SOURCES_HEADERS}
         )
 

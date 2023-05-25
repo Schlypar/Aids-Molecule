@@ -10,31 +10,25 @@ class String
 {
 private:
 	Array<char> string;
-	// Size length;
 
 public:
 	String()
 	    : string()
-	// , length(0)
 	{
 	}
 
 	String(const Array<char>& string)
 	    : string(string)
-	// , length(string.GetLength())
 	{
 	}
 
 	String(char* data, Size count)
 	    : string(data, count)
-	// , length(count)
 	{
-		// this->string[length] = '\0';
 	}
 
 	String(const char* string)
 	    : string(std::strlen(string))
-	// , length(std::strlen(string))
 	{
 		Index i = 0;
 
@@ -43,28 +37,22 @@ public:
 			this->string[i] = string[i];
 			i++;
 		}
-
-		// this->string[length] = '\0';
 	}
 
 	String(Size count)
 	    : string(count)
-	// , length(0)
 	{
 	}
 
 	String(const String& other)
 	    : string(other.string)
-	// , length(other.length)
 	{
 	}
 
 	String(String&& other)
 	    : string(std::move(other.string))
-	// , length(std::move(other.length))
 	{
 		other.string = Array<char>();
-		// other.length = 0;
 	}
 
 	~String()
@@ -73,7 +61,6 @@ public:
 
 	Size Length() const noexcept
 	{
-		// return length;
 		return string.GetLength();
 	}
 
@@ -263,12 +250,9 @@ public:
 		}
 
 		String result = String(size_t(end - start + 2));
-		// result.Length() = end - start + 1;
 
 		for (Index i = start; i <= end; i++)
 			result[i - start] = this->string[i];
-
-		// result[result.Length()] = '\0';
 
 		return result;
 	}
@@ -286,6 +270,24 @@ public:
 		return Pair<String, String>(left, right);
 	}
 
+	bool operator==(const String& other) const noexcept
+	{
+		if (this->Length() != other.Length())
+			return false;
+
+		Size length = this->Length();
+		for (Index i = 0; i < length; i++)
+			if (this->string[i] != other.string[i])
+				return false;
+
+		return true;
+	}
+
+	bool operator!=(const String& other) const noexcept
+	{
+		return !(*this == other);
+	}
+
 	friend String operator+(const String& left, const String& rigth)
 	{
 		String result = String(size_t(left.Length() + rigth.Length() + 1));
@@ -295,9 +297,6 @@ public:
 
 		for (Index i = 0; i < rigth.Length(); i++)
 			result.string[left.Length() + i] = rigth.string[i];
-
-		// result.Length() = left.Length() + rigth.Length();
-		// result[result.Length()] = '\0';
 
 		return result;
 	}
@@ -315,9 +314,6 @@ public:
 			counter--;
 		}
 
-		// result.Length() = left.Length() * right;
-		// result[result.Length()] = '\0';
-
 		return result;
 	}
 
@@ -333,9 +329,6 @@ public:
 
 			counter--;
 		}
-
-		// result.Length() = right.Length() * left;
-		// result[result.Length()] = '\0';
 
 		return result;
 	}

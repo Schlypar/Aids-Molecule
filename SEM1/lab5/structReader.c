@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #include "structReader.h"
 
 #define MAX_LENGHT 100

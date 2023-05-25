@@ -5,7 +5,7 @@
 #include "Tree/ITree.h"
 
 template <Comparible P, typename T>
-class BinaryHeap : protected BinaryTree<P, T>
+class BinaryHeap : public BinaryTree<P, T>
 {
 	template <typename T1, typename T2>
 	using TreeNode = typename Tree<T1, T2>::TreeNode;
@@ -29,8 +29,8 @@ public:
 	{
 	}
 
-	BinaryHeap(TreeNode<P, T>* startRoot)
-	    : BinaryTree<P, T>(startRoot)
+	BinaryHeap(TreeNode<P, T>* startRoot, KGen<P, T> kGen)
+	    : BinaryTree<P, T>(startRoot, kGen)
 	{
 	}
 
@@ -67,19 +67,19 @@ public:
 	{
 		if (this->root == nullptr)
 		{
-			this->root = NodePtr<P, T>(new TreeNode<T, P>(value));
+			this->root = NodePtr<P, T>(new TreeNode<P, T>(value));
 			return this;
 		}
 
 		P valueKey = this->kGen(value);
 
-		NodePtr<T, P> current = this->root.Get();
+		NodePtr<P, T> current = this->root.Get();
 
 		while (NOT_DONE)
 		{
 			if (current->left == nullptr)
 			{
-				current->left = new TreeNode<T, P>(value);
+				current->left = new TreeNode<P, T>(value);
 				current->left->key = valueKey;
 				current->left->parent = current;
 
@@ -88,7 +88,7 @@ public:
 			}
 			if (current->right == nullptr)
 			{
-				current->right = new TreeNode<T, P>(value);
+				current->right = new TreeNode<P, T>(value);
 				current->right->key = valueKey;
 				current->right->parent = current;
 
@@ -108,10 +108,10 @@ public:
 
 	void Delete(const T& value) noexcept override
 	{
-		auto deleter = [this](NodePtr<T, P> node) -> void {
+		auto deleter = [this](NodePtr<P, T> node) -> void {
 			while (node->left != nullptr || node->right != nullptr)
 			{
-				NodePtr<T, P> withMaxValue = nullptr;
+				NodePtr<P, T> withMaxValue = nullptr;
 				if (node->left != nullptr && node->right != nullptr)
 					withMaxValue = (node->left->key > node->right->key) ? node->left.Get()
 											    : node->right.Get();
@@ -124,7 +124,7 @@ public:
 				node = withMaxValue;
 			}
 
-			NodePtr<T, P> parent = node->parent;
+			NodePtr<P, T> parent = node->parent;
 
 			if (parent->left.Get() == node)
 				parent->left = nullptr;
@@ -135,7 +135,7 @@ public:
 			delete node;
 		};
 
-		this->Traverse(Left, Right, Root, [deleter, value](NodePtr<T, P> node) -> void {
+		this->Traverse(Left, Right, Root, [deleter, value](NodePtr<P, T> node) -> void {
 			if (node->data == value)
 				deleter(node);
 		});
@@ -157,15 +157,15 @@ public:
 	}
 
 private:
-	void PushUp(NodePtr<T, P> node) noexcept
+	void PushUp(NodePtr<P, T> node) noexcept
 	{
 		std::swap(node->data, node->parent->data);
 		std::swap(node->key, node->parent->key);
 	}
 
-	void PushDown(NodePtr<T, P> node) noexcept
+	void PushDown(NodePtr<P, T> node) noexcept
 	{
-		NodePtr<T, P> withMaxValue = nullptr;
+		NodePtr<P, T> withMaxValue = nullptr;
 		if (node->left != nullptr && node->right != nullptr)
 			withMaxValue = (node->left->key > node->right->key) ? node->left.Get() : node->right.Get();
 		else if (node->left != nullptr)
@@ -179,7 +179,7 @@ private:
 
 	void Balance() noexcept override
 	{
-		auto pushUp = [this](NodePtr<T, P> node) -> void {
+		auto pushUp = [this](NodePtr<P, T> node) -> void {
 			while (node->parent != nullptr && node->parent->key < node->key)
 			{
 				this->PushUp(node);
@@ -187,11 +187,11 @@ private:
 			}
 		};
 
-		auto pushDown = [this](NodePtr<T, P> node) -> void {
+		auto pushDown = [this](NodePtr<P, T> node) -> void {
 			while ((node->left != nullptr && node->key < node->left->key)
 				|| (node->right != nullptr && node->key < node->right->key))
 			{
-				NodePtr<T, P> withMaxValue = nullptr;
+				NodePtr<P, T> withMaxValue = nullptr;
 				if (node->left != nullptr && node->right != nullptr)
 					withMaxValue = (node->left->key > node->right->key) ? node->left.Get()
 											    : node->right.Get();
@@ -205,7 +205,7 @@ private:
 			}
 		};
 
-		this->Traverse(Left, Right, Root, [pushUp, pushDown](NodePtr<T, P> node) -> void {
+		this->Traverse(Left, Right, Root, [pushUp, pushDown](NodePtr<P, T> node) -> void {
 			pushUp(node);
 			pushDown(node);
 		});
