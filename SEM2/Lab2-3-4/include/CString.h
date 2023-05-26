@@ -13,7 +13,7 @@ private:
 
 public:
 	String()
-	    : string()
+	    : string(Size(0))
 	{
 	}
 
@@ -52,7 +52,7 @@ public:
 	String(String&& other)
 	    : string(std::move(other.string))
 	{
-		other.string = Array<char>();
+		other.string = Array<char>(Size(0));
 	}
 
 	~String()
@@ -79,6 +79,13 @@ public:
 
 	void Replace(char what, char with, Size howMuch)
 	{
+		if (Length() == 0 || howMuch > Length())
+		{
+			Logger::Trace("At String at Replace(char, char, Size)");
+			logException(EXCEPTION_BAD_LOGIC);
+			throw EXCEPTION_BAD_LOGIC;
+		}
+
 		if (Count(what) < howMuch)
 		{
 			Logger::Trace("At String at Replace(char, char, Size)");
@@ -111,7 +118,7 @@ public:
 		if (this->string[0] == suspect)
 			return true;
 
-		return (LFind(suspect) == 0) ? false : true;
+		return (LFind(suspect) == -1) ? false : true;
 	}
 
 	bool isThere(const String& suspect) const noexcept
@@ -204,25 +211,25 @@ public:
 	Index LFind(char suspect) const noexcept
 	{
 		if (isEmpty())
-			return 0;
+			return -1;
 
 		for (Index i = 0; i < Length(); i++)
 			if (this->string[i] == suspect)
 				return i;
 
-		return 0;
+		return -1;
 	}
 
 	Index RFind(char suspect) const noexcept
 	{
 		if (isEmpty())
-			return 0;
+			return -1;
 
 		for (Index i = Length() - 1; i > 0; i--)
 			if (this->string[i] == suspect)
 				return i;
 
-		return 0;
+		return -1;
 	}
 
 	String& operator=(const String& other)
@@ -249,7 +256,7 @@ public:
 			throw EXCEPTION_INDEX_OUT_OF_RANGE;
 		}
 
-		String result = String(size_t(end - start + 2));
+		String result = String(size_t(end - start + 1));
 
 		for (Index i = start; i <= end; i++)
 			result[i - start] = this->string[i];
@@ -260,7 +267,7 @@ public:
 	Pair<String, String> Split(char pivot) const noexcept
 	{
 		if (!isThere(pivot))
-			return Pair<String, String>(String(), String());
+			return Pair<String, String>(String(*this), String());
 
 		Index pivotIndex = LFind(pivot);
 
@@ -290,7 +297,7 @@ public:
 
 	friend String operator+(const String& left, const String& rigth)
 	{
-		String result = String(size_t(left.Length() + rigth.Length() + 1));
+		String result = String(size_t(left.Length() + rigth.Length()));
 
 		for (Index i = 0; i < left.Length(); i++)
 			result[i] = left[i];
@@ -303,7 +310,7 @@ public:
 
 	friend String operator*(const String& left, const int& right)
 	{
-		String result = String(size_t(left.Length() * right + 1));
+		String result = String(size_t(left.Length() * right));
 
 		int counter = right;
 		while (counter > 0)

@@ -33,5 +33,7 @@ int main()
 {
 	Logger::setPriority(ErrorPriority);
 
+	print("asdadwadasdasdwadas\n");
+
 	return 0;
 }

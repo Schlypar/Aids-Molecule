@@ -158,6 +158,7 @@ add_executable(${TEST_PROJECT_NAME}
         ${TEST_DIR}/BinaryTreeTests.cpp
         ${TEST_DIR}/BinaryHeapTests.cpp
         ${TEST_DIR}/OrderedSetTests.cpp
+        ${TEST_DIR}/CStringTests.cpp
         ${SOURCES_HEADERS}
         )
 

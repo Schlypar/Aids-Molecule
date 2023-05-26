@@ -1,6 +1,6 @@
 #pragma once
 
-#include <utility>
+#include "Pointer.h"
 
 #include "Sequence/ArraySequence.h"
 #include "Sequence/ListSequence.h"
@@ -12,31 +12,31 @@ class Allocator
 {
 public:
 	template <typename... Args>
-	static Array<T>* AllocateArray(Args... args)
+	static SharedPtr<Array<T>> AllocateArray(Args... args)
 	{
 		return new Array<T>(args...);
 	}
 
 	template <typename... Args>
-	static List<T>* AllocateList(Args... args)
+	static SharedPtr<List<T>> AllocateList(Args... args)
 	{
 		return new SegmentedList<T>(args...);
 	}
 
 	template <typename... Args>
-	static SegmentedList<T>* AllocateSegmentedList(Args... args)
+	static SharedPtr<SegmentedList<T>> AllocateSegmentedList(Args... args)
 	{
 		return new SegmentedList<T>(args...);
 	}
 
 	template <typename... Args>
-	static Sequence<T>* AllocateArraySequence(Args... args)
+	static SharedPtr<Sequence<T>> AllocateArraySequence(Args... args)
 	{
 		return (Sequence<T>*) new ArraySequence<T>(args...);
 	}
 
 	template <typename... Args>
-	static Sequence<T>* AllocateListSequence(Args... args)
+	static SharedPtr<Sequence<T>> AllocateListSequence(Args... args)
 	{
 		return (Sequence<T>*) new ListSequence<T>(args...);
 	}
