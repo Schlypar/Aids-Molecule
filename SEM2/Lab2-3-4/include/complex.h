@@ -58,16 +58,16 @@ public:
 		other.imaginary = float();
 	}
 
-	complex operator+(const float& other)
+	friend complex operator+(const complex& left, const float& right)
 	{
-		complex copy = complex(*this);
+		complex copy = complex(left);
 
-		copy.real += other;
+		copy.real += right;
 
 		return copy;
 	}
 
-	friend complex operator+(const float& other, complex& complex)
+	friend complex operator+(const float& other, const complex& complex)
 	{
 		return complex + other;
 	}
