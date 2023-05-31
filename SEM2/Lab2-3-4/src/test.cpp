@@ -1,3 +1,4 @@
+#include "Sequence/ArraySequence.h"
 #include "Tree/BinaryHeap.h"
 #include "Tree/BinaryTree.h"
 #include "Tree/MultiBinaryTree.h"
@@ -32,6 +33,13 @@ using SetPtr = SharedPtr<OrderedSet<T1>>;
 int main()
 {
 	Logger::setPriority(ErrorPriority);
+
+	BinTreePtr<int, Pair<int, String>> tree = new BinaryTree<int, Pair<int, String>>({ 25, "root" },
+		[](const Pair<int, String>& pair) -> int { return pair.GetLeft(); });
+
+	tree->Add({ 20, "left" })->Add({ 30, "right" });
+
+	print(tree, '\n');
 
 	return 0;
 }

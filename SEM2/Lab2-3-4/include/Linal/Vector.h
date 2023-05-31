@@ -74,7 +74,7 @@ public:
 	}
 
 	Vector(Vector<T>&& other)
-	    : vector(other.vector)
+	    : vector(std::move(other.vector))
 	{
 		Logger::Info("Copied Vector<T>");
 		other.vector = Array<T>();

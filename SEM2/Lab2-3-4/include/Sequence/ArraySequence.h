@@ -74,12 +74,12 @@ public:
 			return *this;
 		}
 
-		bool operator!=(Iterator& other) const
+		bool operator!=(const Iterator& other) const
 		{
 			return this->current != other.current;
 		}
 
-		bool operator==(Iterator& other) const
+		bool operator==(const Iterator& other) const
 		{
 			return this->current == other.current;
 		}

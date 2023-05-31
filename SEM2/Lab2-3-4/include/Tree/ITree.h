@@ -38,8 +38,6 @@ public:
 	{
 		Tkey key;
 		Tvalue data;
-		// KGen<Tkey, Tvalue> kGen = nullptr;
-		// KGen<Tkey, Tvalue> kGenMulti = nullptr;
 
 		TreeNode* parent;
 		WeakPtr<TreeNode> left;
