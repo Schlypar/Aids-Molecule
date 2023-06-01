@@ -43,7 +43,15 @@ public:
 	friend Matrix<U> ZeroMatrix(Size dimension);
 
 	template <typename U>
-	friend Matrix<U> IdentityMatrix(Size dimension);
+	static Matrix<U> IdentityMatrix(Size dimension)
+	{
+		Matrix<U> result = Matrix<U>(dimension, U());
+
+		for (Index i = 0; i < dimension; i++)
+			result[i][i] = U(1);
+
+		return result;
+	}
 
 	template <typename U>
 	friend Matrix<U> OuterProduct(const Vector<U>& left, const Vector<U>& right);
@@ -724,7 +732,7 @@ public:
 			throw EXCEPTION_BAD_CONTAINER;
 		}
 
-		Matrix<T> augmented = this->AddMatrix(IdentityMatrix<T>(rows));
+		Matrix<T> augmented = this->AddMatrix(Matrix<T>::IdentityMatrix<T>(rows));
 
 		Matrix<T> result = ((augmented.Triangular()).InverseGauss()).SecondPartOfMatrix(columns);
 
@@ -866,16 +874,16 @@ Matrix<U> ZeroMatrix(Size dimension)
 	return Matrix<U>(dimension, U());
 }
 
-template <typename U>
-Matrix<U> IdentityMatrix(Size dimension)
-{
-	Matrix<U> result = Matrix<U>(dimension, U());
-
-	for (Index i = 0; i < dimension; i++)
-		result[i][i] = U(1);
-
-	return result;
-}
+// template <typename U>
+// Matrix<U> IdentityMatrix(Size dimension)
+// {
+// 	Matrix<U> result = Matrix<U>(dimension, U());
+//
+// 	for (Index i = 0; i < dimension; i++)
+// 		result[i][i] = U(1);
+//
+// 	return result;
+// }
 
 template <typename U>
 U determinant(const Matrix<U>& matrix)
