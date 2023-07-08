@@ -210,23 +210,9 @@ public:
 		return container.Get(index);
 	}
 
-	Sequence<T>* Append(T&& data) override
-	{
-		container.Append(data);
-
-		return this;
-	}
-
 	Sequence<T>* Append(const T& data) override
 	{
 		container.Append(data);
-
-		return this;
-	}
-
-	Sequence<T>* Prepend(T&& data) override
-	{
-		container.Prepend(data);
 
 		return this;
 	}

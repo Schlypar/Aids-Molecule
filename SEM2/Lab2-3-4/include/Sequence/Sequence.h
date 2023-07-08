@@ -42,10 +42,7 @@ public:
 	virtual Size GetLength() const noexcept = 0;
 
 	virtual Sequence<T>* Append(const T& data) = 0;
-	virtual Sequence<T>* Append(T&& data) = 0;
-
 	virtual Sequence<T>* Prepend(const T& data) = 0;
-	virtual Sequence<T>* Prepend(T&& data) = 0;
 
 	virtual void InsertAt(const Index index, const T& data) = 0;
 	virtual void Remove(const Index index) = 0;

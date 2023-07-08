@@ -10,11 +10,6 @@ class ArraySequence : public Sequence<T>
 private:
 	Array<T> container;
 
-	void Resize()
-	{
-		container.Realloc(container.GetLength() * CAPACITY_TO_REAL_SIZE);
-	}
-
 public:
 	class Iterator : IIterator<T>
 	{
@@ -169,106 +164,42 @@ public:
 		return (Sequence<T>*) new ArraySequence<T>();
 	}
 
-	T& GetFirst() const override
-	{
-		if (isEmpty())
-		{
-			Logger::Trace("At Get() at ArraySequence.h");
-			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-			throw EXCEPTION_INDEX_OUT_OF_RANGE;
-		}
+	// Gets an instance of the first element
+	T& GetFirst() const override;
 
-		return container.Get(0);
-	}
+	// Gets an instance of the last element
+	T& GetLast() const override;
 
-	T& GetLast() const override
-	{
-		if (isEmpty())
-		{
-			Logger::Trace("At Get() at ArraySequence.h");
-			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-			throw EXCEPTION_INDEX_OUT_OF_RANGE;
-		}
+	// Gets an instance of the element at index
+	T& Get(const Index index) const override;
 
-		return container.Get(GetLength() - 1);
-	}
+	/*
+	 * Appends to array a value.
+	 *
+	 * Has O(n) time complexity
+	 * */
+	Sequence<T>* Append(const T& data) override;
 
-	T& Get(const Index index) const override
-	{
-		if (isEmpty() || index > GetLength())
-		{
-			Logger::Trace("At Get() at ArraySequence.h");
-			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-			throw EXCEPTION_INDEX_OUT_OF_RANGE;
-		}
+	/*
+	 * Prepends to array a value.
+	 *
+	 * Has O(n) time complexity
+	 * */
+	Sequence<T>* Prepend(const T& data) override;
 
-		return container.Get(index);
-	}
+	/*
+	 * Inserts a value to array.
+	 *
+	 * Has O(n) time complexity
+	 * */
+	void InsertAt(const Index index, const T& data) override;
 
-	Sequence<T>* Append(const T& data) override
-	{
-
-		container.Realloc(container.GetLength() + 1);
-		container[container.GetLength() - 1] = data;
-
-		return this;
-	}
-
-	Sequence<T>* Append(T&& data) override
-	{
-		container.Realloc(container.GetLength() + 1);
-		container[container.GetLength() - 1] = data;
-
-		return this;
-	}
-
-	Sequence<T>* Prepend(const T& data) override
-	{
-		container.Realloc(GetLength() + 1);
-
-		for (Index i = GetLength(); i > 0; i--)
-			container[i] = container[i - 1];
-
-		container[0] = data;
-
-		return this;
-	}
-
-	Sequence<T>* Prepend(T&& data) override
-	{
-		container.Realloc(GetLength() + 1);
-
-		for (Index i = GetLength(); i > 0; i--)
-			container[i] = container[i - 1];
-
-		container[0] = data;
-
-		return this;
-	}
-
-	void InsertAt(const Index index, const T& data) override
-	{
-		if (index >= GetLength())
-		{
-			Logger::Trace("At InsertAt() at ArraySequence.h");
-			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-			throw EXCEPTION_INDEX_OUT_OF_RANGE;
-		}
-
-		container.Realloc(container.GetLength() + 1);
-
-		for (Index i = GetLength(); i > index; i--)
-			container[i] = container[i - 1];
-
-		container[index] = data;
-	}
-
-	void Remove(const Index index) override
-	{
-		for (Index i = index; i < GetLength() - 1; i++)
-			container[i] = container[i + 1];
-		container.Realloc(container.GetLength() - 1);
-	}
+	/*
+	 * Removes a value from a array.
+	 *
+	 * Has O(n) time complexity
+	 * */
+	void Remove(const Index index) override;
 
 	Size GetLength() const noexcept override
 	{
@@ -290,16 +221,19 @@ public:
 		return (&(GetLast()) + 1);
 	}
 
+	// Returns abstract class Sequence that underhood is ArraySequence
 	Sequence<T>* Create() const override
 	{
 		return (Sequence<T>*) new ArraySequence<T>();
 	}
 
+	// Returns abstract class Sequence that underhood is ArraySequence and copies it
 	Sequence<T>* Copy() const override
 	{
 		return (Sequence<T>*) new ArraySequence<T>(*this);
 	}
 
+	// Gets an instance of the element at index
 	T& operator[](const Index index)
 	{
 		return container[index];
@@ -332,4 +266,97 @@ public:
 
 		return stream;
 	}
+
+private:
+	void Resize()
+	{
+		container.Realloc(container.GetLength() * CAPACITY_TO_REAL_SIZE);
+	}
 };
+
+template <typename T>
+T& ArraySequence<T>::GetFirst() const
+{
+	if (isEmpty())
+	{
+		Logger::Trace("At Get() at ArraySequence.h");
+		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+		throw EXCEPTION_INDEX_OUT_OF_RANGE;
+	}
+
+	return container.Get(0);
+}
+
+template <typename T>
+T& ArraySequence<T>::GetLast() const
+{
+	if (isEmpty())
+	{
+		Logger::Trace("At Get() at ArraySequence.h");
+		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+		throw EXCEPTION_INDEX_OUT_OF_RANGE;
+	}
+
+	return container.Get(GetLength() - 1);
+}
+
+template <typename T>
+T& ArraySequence<T>::Get(const Index index) const
+{
+	if (isEmpty() || index > GetLength())
+	{
+		Logger::Trace("At Get() at ArraySequence.h");
+		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+		throw EXCEPTION_INDEX_OUT_OF_RANGE;
+	}
+
+	return container.Get(index);
+}
+
+template <typename T>
+Sequence<T>* ArraySequence<T>::Append(const T& data)
+{
+	container.Realloc(container.GetLength() + 1);
+	container[container.GetLength() - 1] = data;
+
+	return this;
+}
+
+template <typename T>
+Sequence<T>* ArraySequence<T>::Prepend(const T& data)
+{
+	container.Realloc(GetLength() + 1);
+
+	for (Index i = GetLength(); i > 0; i--)
+		container[i] = container[i - 1];
+
+	container[0] = data;
+
+	return this;
+}
+
+template <typename T>
+void ArraySequence<T>::InsertAt(const Index index, const T& data)
+{
+	if (index >= GetLength())
+	{
+		Logger::Trace("At InsertAt() at ArraySequence.h");
+		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+		throw EXCEPTION_INDEX_OUT_OF_RANGE;
+	}
+
+	container.Realloc(container.GetLength() + 1);
+
+	for (Index i = GetLength(); i > index; i--)
+		container[i] = container[i - 1];
+
+	container[index] = data;
+}
+
+template <typename T>
+void ArraySequence<T>::Remove(const Index index)
+{
+	for (Index i = index; i < GetLength() - 1; i++)
+		container[i] = container[i + 1];
+	container.Realloc(container.GetLength() - 1);
+}
