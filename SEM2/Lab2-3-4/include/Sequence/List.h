@@ -58,88 +58,7 @@ private:
 	}
 
 public:
-	class Iterator
-	{
-		Node<T>* current;
-
-	public:
-		Iterator()
-		    : current(nullptr)
-		{
-		}
-
-		Iterator(List<T> list)
-		    : current(list.head)
-		{
-		}
-
-		Iterator(Node<T>* first)
-		    : current(first)
-		{
-		}
-
-		Iterator operator+(int n)
-		{
-			Size counter = 0;
-			while (counter != n)
-				current = current->next, counter++;
-
-			return *this;
-		}
-
-		Iterator operator-(int n)
-		{
-			Size counter = 0;
-			while (counter != n)
-				current = current->prev, counter++;
-
-			return *this;
-		}
-
-		Iterator operator++(int)
-		{
-			current = current->next;
-			return *this;
-		}
-
-		Iterator operator--(int)
-		{
-			current = current->prev;
-			return *this;
-		}
-
-		Iterator operator++()
-		{
-			current = current->next;
-			return *this;
-		}
-
-		Iterator operator--()
-		{
-			current = current->prev;
-			return *this;
-		}
-
-		// const Iterator operator++ (int) { current = current->next; return *this; }
-		// const Iterator operator-- (int) { current = current->prev; return *this; }
-		// const Iterator operator++ () { current = current->next; return *this; }
-		// const Iterator operator-- () { current = current->prev; return *this; }
-
-		bool operator!=(const Iterator& other) const
-		{
-			return this->current != other.current;
-		}
-
-		bool operator==(const Iterator& other) const
-		{
-			return this->current == other.current;
-		}
-
-		T& operator*()
-		{
-			return this->current->data;
-		}
-	};
+	class Iterator;
 
 	Iterator begin() noexcept
 	{
@@ -627,3 +546,87 @@ List<T>& List<T>::operator=(List<T>&& other)
 
 	return *this;
 }
+
+template <typename T>
+class List<T>::Iterator
+{
+	Node<T>* current;
+
+public:
+	Iterator()
+	    : current(nullptr)
+	{
+	}
+
+	Iterator(List<T> list)
+	    : current(list.head)
+	{
+	}
+
+	Iterator(Node<T>* first)
+	    : current(first)
+	{
+	}
+
+	Iterator operator+(int n)
+	{
+		Size counter = 0;
+		while (counter != n)
+			current = current->next, counter++;
+
+		return *this;
+	}
+
+	Iterator operator-(int n)
+	{
+		Size counter = 0;
+		while (counter != n)
+			current = current->prev, counter++;
+
+		return *this;
+	}
+
+	Iterator operator++(int)
+	{
+		current = current->next;
+		return *this;
+	}
+
+	Iterator operator--(int)
+	{
+		current = current->prev;
+		return *this;
+	}
+
+	Iterator operator++()
+	{
+		current = current->next;
+		return *this;
+	}
+
+	Iterator operator--()
+	{
+		current = current->prev;
+		return *this;
+	}
+
+	// const Iterator operator++ (int) { current = current->next; return *this; }
+	// const Iterator operator-- (int) { current = current->prev; return *this; }
+	// const Iterator operator++ () { current = current->next; return *this; }
+	// const Iterator operator-- () { current = current->prev; return *this; }
+
+	bool operator!=(const Iterator& other) const
+	{
+		return this->current != other.current;
+	}
+
+	bool operator==(const Iterator& other) const
+	{
+		return this->current == other.current;
+	}
+
+	T& operator*()
+	{
+		return this->current->data;
+	}
+};
