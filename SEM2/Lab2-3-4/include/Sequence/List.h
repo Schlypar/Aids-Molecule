@@ -151,7 +151,6 @@ public:
 		return nullptr;
 	}
 
-	// default constructor
 	List()
 	    : head(nullptr)
 	    , tail(nullptr)
@@ -160,7 +159,6 @@ public:
 		Logger::Info("Default constructor of List<T>");
 	}
 
-	// copying constructor
 	List(const List<T>& other) noexcept
 	    : size(0)
 	{
@@ -169,7 +167,6 @@ public:
 			Append(other.Get(i));
 	}
 
-	// moving constructor
 	List(List<T>&& other) noexcept
 	    : head(other.head)
 	    , tail(other.tail)
@@ -179,7 +176,6 @@ public:
 		other.head = nullptr;
 	}
 
-	// copying from array constructor
 	List(const T* data, Size count) noexcept
 	    : size(0)
 	{
@@ -190,7 +186,6 @@ public:
 		size = count;
 	}
 
-	// parameter pack constructor
 	template <typename... Args>
 	List(T head, Args... args)
 	    : size(0)
@@ -219,383 +214,121 @@ public:
 		this->head = nullptr;
 	}
 
-	void Clear() noexcept
-	{
-		if (isEmpty())
-			return;
+	// Makes empty list
+	void Clear() noexcept;
 
-		Node<T>* current = this->head;
-		while (current != this->tail)
-		{
-			current = current->next;
-			delete current->prev;
-		}
-		delete this->tail;
-		this->head = nullptr;
-		this->size = 0;
-	}
+	/*
+	 * Gets an instance of what is at the head.
+	 * O(1) is the time complexity. Throws int (Exception) if
+	 * list is empty.
+	 * */
+	T& GetFirst() const;
 
-	T& GetFirst() const
-	{
-		if (isEmpty())
-		{
-			Logger::Trace("At GetFirst() at List.h");
-			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-			throw EXCEPTION_INDEX_OUT_OF_RANGE;
-		}
-		return this->head->data;
-	}
+	/*
+	 * Gets an instance of what is at the tail.
+	 * O(1) is the time complexity. Throws int (Exception) if
+	 * list is empty.
+	 * */
+	T& GetLast() const;
 
-	T& GetLast() const
-	{
-		if (isEmpty())
-		{
-			Logger::Trace("At GetLast() at List.h");
-			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-			throw EXCEPTION_INDEX_OUT_OF_RANGE;
-		}
-		return this->tail->data;
-	}
+	/*
+	 * Gets an instance of what is at the index.
+	 * O(n) is the time complexity. Throws int (Exception) if
+	 * list is empty or index is greater or lower than size of list
+	 * */
+	T& Get(Index index) const override;
 
-	T& Get(const Index index) const override
-	{
-		if (index >= size || index < 0)
-		{
-			Logger::Trace("At Get() ai List.h");
-			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-			throw EXCEPTION_INDEX_OUT_OF_RANGE;
-		}
+	/*
+	 * Return pointer to node at the head of list. Throws int
+	 * (Exception) if list is empty or there are no head definded.
+	 * */
+	Node<T>* GetHead() const;
 
-		Node<T>* pointer = this->head;
-		int counter = 0;
-		while (counter < index)
-		{
-			counter++;
-			pointer = pointer->next;
-		}
-
-		if (!pointer)
-		{
-			Logger::Trace("At Get() ai List.h");
-			logException(EXCEPTION_BAD_POINTER);
-			throw EXCEPTION_BAD_POINTER;
-		}
-
-		return pointer->data;
-	}
-
-	Node<T>* GetHead() const
-	{
-		if (isEmpty())
-		{
-			Logger::Trace("At GetHead() at List.h");
-			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-			throw EXCEPTION_INDEX_OUT_OF_RANGE;
-		}
-
-		if (!this->head)
-		{
-			Logger::Trace("At GetHead() at List.h");
-			logException(EXCEPTION_BAD_POINTER);
-			throw EXCEPTION_BAD_POINTER;
-		}
-
-		return this->head;
-	}
-
-	Node<T>* GetTail() const
-	{
-		if (isEmpty())
-		{
-			Logger::Trace("At GetHead() at List.h");
-			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-			throw EXCEPTION_INDEX_OUT_OF_RANGE;
-		}
-
-		if (!this->tail)
-		{
-			Logger::Trace("At GetHead() at List.h");
-			logException(EXCEPTION_BAD_POINTER);
-			throw EXCEPTION_BAD_POINTER;
-		}
-
-		return this->tail;
-	}
+	/*
+	 * Return pointer to node at the tail of list. Throws int
+	 * (Exception) if list is empty or there are no tail definded.
+	 * */
+	Node<T>* GetTail() const;
 
 	Size GetLength() const override
 	{
 		return size;
 	}
 
-	// by copying
-	void InsertAt(const Index index, const T& data)
-	{
-		if (index > size || index < 0)
-		{
-			Logger::Trace("At InsertAt(const Index, const T&) at List.h");
-			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-			throw EXCEPTION_INDEX_OUT_OF_RANGE;
-		}
+	/*
+	 * Inserts exactly at the index inputed.
+	 * So if we have 1, 2, 3 and insert to index 1 value 5 then we have
+	 * 1, 5, 2, 3.
+	 *
+	 * Throws int (Exception) if index is negative (or zero) or if index is
+	 * greater then size of list.
+	 *
+	 * Has O(n) time complexity
+	 * */
+	void InsertAt(Index index, const T& data);
 
-		Node<T>* node = new Node<T>;
-		node->data = data;
-		node->next = nullptr;
-		node->prev = nullptr;
+	/*
+	 * Removes data exactly at the index inputed.
+	 * So if we have 1, 2, 3 and remove index 1 then we have
+	 * 1, 3.
+	 *
+	 * Throws int (Exception) if index is negative (or zero) or if index is
+	 * greater then size of list
+	 *
+	 * Has O(n) time complexity
+	 * */
+	void Remove(Index index);
 
-		if (index == size)
-		{
-			this->NewTail(node);
-			size++;
-			return;
-		}
+	/*
+	 * Adds data at the begining of list.
+	 *
+	 * Return pointer to itself.
+	 *
+	 * Has O(1) time complexity.
+	 * */
+	List<T>* Append(const T& data) noexcept;
 
-		if (index == 0)
-		{
-			this->NewHead(node);
-			size++;
-			return;
-		}
+	/*
+	 * Adds data at the end of list.
+	 *
+	 * Return pointer to itself.
+	 *
+	 * Has O(1) time complexity.
+	 * */
+	List<T>* Prepend(const T& data);
 
-		Node<T>* pointer = this->head;
-
-		int counter = 0;
-		while (counter < index)
-		{
-			counter++;
-			pointer = pointer->next;
-		}
-
-		pointer->prev->next = node;
-		node->prev = pointer->prev;
-		node->next = pointer;
-		pointer->prev = node;
-
-		size++;
-	}
-
-	// by moving
-	void InsertAt(const Index index, T&& data)
-	{
-		if (index > size || index < 0)
-		{
-			Logger::Trace("At InsertAt(const Index, T&&)  at List.h");
-			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-			throw EXCEPTION_INDEX_OUT_OF_RANGE;
-		}
-
-		Node<T>* node = new Node<T>;
-		node->data = data;
-		node->next = nullptr;
-		node->prev = nullptr;
-
-		if (index == size)
-		{
-			this->NewTail(node);
-			size++;
-			return;
-		}
-
-		if (index == 0)
-		{
-			this->NewHead(node);
-			size++;
-			return;
-		}
-
-		Node<T>* pointer = this->head;
-
-		int counter = 0;
-		while (counter < index)
-		{
-			counter++;
-			pointer = pointer->next;
-		}
-
-		pointer->prev->next = node;
-		node->prev = pointer->prev;
-		node->next = pointer;
-		pointer->prev = node;
-
-		size++;
-	}
-
-	void Remove(Index index)
-	{
-		if (index > size || index < 0)
-		{
-			Logger::Trace("At Remove() at List.h");
-			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-			throw EXCEPTION_INDEX_OUT_OF_RANGE;
-		}
-
-		if (index == size - 1)
-		{
-			this->tail = this->tail->prev;
-			delete this->tail->next;
-			this->tail->next = nullptr;
-
-			size--;
-			return;
-		}
-
-		if (index == 0)
-		{
-			this->head = this->head->next;
-			delete this->head->prev;
-			this->head->prev = nullptr;
-
-			size--;
-			return;
-		}
-
-		Node<T>* node = this->head;
-		for (Size i = 0; i < index; i++)
-			node = node->next;
-
-		node->prev->next = node->next;
-		node->next->prev = node->prev;
-
-		delete node;
-		size--;
-	}
-
-	// append by copying
-	List<T>& Append(const T& data)
-	{
-		Node<T>* pointer = new Node<T>;
-
-		pointer->data = data;
-		pointer->next = nullptr;
-		pointer->prev = nullptr;
-
-		if (isEmpty())
-		{
-			this->head = pointer;
-			this->tail = pointer;
-
-			size++;
-		}
-		else
-		{
-			pointer->prev = this->tail;
-			this->tail->next = pointer;
-			this->tail = pointer;
-
-			size++;
-		}
-
-		return *this;
-	}
-
-	// append by moving
-	List<T>& Append(T&& data)
-	{
-		Node<T>* pointer = new Node<T>;
-
-		pointer->data = data;
-		pointer->next = nullptr;
-		pointer->prev = nullptr;
-
-		if (isEmpty())
-		{
-			this->head = pointer;
-			this->tail = pointer;
-
-			size++;
-		}
-		else
-		{
-			pointer->prev = this->tail;
-			this->tail->next = pointer;
-			this->tail = pointer;
-
-			size++;
-		}
-		return *this;
-	}
-
-	// Prepend by copying
-	void Prepend(const T& data)
-	{
-		Node<T>* pointer = new Node<T>;
-
-		pointer->data = data;
-		pointer->next = nullptr;
-		pointer->prev = nullptr;
-
-		if (isEmpty())
-		{
-			this->head = pointer;
-			this->tail = pointer;
-
-			size++;
-		}
-		else
-		{
-			this->head->prev = pointer;
-			pointer->next = this->head;
-			this->head = pointer;
-
-			size++;
-		}
-	}
-
-	// Prepend by moving
-	void Prepend(T&& data)
-	{
-		Node<T>* pointer = new Node<T>;
-
-		pointer->data = data;
-		pointer->next = nullptr;
-		pointer->prev = nullptr;
-
-		if (isEmpty())
-		{
-			this->head = pointer;
-			this->tail = pointer;
-
-			size++;
-		}
-		else
-		{
-			this->head->prev = pointer;
-			pointer->next = this->head;
-			this->head = pointer;
-
-			size++;
-		}
-	}
-
-	auto& operator[](const Index index) const
+	/*
+	 * Gets an instance of what is at the index.
+	 * O(n) is the time complexity. Throws int (Exception) if
+	 * list is empty or index is greater or lower than size of list
+	 * */
+	T& operator[](Index index) const
 	{
 		return Get(index);
 	}
 
-	// copying operator =
-	List<T>& operator=(List<T>& other)
+	/*
+	 * Destroys old list and makes deep copy of other
+	 *
+	 * Has O(n) time complexity
+	 * */
+	List<T>& operator=(List<T>& other);
+
+	/*
+	 * Destroys old list and steals pointers from other
+	 *
+	 * Has O(1) time complexity
+	 * */
+	List<T>& operator=(List<T>&& other);
+
+	bool isEmpty() const override
 	{
-		Logger::Info("Used copying operator = of List<T>");
-		this->Clear();
-
-		for (auto data : other)
-			Append(data);
-
-		return *this;
+		return size == 0;
 	}
 
-	// moving operator =
-	List<T>& operator=(List<T>&& other)
+	void SetSize(Size newSize)
 	{
-		Logger::Info("Used moving operator = of List<T>");
-		this->Clear();
-
-		this->head = other.head;
-		this->tail = other.tail;
-		this->size = other.size;
-
-		other.head = nullptr;
-
-		return *this;
+		size = newSize;
 	}
 
 	friend std::ostream& operator<<(std::ostream& stream, const List<T>& list)
@@ -614,14 +347,283 @@ public:
 
 		return stream;
 	}
-
-	bool isEmpty() const override
-	{
-		return size == 0;
-	}
-
-	void SetSize(Size newSize)
-	{
-		size = newSize;
-	}
 };
+
+template <typename T>
+void List<T>::Clear() noexcept
+{
+	if (isEmpty())
+		return;
+
+	Node<T>* current = this->head;
+	while (current != this->tail)
+	{
+		current = current->next;
+		delete current->prev;
+	}
+	delete this->tail;
+	this->head = nullptr;
+	this->size = 0;
+}
+
+template <typename T>
+T& List<T>::GetFirst() const
+{
+	if (isEmpty())
+	{
+		Logger::Trace("At GetFirst() at List.h");
+		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+		throw EXCEPTION_INDEX_OUT_OF_RANGE;
+	}
+	return this->head->data;
+}
+
+template <typename T>
+T& List<T>::GetLast() const
+{
+	if (isEmpty())
+	{
+		Logger::Trace("At GetLast() at List.h");
+		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+		throw EXCEPTION_INDEX_OUT_OF_RANGE;
+	}
+	return this->tail->data;
+}
+
+template <typename T>
+T& List<T>::Get(const Index index) const
+{
+	if (index >= size || index < 0)
+	{
+		Logger::Trace("At Get() ai List.h");
+		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+		throw EXCEPTION_INDEX_OUT_OF_RANGE;
+	}
+
+	Node<T>* pointer = this->head;
+	int counter = 0;
+	while (counter < index)
+	{
+		counter++;
+		pointer = pointer->next;
+	}
+
+	if (!pointer)
+	{
+		Logger::Trace("At Get() ai List.h");
+		logException(EXCEPTION_BAD_POINTER);
+		throw EXCEPTION_BAD_POINTER;
+	}
+
+	return pointer->data;
+}
+
+template <typename T>
+Node<T>* List<T>::GetHead() const
+{
+	if (isEmpty())
+	{
+		Logger::Trace("At GetHead() at List.h");
+		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+		throw EXCEPTION_INDEX_OUT_OF_RANGE;
+	}
+
+	if (!this->head)
+	{
+		Logger::Trace("At GetHead() at List.h");
+		logException(EXCEPTION_BAD_POINTER);
+		throw EXCEPTION_BAD_POINTER;
+	}
+
+	return this->head;
+}
+
+template <typename T>
+Node<T>* List<T>::GetTail() const
+{
+	if (isEmpty())
+	{
+		Logger::Trace("At GetHead() at List.h");
+		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+		throw EXCEPTION_INDEX_OUT_OF_RANGE;
+	}
+
+	if (!this->tail)
+	{
+		Logger::Trace("At GetHead() at List.h");
+		logException(EXCEPTION_BAD_POINTER);
+		throw EXCEPTION_BAD_POINTER;
+	}
+
+	return this->tail;
+}
+
+template <typename T>
+void List<T>::InsertAt(Index index, const T& data)
+{
+	if (index > size || index < 0)
+	{
+		Logger::Trace("At InsertAt(const Index, const T&) at List.h");
+		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+		throw EXCEPTION_INDEX_OUT_OF_RANGE;
+	}
+
+	Node<T>* node = new Node<T>;
+	node->data = data;
+	node->next = nullptr;
+	node->prev = nullptr;
+
+	if (index == size)
+	{
+		this->NewTail(node);
+		size++;
+		return;
+	}
+
+	if (index == 0)
+	{
+		this->NewHead(node);
+		size++;
+		return;
+	}
+
+	Node<T>* pointer = this->head;
+
+	int counter = 0;
+	while (counter < index)
+	{
+		counter++;
+		pointer = pointer->next;
+	}
+
+	pointer->prev->next = node;
+	node->prev = pointer->prev;
+	node->next = pointer;
+	pointer->prev = node;
+
+	size++;
+}
+
+template <typename T>
+void List<T>::Remove(Index index)
+{
+	if (index > size || index < 0)
+	{
+		Logger::Trace("At Remove() at List.h");
+		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+		throw EXCEPTION_INDEX_OUT_OF_RANGE;
+	}
+
+	if (index == size - 1)
+	{
+		this->tail = this->tail->prev;
+		delete this->tail->next;
+		this->tail->next = nullptr;
+
+		size--;
+		return;
+	}
+
+	if (index == 0)
+	{
+		this->head = this->head->next;
+		delete this->head->prev;
+		this->head->prev = nullptr;
+
+		size--;
+		return;
+	}
+
+	Node<T>* node = this->head;
+	for (Size i = 0; i < index; i++)
+		node = node->next;
+
+	node->prev->next = node->next;
+	node->next->prev = node->prev;
+
+	delete node;
+	size--;
+}
+
+template <typename T>
+List<T>* List<T>::Append(const T& data) noexcept
+{
+	Node<T>* pointer = new Node<T>;
+
+	pointer->data = data;
+	pointer->next = nullptr;
+	pointer->prev = nullptr;
+
+	if (isEmpty())
+	{
+		this->head = pointer;
+		this->tail = pointer;
+
+		size++;
+	}
+	else
+	{
+		pointer->prev = this->tail;
+		this->tail->next = pointer;
+		this->tail = pointer;
+
+		size++;
+	}
+
+	return this;
+}
+
+template <typename T>
+List<T>* List<T>::Prepend(const T& data)
+{
+	Node<T>* pointer = new Node<T>;
+
+	pointer->data = data;
+	pointer->next = nullptr;
+	pointer->prev = nullptr;
+
+	if (isEmpty())
+	{
+		this->head = pointer;
+		this->tail = pointer;
+
+		size++;
+	}
+	else
+	{
+		this->head->prev = pointer;
+		pointer->next = this->head;
+		this->head = pointer;
+
+		size++;
+	}
+
+	return this;
+}
+
+template <typename T>
+List<T>& List<T>::operator=(List<T>& other)
+{
+	Logger::Info("Used copying operator = of List<T>");
+	this->Clear();
+
+	for (T data : other)
+		Append(data);
+
+	return *this;
+}
+
+template <typename T>
+List<T>& List<T>::operator=(List<T>&& other)
+{
+	Logger::Info("Used moving operator = of List<T>");
+	this->Clear();
+
+	this->head = other.head;
+	this->tail = other.tail;
+	this->size = other.size;
+
+	other.head = nullptr;
+
+	return *this;
+}
