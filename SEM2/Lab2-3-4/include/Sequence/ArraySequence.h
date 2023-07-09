@@ -175,29 +175,21 @@ public:
 
 	/*
 	 * Appends to array a value.
-	 *
-	 * Has O(n) time complexity
 	 * */
 	Sequence<T>* Append(const T& data) override;
 
 	/*
 	 * Prepends to array a value.
-	 *
-	 * Has O(n) time complexity
 	 * */
 	Sequence<T>* Prepend(const T& data) override;
 
 	/*
 	 * Inserts a value to array.
-	 *
-	 * Has O(n) time complexity
 	 * */
 	void InsertAt(const Index index, const T& data) override;
 
 	/*
 	 * Removes a value from a array.
-	 *
-	 * Has O(n) time complexity
 	 * */
 	void Remove(const Index index) override;
 

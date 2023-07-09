@@ -121,22 +121,16 @@ public:
 
 	/*
 	 * Return an instance of what is at the head
-	 *
-	 * Has O(1) time complexity
 	 * */
 	T& GetFirst() const;
 
 	/*
 	 * Return an instance of what is at the tail
-	 *
-	 * Has O(1) time complexity
 	 * */
 	T& GetLast() const;
 
 	/*
 	 * Returns an instance of what is ath the index
-	 *
-	 * Has O(n) time complexity (with better coefficient)
 	 * */
 	T& Get(const Index index) const override;
 
@@ -159,8 +153,6 @@ public:
 
 	/*
 	 * Inserts exactly at the index inputed.
-	 *
-	 * Has O(n) time complexity (with better coefficient)
 	 * */
 	void insertAt(Index index, const T& data);
 
@@ -175,8 +167,6 @@ public:
 
 	/*
 	 * Returns an instance of what is ath the index
-	 *
-	 * Has O(n) time complexity (with better coefficient)
 	 * */
 	T& operator[](const Index index)
 	{
@@ -185,15 +175,11 @@ public:
 
 	/*
 	 * Destroys old list and makes deep copy of other
-	 *
-	 * Has O(n) time complexity
 	 * */
 	SegmentedList<T>& operator=(const SegmentedList<T>& other);
 
 	/*
 	 * Destroys old list and steals pointer from another
-	 *
-	 * Has O(1) time complexity
 	 * */
 	SegmentedList<T>& operator=(SegmentedList<T>&& other);
 

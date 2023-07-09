@@ -103,11 +103,9 @@ public:
 	/*
 	 * Reallocs memory to the new size
 	 *
-	 * This function has O(n) time complexity and can
 	 * realloc to size that is smaller than initial size before calling Realloc.
 	 * Realloc can throw int (Exception) and it is for user to catch it.
 	 * Exception can happen because of negative or zero size realloc.
-	 *
 	 * */
 	void Realloc(int newSize);
 
@@ -140,8 +138,6 @@ public:
 	/*
 	 * If two arrays have same size, all elements are the same
 	 * and in the same order then this two arrays are equal.
-	 *
-	 * Comparison have O(n) time complexity
 	 * */
 	bool operator==(const Array<T>& other);
 
@@ -160,9 +156,6 @@ public:
 	 * */
 	Array<T>& operator=(Array<T>&& other);
 
-	/*
-	 * From std::cout prints array to the console
-	 * */
 	friend std::ostream& operator<<(std::ostream& stream, const Array<T>& array)
 	{
 		if (array.isEmpty())

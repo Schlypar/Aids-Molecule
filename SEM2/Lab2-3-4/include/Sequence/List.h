@@ -138,22 +138,19 @@ public:
 
 	/*
 	 * Gets an instance of what is at the head.
-	 * O(1) is the time complexity. Throws int (Exception) if
-	 * list is empty.
+	 * Throws int (Exception) if list is empty.
 	 * */
 	T& GetFirst() const;
 
 	/*
 	 * Gets an instance of what is at the tail.
-	 * O(1) is the time complexity. Throws int (Exception) if
-	 * list is empty.
+	 * Throws int (Exception) if list is empty.
 	 * */
 	T& GetLast() const;
 
 	/*
 	 * Gets an instance of what is at the index.
-	 * O(n) is the time complexity. Throws int (Exception) if
-	 * list is empty or index is greater or lower than size of list
+	 * Throws int (Exception) if list is empty or index is greater or lower than size of list
 	 * */
 	T& Get(Index index) const override;
 
@@ -181,8 +178,6 @@ public:
 	 *
 	 * Throws int (Exception) if index is negative (or zero) or if index is
 	 * greater then size of list.
-	 *
-	 * Has O(n) time complexity
 	 * */
 	void InsertAt(Index index, const T& data);
 
@@ -193,8 +188,6 @@ public:
 	 *
 	 * Throws int (Exception) if index is negative (or zero) or if index is
 	 * greater then size of list
-	 *
-	 * Has O(n) time complexity
 	 * */
 	void Remove(Index index);
 
@@ -202,8 +195,6 @@ public:
 	 * Adds data at the begining of list.
 	 *
 	 * Return pointer to itself.
-	 *
-	 * Has O(1) time complexity.
 	 * */
 	List<T>* Append(const T& data) noexcept;
 
@@ -211,15 +202,12 @@ public:
 	 * Adds data at the end of list.
 	 *
 	 * Return pointer to itself.
-	 *
-	 * Has O(1) time complexity.
 	 * */
 	List<T>* Prepend(const T& data);
 
 	/*
 	 * Gets an instance of what is at the index.
-	 * O(n) is the time complexity. Throws int (Exception) if
-	 * list is empty or index is greater or lower than size of list
+	 * Throws int (Exception) if list is empty or index is greater or lower than size of list
 	 * */
 	T& operator[](Index index) const
 	{
@@ -228,15 +216,11 @@ public:
 
 	/*
 	 * Destroys old list and makes deep copy of other
-	 *
-	 * Has O(n) time complexity
 	 * */
 	List<T>& operator=(List<T>& other);
 
 	/*
 	 * Destroys old list and steals pointers from other
-	 *
-	 * Has O(1) time complexity
 	 * */
 	List<T>& operator=(List<T>&& other);
 
