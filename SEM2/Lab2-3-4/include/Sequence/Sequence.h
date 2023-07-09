@@ -17,14 +17,15 @@ public:
 	{
 	}
 
+	// Gets pointer to the first element
 	virtual T* GetFirstPointer() const = 0;
+	// Gets pointer to the last element
 	virtual T* GetEndPointer() const = 0;
 
+	// Begin for abstract iterator
 	virtual IIterator<T>* _Begin() const = 0;
+	// End for abstract iterator
 	virtual IIterator<T>* _End() const = 0;
-
-	Iter decltype(auto) begin();
-	Iter decltype(auto) end();
 
 	virtual T& GetFirst() const = 0;
 	virtual T& GetLast() const = 0;

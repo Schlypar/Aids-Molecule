@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <cmath>
 #include <cstdlib>
 #include <stdlib.h>
@@ -85,100 +86,35 @@ public:
 		Logger::Info("Destroyed Vector<T> of dimension %u", vector.GetLength());
 	}
 
-	void Randomize()
-	{
-		srand(time(NULL));
-		for (Index i = 0; i < Dimension(); i++)
-			vector[i] = T(std::rand() % 100 + (std::rand() % 100) / 100);
-	}
+	void Randomize();
 
-	void Normalize()
-	{
-		T norm = EuclidianNorm();
+	// Makes instance of vector to have length of one
+	void Normalize();
 
-		(*this) /= norm;
-	}
+	// Gets coordinate at index
+	T& Get(Index i) const;
 
-	T& Get(Index i) const
-	{
-		return vector[i];
-	}
+	// Gets max value from vector coordinates
+	T GetMax() const noexcept;
 
-	T GetMax() const noexcept
-	{
-		T max = Get(0);
-
-		for (Index i = 1; i < Dimension(); i++)
-			if (vector[i] > max)
-				max = vector[i];
-
-		return max;
-	}
-
+	// Gets number of coordinates that vector has
 	Size Dimension() const
 	{
 		return vector.GetLength();
 	}
 
-	T& operator[](Index i) const
-	{
-		if (i >= Dimension())
-		{
-			Logger::Info("At Vector<T> at operator[%u]", i);
-			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-			throw EXCEPTION_INDEX_OUT_OF_RANGE;
-		}
+	// Gets coordinate at index
+	T& operator[](Index i) const;
 
-		return vector[i];
-	}
+	// Destroys old vector and makes deep copy of other
+	Vector<T>& operator=(const Vector<T>& other);
 
-	Vector<T>& operator=(const Vector<T>& other)
-	{
-		Logger::Info("Used assignment operator= of Vector<T>");
+	// Destroys old vector and steals data from other
+	Vector<T>& operator=(Vector<T>&& other);
 
-		vector = other.vector;
+	bool operator==(const Vector<T>& other) const;
 
-		return *this;
-	}
-
-	Vector<T>& operator=(Vector<T>&& other)
-	{
-		Logger::Info("Used moving operator= of Vector<T>");
-		this->vector.Clear();
-
-		vector = other.vector;
-		other.vector = Array<T>();
-
-		return *this;
-	}
-
-	bool operator==(const Vector<T>& other) const
-	{
-		if (this->Dimension() != other.Dimension())
-			return false;
-
-		Size dim = this->Dimension();
-		for (Index i = 0; i < dim; i++)
-			if (vector[i] != other.vector[i])
-				return false;
-
-		return true;
-	}
-
-	Array<T> GetContainer() const
-	{
-		return vector;
-	}
-
-	T EuclidianNorm() const
-	{
-		T sum = T();
-
-		for (Index i = 0; i < Dimension(); i++)
-			sum += vector[i] * vector[i];
-
-		return std::sqrt(sum);
-	}
+	T EuclidianNorm() const;
 
 	template <typename U>
 	friend Vector<U> operator+(const Vector<U>& left, const Vector<U>& right);
@@ -207,14 +143,7 @@ public:
 	template <typename U>
 	friend Vector<U> operator*(const U& left, const Vector<U>& right);
 
-	template <typename U>
-	Vector<U>& operator/=(const U& other)
-	{
-		for (Index i = 0; i < Dimension(); i++)
-			vector[i] = vector[i] / other;
-
-		return *this;
-	}
+	Vector<T>& operator/=(const T& other);
 
 	template <typename U>
 	friend Vector<U> operator/(const Vector<U>& left, const U& right);
@@ -409,4 +338,114 @@ Vector<U> operator/(const Vector<U>& left, const U& right)
 		result[i] = result[i] / right;
 
 	return result;
+}
+
+template <typename T>
+Vector<T>& Vector<T>::operator/=(const T& other)
+{
+	for (Index i = 0; i < Dimension(); i++)
+		vector[i] = vector[i] / other;
+
+	return *this;
+}
+
+template <typename T>
+void Vector<T>::Randomize()
+{
+	srand(time(NULL));
+	for (Index i = 0; i < Dimension(); i++)
+		vector[i] = T(std::rand() % 100 + (std::rand() % 100) / 100);
+}
+
+template <typename T>
+void Vector<T>::Normalize()
+{
+	T norm = EuclidianNorm();
+
+	(*this) /= norm;
+}
+
+template <typename T>
+T& Vector<T>::Get(Index i) const
+{
+	if (i >= Dimension())
+	{
+		Logger::Info("At Vector<T> at operator[%u]", i);
+		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+		throw EXCEPTION_INDEX_OUT_OF_RANGE;
+	}
+
+	return vector[i];
+}
+
+template <typename T>
+T Vector<T>::GetMax() const noexcept
+{
+	T max = Get(0);
+
+	for (Index i = 1; i < Dimension(); i++)
+		if (vector[i] > max)
+			max = vector[i];
+
+	return max;
+}
+
+template <typename T>
+T& Vector<T>::operator[](Index i) const
+{
+	if (i >= Dimension())
+	{
+		Logger::Info("At Vector<T> at operator[%u]", i);
+		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+		throw EXCEPTION_INDEX_OUT_OF_RANGE;
+	}
+
+	return vector[i];
+}
+
+template <typename T>
+Vector<T>& Vector<T>::operator=(const Vector<T>& other)
+{
+	Logger::Info("Used assignment operator= of Vector<T>");
+
+	vector = other.vector;
+
+	return *this;
+}
+
+template <typename T>
+Vector<T>& Vector<T>::operator=(Vector<T>&& other)
+{
+	Logger::Info("Used moving operator= of Vector<T>");
+	this->vector.Clear();
+
+	vector = other.vector;
+	other.vector = Array<T>();
+
+	return *this;
+}
+
+template <typename T>
+bool Vector<T>::operator==(const Vector<T>& other) const
+{
+	if (this->Dimension() != other.Dimension())
+		return false;
+
+	Size dim = this->Dimension();
+	for (Index i = 0; i < dim; i++)
+		if (vector[i] != other.vector[i])
+			return false;
+
+	return true;
+}
+
+template <typename T>
+T Vector<T>::EuclidianNorm() const
+{
+	T sum = T();
+
+	for (Index i = 0; i < Dimension(); i++)
+		sum += vector[i] * vector[i];
+
+	return std::sqrt(sum);
 }
