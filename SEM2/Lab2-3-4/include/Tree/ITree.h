@@ -11,6 +11,8 @@
 #include "Sequence/Sequence.h"
 #include <functional>
 
+// Needed for traverse method.
+// Serves as parameters for the order of traversal of a tree
 enum TraverseOrder
 {
 	Left,
@@ -18,6 +20,7 @@ enum TraverseOrder
 	Right
 };
 
+// Function that will generate key for key-value pairs
 template <typename Tkey, typename Tvalue>
 using KGen = Tkey (*)(const Tvalue&);
 
@@ -71,62 +74,6 @@ public:
 		{
 		}
 
-		// TreeNode(const Tvalue& value, KGen<Tkey, Tvalue> kGen)
-		//     : key(Tkey())
-		//     , data(value)
-		//     , parent(nullptr)
-		//     , left(nullptr)
-		//     , right(nullptr)
-		// {
-		// 	key = kGen(data);
-		// }
-
-		// TreeNode(const Tvalue& value, KGenMulti<Tkey, Tvalue> kGen)
-		//     : key(Tkey(value))
-		//     , data(value)
-		//     , parent(nullptr)
-		//     , left(nullptr)
-		//     , right(nullptr)
-		// {
-		// 	key = kGenMulti(data);
-		// }
-
-		// TreeNode(const Tkey& key, const Tvalue& value)
-		//     : key(key)
-		//     , data(value)
-		//     , kGen([](Tvalue value) -> Tkey { return Tkey(value); })
-		//     , kGenMulti([](Stack<Tvalue> stack) -> Tkey { return Tkey(stack.Peek(0)); })
-		//     , parent(nullptr)
-		//     , left(nullptr)
-		//     , right(nullptr)
-		// {
-		// 	key = kGen(data);
-		// }
-
-		// TreeNode(const Tkey& key, const Tvalue& value, KGen<Tkey, Tvalue> kGen)
-		//     : key(key)
-		//     , data(value)
-		//     , kGen(kGen)
-		//     , kGenMulti([](Stack<Tvalue> stack) -> Tkey { return Tkey(stack.Peek(0)); })
-		//     , parent(nullptr)
-		//     , left(nullptr)
-		//     , right(nullptr)
-		// {
-		// 	// key = kGen(data);
-		// }
-
-		// TreeNode(const Tkey& key, const Tvalue& value, KGenMulti<Tkey, Tvalue> kGen)
-		//     : key(key)
-		//     , data(value)
-		//     , kGen(nullptr)
-		//     , kGenMulti(kGen)
-		//     , parent(nullptr)
-		//     , left(nullptr)
-		//     , right(nullptr)
-		// {
-		// 	// key = kGenMulti(data);
-		// }
-
 		TreeNode(TreeNode&& other)
 		{
 			key = other.key;
@@ -149,6 +96,10 @@ public:
 		{
 		}
 
+		// Finds the most right node from the current one.
+		// So right->right... until there is no right.
+		//
+		// Returns null if there is no right node.
 		friend TreeNode* MostRight(TreeNode* startNode) noexcept
 		{
 			if (startNode == nullptr)
@@ -162,6 +113,10 @@ public:
 			return (current != startNode) ? current : nullptr;
 		}
 
+		// Finds the most left node from the current one.
+		// So left->left... until there is no left.
+		//
+		// Returns null if there is no left node.
 		friend TreeNode* MostLeft(TreeNode* startNode) noexcept
 		{
 			if (startNode == nullptr)
@@ -185,124 +140,66 @@ public:
 		Logger::Info("Destroyed Tree<T>");
 	}
 
-	Tree<Tkey, Tvalue>* Map(Func<Tvalue> func)
-	{
-		Traverse(Left, Root, Right, func);
+	Tree<Tkey, Tvalue>* Map(Func<Tvalue> func);
 
-		return this;
-	}
+	Tree<Tkey, Tvalue>* Map(Func<Tvalue> func) const;
 
-	Tree<Tkey, Tvalue>* Map(Func<Tvalue> func) const
-	{
-		Tree<Tkey, Tvalue>* result = this->Copy();
+	Tree<Tkey, Tvalue>* Where(Condition<Tvalue> condition) const noexcept;
 
-		result->Traverse(Left, Root, Right, func);
+	Tree<Tkey, Tvalue>* Where(Condition<Tvalue> condition) noexcept;
 
-		return result;
-	}
+	Tree<Tkey, Tvalue>* Concat(Tree<Tkey, Tvalue>* other) noexcept;
 
-	Tree<Tkey, Tvalue>* Where(Condition<Tvalue> condition) const noexcept
-	{
-		Tree<Tkey, Tvalue>* result = Create();
+	Tree<Tkey, Tvalue>* Concat(Tree<Tkey, Tvalue>* other) const noexcept;
 
-		auto copy = this->Traverse(Root, Left, Right, [result, condition](Tvalue& val) -> void {
-			if (condition(val))
-				result->Add(val);
-		});
+	// Same as concat. Only becomes useful for Multi<T> cases
+	Tree<Tkey, Tvalue>* Merge(Tree<Tkey, Tvalue>* other) noexcept;
 
-		delete copy;
+	// Same as concat. Only becomes useful for Multi<T> cases
+	Tree<Tkey, Tvalue>* Merge(Tree<Tkey, Tvalue>* other) const noexcept;
 
-		return result;
-	}
-
-	Tree<Tkey, Tvalue>* Where(Condition<Tvalue> condition) noexcept
-	{
-		Tree<Tkey, Tvalue>* result = Create();
-
-		this->Traverse(Root, Left, Right, [result, condition](Tvalue& val) -> void {
-			if (condition(val))
-				result->Add(val);
-		});
-
-		return result;
-	}
-
-	Tree<Tkey, Tvalue>* Concat(Tree<Tkey, Tvalue>* other) noexcept
-	{
-		auto addEvery = [this, other](const Tvalue& value) -> void { this->Add(value); };
-
-		other->Traverse(Left, Root, Right, addEvery);
-
-		return this;
-	}
-
-	Tree<Tkey, Tvalue>* Concat(Tree<Tkey, Tvalue>* other) const noexcept
-	{
-		auto result = this->Copy();
-
-		auto addEvery = [result, other](const Tvalue& value) -> void { result->Add(value); };
-
-		other->Traverse(Left, Right, Root, addEvery);
-
-		result->Balance();
-
-		return result;
-	}
-
-	Tree<Tkey, Tvalue>* Merge(Tree<Tkey, Tvalue>* other) noexcept
-	{
-		auto isUnique = [this, other](Tvalue& value) -> void {
-			if (!(this->isThere(value)) && other->isThere(value))
-				this->Add(value);
-		};
-
-		other->Traverse(Left, Root, Right, isUnique);
-
-		this->Balance();
-
-		return this;
-	}
-
-	// only becomes useful for Multi<T> cases
-	Tree<Tkey, Tvalue>* Merge(Tree<Tkey, Tvalue>* other) const noexcept
-	{
-		auto result = this->Copy();
-
-		auto addIfUnique = [this, other, result](Tvalue& value) -> void {
-			if (!(this->isThere(value)) && other->isThere(value))
-				result->Add(value);
-		};
-
-		other->Traverse(Left, Root, Right, addIfUnique);
-
-		result->Balance();
-
-		return result;
-	}
-
+	// Finds node by value and returns pointer to it.
 	virtual NodePtr<Tkey, Tvalue> Find(const Tvalue& value) const noexcept = 0;
+	// Finds node by path and returns pointer to it. Throws if path is invalid.
 	virtual NodePtr<Tkey, Tvalue> Find(Sequence<TraverseOrder>* sequenceOfTraversion) const = 0;
 
+	// Checks if value is present in the tree.
 	virtual bool isThere(const Tvalue& value) const noexcept = 0;
 
+	// Calculates depth of a tree starting at the startNode
 	virtual Size Depth(NodePtr<Tkey, Tvalue> startNode) const noexcept = 0;
+	// Calculates depth of a tree starting at the startNode with parametrized initial depth
 	virtual Size Depth(NodePtr<Tkey, Tvalue> startNode, Size depth) const noexcept = 0;
+	// Calculates depth of a tree starting at the root
 	virtual Size Depth() const noexcept = 0;
 
+	// Inserts value to a tree
 	virtual Tree<Tkey, Tvalue>* Add(const Tvalue& value) noexcept = 0;
+
+	// Deletes value from a tree
 	virtual void Delete(const Tvalue& value) noexcept = 0;
+
+	// Returns pointer to the root node
 	virtual NodePtr<Tkey, Tvalue> GetRoot() const noexcept = 0;
 
+	// Travesing tree in specified order and maps some function to the values in nodes.
 	virtual void Traverse(NodePtr<Tkey, Tvalue> startNode, TraverseOrder first, TraverseOrder second, TraverseOrder third, std::function<void(Tvalue&)> func) = 0;
+	// Travesing tree in specified order and maps some function to the values in nodes. This method is for immutable data
 	virtual void Traverse(TraverseOrder first, TraverseOrder second, TraverseOrder third, std::function<void(Tvalue&)> func) = 0;
 
+	// Travesing tree in specified order and maps some function to the nodes.
 	virtual void Traverse(TraverseOrder first, TraverseOrder second, TraverseOrder third, std::function<void(NodePtr<Tkey, Tvalue>)> func) = 0;
+	// Travesing tree in specified order and maps some function to the nodes. This method is for immutable data
 	virtual void Traverse(NodePtr<Tkey, Tvalue> startNode, TraverseOrder first, TraverseOrder second, TraverseOrder third, std::function<void(NodePtr<Tkey, Tvalue>)> func) = 0;
 
+	// Traverse for chaining multiple actions on a single tree
 	virtual Tree<Tkey, Tvalue>* Traverse(TraverseOrder first, TraverseOrder second, TraverseOrder third, std::function<void(Tvalue&)> func) const = 0;
 
+	// Returns diff of depths of left and right subtrees starting from root node
 	virtual int BalanceFactor() const noexcept = 0;
+	// Returns diff of depths of left and right subtrees starting from 'startNode'
 	virtual int BalanceFactor(NodePtr<Tkey, Tvalue> startNode) const noexcept = 0;
+	// Function that balances a tree. Automatically calls itself after each Add or Delete methods
 	virtual void Balance() noexcept = 0;
 
 	virtual Tree<Tkey, Tvalue>* Create() const noexcept = 0;
@@ -329,3 +226,105 @@ public:
 		return stream;
 	}
 };
+
+template <typename Tkey, typename Tvalue>
+Tree<Tkey, Tvalue>* Tree<Tkey, Tvalue>::Map(Func<Tvalue> func)
+{
+	Traverse(Left, Root, Right, func);
+
+	return this;
+}
+
+template <typename Tkey, typename Tvalue>
+Tree<Tkey, Tvalue>* Tree<Tkey, Tvalue>::Map(Func<Tvalue> func) const
+{
+	Tree<Tkey, Tvalue>* result = this->Copy();
+
+	result->Traverse(Left, Root, Right, func);
+
+	return result;
+}
+
+template <typename Tkey, typename Tvalue>
+Tree<Tkey, Tvalue>* Tree<Tkey, Tvalue>::Where(Condition<Tvalue> condition) const noexcept
+{
+	Tree<Tkey, Tvalue>* result = Create();
+
+	auto copy = this->Traverse(Root, Left, Right, [result, condition](Tvalue& val) -> void {
+		if (condition(val))
+			result->Add(val);
+	});
+
+	delete copy;
+
+	return result;
+}
+
+template <typename Tkey, typename Tvalue>
+Tree<Tkey, Tvalue>* Tree<Tkey, Tvalue>::Where(Condition<Tvalue> condition) noexcept
+{
+	Tree<Tkey, Tvalue>* result = Create();
+
+	this->Traverse(Root, Left, Right, [result, condition](Tvalue& val) -> void {
+		if (condition(val))
+			result->Add(val);
+	});
+
+	return result;
+}
+
+template <typename Tkey, typename Tvalue>
+Tree<Tkey, Tvalue>* Tree<Tkey, Tvalue>::Concat(Tree<Tkey, Tvalue>* other) noexcept
+{
+	auto addEvery = [this, other](const Tvalue& value) -> void { this->Add(value); };
+
+	other->Traverse(Left, Root, Right, addEvery);
+
+	return this;
+}
+
+template <typename Tkey, typename Tvalue>
+Tree<Tkey, Tvalue>* Tree<Tkey, Tvalue>::Concat(Tree<Tkey, Tvalue>* other) const noexcept
+{
+	auto result = this->Copy();
+
+	auto addEvery = [result, other](const Tvalue& value) -> void { result->Add(value); };
+
+	other->Traverse(Left, Right, Root, addEvery);
+
+	result->Balance();
+
+	return result;
+}
+
+template <typename Tkey, typename Tvalue>
+Tree<Tkey, Tvalue>* Tree<Tkey, Tvalue>::Merge(Tree<Tkey, Tvalue>* other) noexcept
+{
+	auto isUnique = [this, other](Tvalue& value) -> void {
+		if (!(this->isThere(value)) && other->isThere(value))
+			this->Add(value);
+	};
+
+	other->Traverse(Left, Root, Right, isUnique);
+
+	this->Balance();
+
+	return this;
+}
+
+template <typename Tkey, typename Tvalue>
+Tree<Tkey, Tvalue>* Tree<Tkey, Tvalue>::Merge(Tree<Tkey, Tvalue>* other) const noexcept
+{
+	auto result = this->Copy();
+
+	auto addIfUnique = [this, other, result](Tvalue& value) -> void {
+		if (!(this->isThere(value)) && other->isThere(value))
+			result->Add(value);
+	};
+
+	other->Traverse(Left, Root, Right, addIfUnique);
+
+	result->Balance();
+
+	return result;
+}

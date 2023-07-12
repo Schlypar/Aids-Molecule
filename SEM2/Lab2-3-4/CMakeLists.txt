@@ -70,9 +70,10 @@ set(SOURCES_HEADERS
         ${INCLUDE}/Allocator.h
         ${INCLUDE}/complex.h
         ${INCLUDE}/Logger.h
-        ${INCLUDE}/CString.h
         ${INCLUDE}/Pair.h
         ${INCLUDE}/Tuple.h
+        ${INCLUDE}/str/CString.h
+        ${INCLUDE}/str/CString.cpp
         ${INCLUDE}/functional/Algorithms.h
         ${INCLUDE}/Sequence/ListSequence.h
         ${INCLUDE}/Sequence/SegmentedList.h
@@ -165,8 +166,4 @@ add_executable(${TEST_PROJECT_NAME}
 target_include_directories(${TEST_PROJECT_NAME} PRIVATE ${SOURCE_DIR})
 target_include_directories(${TEST_PROJECT_NAME} PRIVATE ${INCLUDE})
 # target_link_libraries(${TEST_PROJECT_NAME} PRIVATE Catch2::Catch2WithMain)
-#
-# include(CTest)
-# include(Catch)
-# catch_discover_tests(${TEST_PROJECT_NAME})
-# enable_testing()
+
