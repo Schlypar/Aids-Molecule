@@ -2,7 +2,7 @@
 #include "Sequence/Array.h"
 #include "moduleTest.h"
 
-#include "CString.h"
+#include "str/CString.h"
 #include <catch2/catch.hpp>
 
 TEST_CASE("Default constructor of String class")

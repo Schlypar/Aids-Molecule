@@ -1,10 +1,10 @@
 #include "Logger.h"
 #include "moduleTest.h"
 
-#include "CString.h"
 #include "Pair.h"
 #include "Sequence/ListSequence.h"
 #include "Tree/BinaryHeap.h"
+#include "str/CString.h"
 
 template <typename T1, typename T2>
 using BinHeapPtr = SharedPtr<BinaryHeap<T1, T2>>;
