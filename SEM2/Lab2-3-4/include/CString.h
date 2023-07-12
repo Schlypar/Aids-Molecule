@@ -64,237 +64,56 @@ public:
 		return string.GetLength();
 	}
 
-	Size Count(char suspect)
-	{
-		if (isEmpty())
-			return 0;
+	// Counts how many of suspect is in the string
+	Size Count(char suspect);
 
-		Size count = 0;
-		for (Index i = 0; i < string.GetLength(); i++)
-			if (this->string[i] == suspect)
-				count++;
-
-		return count;
-	}
-
-	void Replace(char what, char with, Size howMuch)
-	{
-		if (Length() == 0 || howMuch > Length())
-		{
-			Logger::Trace("At String at Replace(char, char, Size)");
-			logException(EXCEPTION_BAD_LOGIC);
-			throw EXCEPTION_BAD_LOGIC;
-		}
-
-		if (Count(what) < howMuch)
-		{
-			Logger::Trace("At String at Replace(char, char, Size)");
-			logException(EXCEPTION_BAD_LOGIC);
-			throw EXCEPTION_BAD_LOGIC;
-		}
-
-		Index i = 0;
-		Size count = 0;
-
-		while (count < howMuch)
-		{
-			if (this->string[i] == what)
-			{
-				this->string[i] = with;
-				count++;
-			}
-
-			i++;
-		}
-	}
+	// Replaces first 'howMuch' chars of 'what' with 'with'
+	void Replace(char what, char with, Size howMuch);
 
 	bool isEmpty() const noexcept
 	{
 		return Length() == 0;
 	}
 
-	bool isThere(char suspect) const noexcept
+	char& operator[](Index index) const noexcept
 	{
-		if (this->string[0] == suspect)
-			return true;
-
-		return (LFind(suspect) == -1) ? false : true;
+		return string.Get(index);
 	}
 
-	bool isThere(const String& suspect) const noexcept
-	{
-		if (isEmpty() && !suspect.isEmpty())
-			return false;
+	// Checks if suspect char is in string
+	bool isThere(char suspect) const noexcept;
 
-		if (!isEmpty() && suspect.isEmpty())
-			return false;
+	// Checks if suspect string is a substring of a string
+	bool isThere(const String& suspect) const noexcept;
 
-		if (isEmpty() && suspect.isEmpty())
-			return true;
+	// Slices entire string into the curren from starting from index (in the current)
+	void Slice(Index start, const String& toBeInserted);
 
-		if (this->Length() < suspect.Length())
-			return false;
+	// Slices entire string into the curren from starting from index (in the current). This method is is for immutable String
+	String Slice(Index start, const String& toBeInserted) const;
 
-		Index suspectStart = LFind(suspect[0]);
-		Index suspectEnd = suspectStart + suspect.Length() - 1;
-		Size segmentLength = suspectEnd - suspectStart;
+	Index LFind(char suspect) const noexcept;
 
-		if (segmentLength == 0)
-			return isThere(suspect[0]);
+	Index RFind(char suspect) const noexcept;
 
-		while (1)
-		{
-			for (Index i = 0; i < segmentLength; i++)
-				if (this->string[suspectStart] == suspect[i])
-					return true;
+	String& operator=(const String& other);
 
-			suspectStart++;
-			while (this->string[suspectStart] != suspect[0])
-			{
-				suspectStart++;
+	String& operator=(String&& other);
 
-				if (suspectStart == this->Length())
-					return false;
-			}
+	// Creates substring from start to inclusive end
+	String GetSubString(Index start, Index end) const;
 
-			Index suspectEnd = suspectStart + suspect.Length() - 1;
-			Size segmentLength = suspectEnd - suspectStart;
-		}
-	}
+	// Splits on the first pivot char
+	Pair<String, String> Split(char pivot) const noexcept;
 
-	void Slice(Index start, const String& toBeInserted)
-	{
-		if (start >= Length() || start + toBeInserted.Length() >= Length())
-		{
-			Logger::Trace("At String at Slice(Index, const String&)");
-			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-			throw EXCEPTION_INDEX_OUT_OF_RANGE;
-		}
-
-		if (toBeInserted.isEmpty())
-		{
-			for (Index i = start; i < Length() - 1; i++)
-				this->string[i] = this->string[i + 1];
-
-			return;
-		}
-
-		for (Index i = 0; i < toBeInserted.Length(); i++)
-			this->string[start + i] = toBeInserted[i];
-	}
-
-	String Slice(Index start, const String& toBeInserted) const
-	{
-		if (start >= Length() || start + toBeInserted.Length() >= Length())
-		{
-			Logger::Trace("At String at Slice(Index, const String&)");
-			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-			throw EXCEPTION_INDEX_OUT_OF_RANGE;
-		}
-
-		String result = *this;
-
-		if (toBeInserted.isEmpty())
-		{
-			for (Index i = start; i < Length() - 1; i++)
-				result.string[i] = result.string[i + 1];
-
-			return result;
-		}
-
-		for (Index i = 0; i < toBeInserted.Length(); i++)
-			result.string[start + i] = toBeInserted[i];
-
-		return result;
-	}
-
-	Index LFind(char suspect) const noexcept
-	{
-		if (isEmpty())
-			return -1;
-
-		for (Index i = 0; i < Length(); i++)
-			if (this->string[i] == suspect)
-				return i;
-
-		return -1;
-	}
-
-	Index RFind(char suspect) const noexcept
-	{
-		if (isEmpty())
-			return -1;
-
-		for (Index i = Length() - 1; i > 0; i--)
-			if (this->string[i] == suspect)
-				return i;
-
-		return -1;
-	}
-
-	String& operator=(const String& other)
-	{
-		this->string = other.string;
-
-		return *this;
-	}
-
-	String& operator=(String&& other)
-	{
-		this->string = other.string;
-		other.string = Array<char>();
-
-		return *this;
-	}
-
-	String GetSubString(Index start, Index end) const
-	{
-		if (start > end || start < 0 || end >= Length())
-		{
-			Logger::Trace("At String at GetSubString(Index, Index)");
-			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-			throw EXCEPTION_INDEX_OUT_OF_RANGE;
-		}
-
-		String result = String(size_t(end - start + 1));
-
-		for (Index i = start; i <= end; i++)
-			result[i - start] = this->string[i];
-
-		return result;
-	}
-
-	Pair<String, String> Split(char pivot) const noexcept
-	{
-		if (!isThere(pivot))
-			return Pair<String, String>(String(*this), String());
-
-		Index pivotIndex = LFind(pivot);
-
-		String left = GetSubString(0, pivotIndex);
-		String right = GetSubString(pivotIndex + 1, Length() - 1);
-
-		return Pair<String, String>(left, right);
-	}
-
-	bool operator==(const String& other) const noexcept
-	{
-		if (this->Length() != other.Length())
-			return false;
-
-		Size length = this->Length();
-		for (Index i = 0; i < length; i++)
-			if (this->string[i] != other.string[i])
-				return false;
-
-		return true;
-	}
+	bool operator==(const String& other) const noexcept;
 
 	bool operator!=(const String& other) const noexcept
 	{
 		return !(*this == other);
 	}
 
+	// Concatenation of two strings
 	friend String operator+(const String& left, const String& rigth)
 	{
 		String result = String(size_t(left.Length() + rigth.Length()));
@@ -308,6 +127,7 @@ public:
 		return result;
 	}
 
+	// Repeats same string for inputed number of times
 	friend String operator*(const String& left, const int& right)
 	{
 		String result = String(size_t(left.Length() * right));
@@ -324,6 +144,7 @@ public:
 		return result;
 	}
 
+	// Repeats same string for inputed number of times
 	friend String operator*(int left, const String& right)
 	{
 		String result = String(size_t(right.Length() * left + 1));
@@ -338,11 +159,6 @@ public:
 		}
 
 		return result;
-	}
-
-	char& operator[](Index index) const noexcept
-	{
-		return string.Get(index);
 	}
 
 	friend std::ostream& operator<<(std::ostream& stream, const String& string)
@@ -363,3 +179,224 @@ public:
 		return stream;
 	}
 };
+
+Size String::Count(char suspect)
+{
+	if (isEmpty())
+		return 0;
+
+	Size count = 0;
+	for (Index i = 0; i < string.GetLength(); i++)
+		if (this->string[i] == suspect)
+			count++;
+
+	return count;
+}
+
+void String::Replace(char what, char with, Size howMuch)
+{
+	if (Length() == 0 || howMuch > Length())
+	{
+		Logger::Trace("At String at Replace(char, char, Size)");
+		logException(EXCEPTION_BAD_LOGIC);
+		throw EXCEPTION_BAD_LOGIC;
+	}
+
+	if (Count(what) < howMuch)
+	{
+		Logger::Trace("At String at Replace(char, char, Size)");
+		logException(EXCEPTION_BAD_LOGIC);
+		throw EXCEPTION_BAD_LOGIC;
+	}
+
+	Index i = 0;
+	Size count = 0;
+
+	while (count < howMuch)
+	{
+		if (this->string[i] == what)
+		{
+			this->string[i] = with;
+			count++;
+		}
+
+		i++;
+	}
+}
+
+bool String::isThere(char suspect) const noexcept
+{
+	if (this->string[0] == suspect)
+		return true;
+
+	return (LFind(suspect) == -1) ? false : true;
+}
+
+bool String::isThere(const String& suspect) const noexcept
+{
+	if (isEmpty() && !suspect.isEmpty())
+		return false;
+
+	if (!isEmpty() && suspect.isEmpty())
+		return false;
+
+	if (isEmpty() && suspect.isEmpty())
+		return true;
+
+	if (this->Length() < suspect.Length())
+		return false;
+
+	Index suspectStart = LFind(suspect[0]);
+	Index suspectEnd = suspectStart + suspect.Length() - 1;
+	Size segmentLength = suspectEnd - suspectStart;
+
+	if (segmentLength == 0)
+		return isThere(suspect[0]);
+
+	while (1)
+	{
+		for (Index i = 0; i < segmentLength; i++)
+			if (this->string[suspectStart] == suspect[i])
+				return true;
+
+		suspectStart++;
+		while (this->string[suspectStart] != suspect[0])
+		{
+			suspectStart++;
+
+			if (suspectStart == this->Length())
+				return false;
+		}
+
+		Index suspectEnd = suspectStart + suspect.Length() - 1;
+		Size segmentLength = suspectEnd - suspectStart;
+	}
+}
+
+void String::Slice(Index start, const String& toBeInserted)
+{
+	if (start >= Length() || start + toBeInserted.Length() >= Length())
+	{
+		Logger::Trace("At String at Slice(Index, const String&)");
+		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+		throw EXCEPTION_INDEX_OUT_OF_RANGE;
+	}
+
+	if (toBeInserted.isEmpty())
+	{
+		for (Index i = start; i < Length() - 1; i++)
+			this->string[i] = this->string[i + 1];
+
+		return;
+	}
+
+	for (Index i = 0; i < toBeInserted.Length(); i++)
+		this->string[start + i] = toBeInserted[i];
+}
+
+String String::Slice(Index start, const String& toBeInserted) const
+{
+	if (start >= Length() || start + toBeInserted.Length() >= Length())
+	{
+		Logger::Trace("At String at Slice(Index, const String&)");
+		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+		throw EXCEPTION_INDEX_OUT_OF_RANGE;
+	}
+
+	String result = *this;
+
+	if (toBeInserted.isEmpty())
+	{
+		for (Index i = start; i < Length() - 1; i++)
+			result.string[i] = result.string[i + 1];
+
+		return result;
+	}
+
+	for (Index i = 0; i < toBeInserted.Length(); i++)
+		result.string[start + i] = toBeInserted[i];
+
+	return result;
+}
+
+Index String::LFind(char suspect) const noexcept
+{
+	if (isEmpty())
+		return -1;
+
+	for (Index i = 0; i < Length(); i++)
+		if (this->string[i] == suspect)
+			return i;
+
+	return -1;
+}
+
+Index String::RFind(char suspect) const noexcept
+{
+	if (isEmpty())
+		return -1;
+
+	for (Index i = Length() - 1; i > 0; i--)
+		if (this->string[i] == suspect)
+			return i;
+
+	return -1;
+}
+
+String& String::operator=(const String& other)
+{
+	this->string = other.string;
+
+	return *this;
+}
+
+String& String::operator=(String&& other)
+{
+	this->string = other.string;
+	other.string = Array<char>();
+
+	return *this;
+}
+
+String String::GetSubString(Index start, Index end) const
+{
+	if (start > end || start < 0 || end >= Length())
+	{
+		Logger::Trace("At String at GetSubString(Index, Index)");
+		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+		throw EXCEPTION_INDEX_OUT_OF_RANGE;
+	}
+
+	String result = String(size_t(end - start + 1));
+
+	for (Index i = start; i <= end; i++)
+		result[i - start] = this->string[i];
+
+	return result;
+}
+
+bool String::operator==(const String& other) const noexcept
+{
+	if (this->Length() != other.Length())
+		return false;
+
+	Size length = this->Length();
+	for (Index i = 0; i < length; i++)
+		if (this->string[i] != other.string[i])
+			return false;
+
+	return true;
+}
+
+Pair<String, String> String::Split(char pivot) const noexcept
+{
+	if (!isThere(pivot))
+		return Pair<String, String>(String(*this), String());
+
+	Index pivotIndex = LFind(pivot);
+
+	String left = GetSubString(0, pivotIndex);
+	String right = GetSubString(pivotIndex + 1, Length() - 1);
+
+	return Pair<String, String>(left, right);
+}
