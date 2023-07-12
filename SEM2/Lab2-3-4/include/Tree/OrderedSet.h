@@ -50,106 +50,37 @@ public:
 	{
 	}
 
+	// Adds value to the set
 	OrderedSet<T>* Include(const T& value) noexcept
 	{
 		return (OrderedSet<T>*) (((BinarySearchTree<T>*) this)->Add(value));
 	}
 
+	// Deletes value from a set
 	void Erase(const T& value) noexcept
 	{
 		((BinarySearchTree<T>*) this)->Delete(value);
 	}
 
-	OrderedSet<T>* Union(const OrderedSet<T>* other) const noexcept
-	{
-		OrderedSet<T>* result = (OrderedSet<T>*) this->Copy();
+	// Mathematical union of two sets
+	OrderedSet<T>* Union(const OrderedSet<T>* other) const noexcept;
 
-		result->Concat((Tree<T, T>*) other);
+	// Mathematical intersection of two sets
+	OrderedSet<T>* Intersection(const OrderedSet<T>* other) const noexcept;
 
-		return result;
-	}
+	// Mathematical difference between two sets
+	OrderedSet<T>* Difference(const OrderedSet<T>* other) const noexcept;
 
-	OrderedSet<T>* operator+(const OrderedSet<T>* other) const noexcept
-	{
-		return this->Union(other);
-	}
+	bool IncludesSubset(const OrderedSet<T>* other);
 
-	OrderedSet<T>* Intersection(const OrderedSet<T>* other) const noexcept
-	{
-		OrderedSet<T>* result = (OrderedSet<T>*) this->Create();
-
-		auto add = [this, other, result](const T& value) -> void {
-			if (this->Includes(value) && other->Includes(value))
-				result->Include(value);
-		};
-
-		auto copy = this->Traverse(Left, Right, Root, add);
-		delete copy;
-
-		return result;
-	}
-
-	OrderedSet<T>* operator*(const OrderedSet<T>* other) const noexcept
-	{
-		return this->Intersection(other);
-	}
-
-	OrderedSet<T>* Difference(const OrderedSet<T>* other) const noexcept
-	{
-		OrderedSet<T>* result = (OrderedSet<T>*) this->Create();
-
-		auto isUnique = [this, other](const T& value) -> bool {
-			if (this->Includes(value) && other->Includes(value))
-				return false;
-
-			return true;
-		};
-
-		auto addIfUnique = [isUnique, result, this](const T& value) -> void {
-			if (isUnique(value) && this->Includes(value))
-				result->Add(value);
-		};
-
-		auto copy = this->Traverse(Left, Right, Root, addIfUnique);
-		delete copy;
-
-		return result;
-	}
-
-	OrderedSet<T>* operator/(const OrderedSet<T>* other) const noexcept
-	{
-		return this->Difference(other);
-	}
-
-	bool IncludesSubset(const OrderedSet<T>* other)
-	{
-		bool result = true;
-		bool* includes = &result;
-
-		auto alterIncludes = [&includes, this](const T& value) -> void {
-			if (this->Includes(value) == false)
-				*includes = false;
-		};
-
-		auto copy = other->Traverse(Left, Right, Root, alterIncludes);
-		delete copy;
-
-		return result;
-	}
-
-	bool isEquals(const OrderedSet<T>* other)
-	{
-		if (this->IncludesSubset(other) && other->IncludesSubset(this))
-			return true;
-		else
-			return false;
-	}
+	bool isEquals(const OrderedSet<T>* other);
 
 	bool Includes(const T& value) const noexcept
 	{
 		return this->isThere(value);
 	}
 
+	// Returns number of elements in a set
 	friend Size Cardinalis(const OrderedSet<T>* set)
 	{
 		Size power = 0;
@@ -205,3 +136,78 @@ public:
 		return (Tree<T, T>*) new OrderedSet<T>(this);
 	}
 };
+
+template <Comparible T>
+OrderedSet<T>* OrderedSet<T>::Union(const OrderedSet<T>* other) const noexcept
+{
+	OrderedSet<T>* result = (OrderedSet<T>*) this->Copy();
+
+	result->Concat((Tree<T, T>*) other);
+
+	return result;
+}
+
+template <Comparible T>
+OrderedSet<T>* OrderedSet<T>::Intersection(const OrderedSet<T>* other) const noexcept
+{
+	OrderedSet<T>* result = (OrderedSet<T>*) this->Create();
+
+	auto add = [this, other, result](const T& value) -> void {
+		if (this->Includes(value) && other->Includes(value))
+			result->Include(value);
+	};
+
+	auto copy = this->Traverse(Left, Right, Root, add);
+	delete copy;
+
+	return result;
+}
+
+template <Comparible T>
+OrderedSet<T>* OrderedSet<T>::Difference(const OrderedSet<T>* other) const noexcept
+{
+	OrderedSet<T>* result = (OrderedSet<T>*) this->Create();
+
+	auto isUnique = [this, other](const T& value) -> bool {
+		if (this->Includes(value) && other->Includes(value))
+			return false;
+
+		return true;
+	};
+
+	auto addIfUnique = [isUnique, result, this](const T& value) -> void {
+		if (isUnique(value) && this->Includes(value))
+			result->Add(value);
+	};
+
+	auto copy = this->Traverse(Left, Right, Root, addIfUnique);
+	delete copy;
+
+	return result;
+}
+
+template <Comparible T>
+bool OrderedSet<T>::IncludesSubset(const OrderedSet<T>* other)
+{
+	bool result = true;
+	bool* includes = &result;
+
+	auto alterIncludes = [&includes, this](const T& value) -> void {
+		if (this->Includes(value) == false)
+			*includes = false;
+	};
+
+	auto copy = other->Traverse(Left, Right, Root, alterIncludes);
+	delete copy;
+
+	return result;
+}
+
+template <Comparible T>
+bool OrderedSet<T>::isEquals(const OrderedSet<T>* other)
+{
+	if (this->IncludesSubset(other) && other->IncludesSubset(this))
+		return true;
+	else
+		return false;
+}

@@ -63,83 +63,9 @@ public:
 		return stream;
 	}
 
-	Tree<P, T>* Add(const T& value) noexcept override
-	{
-		if (this->root == nullptr)
-		{
-			this->root = NodePtr<P, T>(new TreeNode<P, T>(value));
-			return this;
-		}
+	Tree<P, T>* Add(const T& value) noexcept override;
 
-		P valueKey = this->kGen(value);
-
-		NodePtr<P, T> current = this->root.Get();
-
-		while (NOT_DONE)
-		{
-			if (current->left == nullptr)
-			{
-				current->left = new TreeNode<P, T>(value);
-				current->left->key = valueKey;
-				current->left->parent = current;
-
-				this->Balance();
-				return this;
-			}
-			if (current->right == nullptr)
-			{
-				current->right = new TreeNode<P, T>(value);
-				current->right->key = valueKey;
-				current->right->parent = current;
-
-				this->Balance();
-				return this;
-			}
-
-			if (this->Depth(current->left.Get()) < this->Depth(current->right.Get()))
-				current = current->left.Get();
-			else
-				current = current->right.Get();
-		}
-
-		this->Balance();
-		return this;
-	}
-
-	void Delete(const T& value) noexcept override
-	{
-		auto deleter = [this](NodePtr<P, T> node) -> void {
-			while (node->left != nullptr || node->right != nullptr)
-			{
-				NodePtr<P, T> withMaxValue = nullptr;
-				if (node->left != nullptr && node->right != nullptr)
-					withMaxValue = (node->left->key > node->right->key) ? node->left.Get()
-											    : node->right.Get();
-				else if (node->left != nullptr)
-					withMaxValue = node->left.Get();
-				else
-					withMaxValue = node->right.Get();
-
-				this->PushDown(node);
-				node = withMaxValue;
-			}
-
-			NodePtr<P, T> parent = node->parent;
-
-			if (parent->left.Get() == node)
-				parent->left = nullptr;
-			else
-				parent->right = nullptr;
-
-			node->parent = nullptr;
-			delete node;
-		};
-
-		this->Traverse(Left, Right, Root, [deleter, value](NodePtr<P, T> node) -> void {
-			if (node->data == value)
-				deleter(node);
-		});
-	}
+	void Delete(const T& value) noexcept override;
 
 	Tree<P, T>* Create() const noexcept override
 	{
@@ -157,57 +83,146 @@ public:
 	}
 
 private:
-	void PushUp(NodePtr<P, T> node) noexcept
-	{
-		std::swap(node->data, node->parent->data);
-		std::swap(node->key, node->parent->key);
-	}
+	// swaps values with parent of the 'node'
+	void PushUp(NodePtr<P, T> node) noexcept;
 
-	void PushDown(NodePtr<P, T> node) noexcept
-	{
-		NodePtr<P, T> withMaxValue = nullptr;
-		if (node->left != nullptr && node->right != nullptr)
-			withMaxValue = (node->left->key > node->right->key) ? node->left.Get() : node->right.Get();
-		else if (node->left != nullptr)
-			withMaxValue = node->left.Get();
-		else
-			withMaxValue = node->right.Get();
+	// swaps values with 'bigger' child node
+	void PushDown(NodePtr<P, T> node) noexcept;
 
-		std::swap(node->data, withMaxValue->data);
-		std::swap(node->key, withMaxValue->key);
-	}
-
-	void Balance() noexcept override
-	{
-		auto pushUp = [this](NodePtr<P, T> node) -> void {
-			while (node->parent != nullptr && node->parent->key < node->key)
-			{
-				this->PushUp(node);
-				node = node->parent;
-			}
-		};
-
-		auto pushDown = [this](NodePtr<P, T> node) -> void {
-			while ((node->left != nullptr && node->key < node->left->key)
-				|| (node->right != nullptr && node->key < node->right->key))
-			{
-				NodePtr<P, T> withMaxValue = nullptr;
-				if (node->left != nullptr && node->right != nullptr)
-					withMaxValue = (node->left->key > node->right->key) ? node->left.Get()
-											    : node->right.Get();
-				else if (node->left != nullptr)
-					withMaxValue = node->left.Get();
-				else
-					withMaxValue = node->right.Get();
-
-				this->PushDown(node);
-				node = withMaxValue;
-			}
-		};
-
-		this->Traverse(Left, Right, Root, [pushUp, pushDown](NodePtr<P, T> node) -> void {
-			pushUp(node);
-			pushDown(node);
-		});
-	}
+	void Balance() noexcept override;
 };
+
+template <Comparible P, typename T>
+Tree<P, T>* BinaryHeap<P, T>::Add(const T& value) noexcept
+{
+	if (this->root == nullptr)
+	{
+		this->root = NodePtr<P, T>(new TreeNode<P, T>(value));
+		return this;
+	}
+
+	P valueKey = this->kGen(value);
+
+	NodePtr<P, T> current = this->root.Get();
+
+	while (NOT_DONE)
+	{
+		if (current->left == nullptr)
+		{
+			current->left = new TreeNode<P, T>(value);
+			current->left->key = valueKey;
+			current->left->parent = current;
+
+			this->Balance();
+			return this;
+		}
+		if (current->right == nullptr)
+		{
+			current->right = new TreeNode<P, T>(value);
+			current->right->key = valueKey;
+			current->right->parent = current;
+
+			this->Balance();
+			return this;
+		}
+
+		if (this->Depth(current->left.Get()) < this->Depth(current->right.Get()))
+			current = current->left.Get();
+		else
+			current = current->right.Get();
+	}
+
+	this->Balance();
+	return this;
+}
+
+template <Comparible P, typename T>
+void BinaryHeap<P, T>::Delete(const T& value) noexcept
+{
+	auto deleter = [this](NodePtr<P, T> node) -> void {
+		while (node->left != nullptr || node->right != nullptr)
+		{
+			NodePtr<P, T> withMaxValue = nullptr;
+			if (node->left != nullptr && node->right != nullptr)
+				withMaxValue = (node->left->key > node->right->key) ? node->left.Get() : node->right.Get();
+			else if (node->left != nullptr)
+				withMaxValue = node->left.Get();
+			else
+				withMaxValue = node->right.Get();
+
+			this->PushDown(node);
+			node = withMaxValue;
+		}
+
+		NodePtr<P, T> parent = node->parent;
+
+		if (parent->left.Get() == node)
+			parent->left = nullptr;
+		else
+			parent->right = nullptr;
+
+		node->parent = nullptr;
+		delete node;
+	};
+
+	this->Traverse(Left, Right, Root, [deleter, value](NodePtr<P, T> node) -> void {
+		if (node->data == value)
+			deleter(node);
+	});
+}
+
+template <Comparible P, typename T>
+void BinaryHeap<P, T>::PushUp(NodePtr<P, T> node) noexcept
+{
+	std::swap(node->data, node->parent->data);
+	std::swap(node->key, node->parent->key);
+}
+
+template <Comparible P, typename T>
+void BinaryHeap<P, T>::PushDown(NodePtr<P, T> node) noexcept
+{
+	NodePtr<P, T> withMaxValue = nullptr;
+	if (node->left != nullptr && node->right != nullptr)
+		withMaxValue = (node->left->key > node->right->key) ? node->left.Get() : node->right.Get();
+	else if (node->left != nullptr)
+		withMaxValue = node->left.Get();
+	else
+		withMaxValue = node->right.Get();
+
+	std::swap(node->data, withMaxValue->data);
+	std::swap(node->key, withMaxValue->key);
+}
+
+template <Comparible P, typename T>
+void BinaryHeap<P, T>::Balance() noexcept
+{
+	auto pushUp = [this](NodePtr<P, T> node) -> void {
+		while (node->parent != nullptr && node->parent->key < node->key)
+		{
+			this->PushUp(node);
+			node = node->parent;
+		}
+	};
+
+	auto pushDown = [this](NodePtr<P, T> node) -> void {
+		while ((node->left != nullptr && node->key < node->left->key)
+			|| (node->right != nullptr && node->key < node->right->key))
+		{
+			NodePtr<P, T> withMaxValue = nullptr;
+			if (node->left != nullptr && node->right != nullptr)
+				withMaxValue = (node->left->key > node->right->key) ? node->left.Get() : node->right.Get();
+			else if (node->left != nullptr)
+				withMaxValue = node->left.Get();
+			else
+				withMaxValue = node->right.Get();
+
+			this->PushDown(node);
+			node = withMaxValue;
+		}
+	};
+
+	this->Traverse(Left, Right, Root, [pushUp, pushDown](NodePtr<P, T> node) -> void {
+		pushUp(node);
+		pushDown(node);
+	});
+}
