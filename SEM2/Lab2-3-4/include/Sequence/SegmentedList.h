@@ -562,7 +562,7 @@ bool SegmentedList<T>::operator==(const SegmentedList<T>& other)
 }
 
 template <typename T>
-SegmentedList<T>::Segment<T>* SegmentedList<T>::maxFrom(SegmentedList<T>::Segment<T>* segmentOne,
+typename SegmentedList<T>::template Segment<T>* SegmentedList<T>::maxFrom(SegmentedList<T>::Segment<T>* segmentOne,
 	SegmentedList<T>::Segment<T>* segmentTwo)
 {
 	if (!segmentOne && segmentTwo)
@@ -575,7 +575,7 @@ SegmentedList<T>::Segment<T>* SegmentedList<T>::maxFrom(SegmentedList<T>::Segmen
 }
 
 template <typename T>
-SegmentedList<T>::Segment<T>* SegmentedList<T>::minFrom(SegmentedList<T>::Segment<T>* segmentOne,
+typename SegmentedList<T>::template Segment<T>* SegmentedList<T>::minFrom(SegmentedList<T>::Segment<T>* segmentOne,
 	SegmentedList<T>::Segment<T>* segmentTwo)
 {
 	if (!segmentOne && segmentTwo)

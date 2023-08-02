@@ -3,6 +3,32 @@
 #include "Array.h"
 #include "Logger.h"
 #include "Sequence.h"
+#include <functional>
+
+namespace fn
+{
+
+struct filter
+{
+	std::function<int(int)> _filter;
+
+	filter(std::function<int(int)> func)
+	    : _filter(func)
+	{
+	}
+};
+
+struct transformer
+{
+	std::function<int(int)> _transformer;
+
+	transformer(std::function<int(int)> func)
+	    : _transformer(func)
+	{
+	}
+};
+
+}
 
 template <typename T>
 class ArraySequence : public Sequence<T>
@@ -211,6 +237,27 @@ public:
 	T* GetEndPointer() const override
 	{
 		return (&(GetLast()) + 1);
+	}
+
+	ArraySequence<int> operator|(fn::filter filter)
+	{
+		ArraySequence<T> result;
+
+		for (T& data : *this)
+			if (filter._filter(data))
+				result.Append(data);
+
+		return result;
+	}
+
+	ArraySequence<int> operator|(fn::transformer transformer)
+	{
+		ArraySequence<T> result;
+
+		for (T& data : *this)
+			result.Append(transformer._transformer(data));
+
+		return result;
 	}
 
 	// Returns abstract class Sequence that underhood is ArraySequence
