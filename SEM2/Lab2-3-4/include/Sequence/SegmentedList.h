@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "IContainer.h"
+#include "Iterator.h"
 #include "List.h"
 
 #define SEGMENT_MIN_SIZE 6
@@ -699,7 +700,7 @@ void SegmentedList<T>::ResizeSegments()
 }
 
 template <typename T>
-class SegmentedList<T>::Iterator
+class SegmentedList<T>::Iterator : public AbstractIterator<T>
 {
 private:
 	Node<T>* current;
@@ -720,59 +721,48 @@ public:
 	{
 	}
 
-	Iterator operator+(int n)
+	AbstractIterator<T>& operator++() override
 	{
-		Size counter = 0;
-		while (counter != n)
-			current = current->next, counter++;
-
-		return *this;
-	}
-
-	Iterator operator-(int n)
-	{
-		Size counter = 0;
-		while (counter != n)
-			current = current->prev, counter++;
-
+		current = current->next;
 		return *this;
 	}
 
 	Iterator operator++(int)
 	{
-		current = current->next;
+		Iterator temp = *this;
+		(*this)++;
+		return temp;
+	}
+
+	AbstractIterator<T>& operator--() override
+	{
+		current = current->prev;
 		return *this;
 	}
 
 	Iterator operator--(int)
 	{
-		current = current->prev;
-		return *this;
+		Iterator temp = *this;
+		(*this)--;
+		return temp;
 	}
 
-	Iterator operator++()
-	{
-		current = current->next;
-		return *this;
-	}
-
-	Iterator operator--()
-	{
-		current = current->prev;
-		return *this;
-	}
-
-	bool operator!=(const Iterator& other)
+	bool operator!=(const Iterator& other) const
 	{
 		return this->current != other.current;
 	}
 
-	bool operator==(const Iterator& other)
+	bool operator==(const Iterator& other) const
 	{
 		return this->current == other.current;
 	}
 
-	T& operator*()
+	bool equal(const AbstractIterator<T>& other) const override
+	{
+		return &(this->current->data) == &(*other);
+	}
+
+	T& operator*() const override
 	{
 		return this->current->data;
 	}

@@ -1,7 +1,8 @@
+#pragma once
 
 #include <iterator>
 
-template<typename Iterator, typename TransformFunction>
+template <typename Iterator, typename TransformFunction>
 class output_transform_iterator
 {
 public:
@@ -67,43 +68,26 @@ private:
 // 	return output_transformer<TransformFunction>(transformFunction);
 // }
 
-template <typename T, typename U>
-concept hasAppend = requires(T t, U value)
+template <typename T>
+class AbstractIterator
 {
-	t.Append(value);
-};
-
-
-template <hasAppend<int> Container>
-class backInsertIterator : public std::iterator<std::output_iterator_tag,void,void,void,void>
-{
-private:
-	Container* container;		
-
 public:
-	backInsertIterator(Container& container)
-		: container(&container)
+	virtual ~AbstractIterator()
 	{
 	}
 
-	backInsertIterator<Container>& operator=(int value)
-	{
-		container->Append(value);
-		return *this;
-	}
+	virtual AbstractIterator<T>& operator++() = 0;
+	// virtual AbstractIterator<T> operator++(int) = 0;
 
-	backInsertIterator<Container>& operator*()
-	{
-		return *this;
-	}
+	virtual AbstractIterator<T>& operator--() = 0;
+	// virtual AbstractIterator<T> operator--(int) = 0;
 
-	backInsertIterator<Container>& operator++()
-	{
-		return *this;
-	}
+	virtual T& operator*() const = 0;
 
-	backInsertIterator<Container>& operator++(int)
+	virtual bool equal(const AbstractIterator<T>& other) const = 0;
+
+	bool operator==(const AbstractIterator<T>& other) const
 	{
-		return *this;
+		return equal(*this, other);
 	}
 };

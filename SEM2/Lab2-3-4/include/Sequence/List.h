@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IContainer.h"
+#include "Iterator.h"
 
 template <typename T>
 struct Node
@@ -532,7 +533,7 @@ List<T>& List<T>::operator=(List<T>&& other)
 }
 
 template <typename T>
-class List<T>::Iterator
+class List<T>::Iterator : public AbstractIterator<T>
 {
 	Node<T>* current;
 
@@ -552,52 +553,31 @@ public:
 	{
 	}
 
-	Iterator operator+(int n)
+	AbstractIterator<T>& operator++() override
 	{
-		Size counter = 0;
-		while (counter != n)
-			current = current->next, counter++;
-
-		return *this;
-	}
-
-	Iterator operator-(int n)
-	{
-		Size counter = 0;
-		while (counter != n)
-			current = current->prev, counter++;
-
+		current = current->next;
 		return *this;
 	}
 
 	Iterator operator++(int)
 	{
-		current = current->next;
+		Iterator temp = *this;
+		(*this)++;
+		return temp;
+	}
+
+	AbstractIterator<T>& operator--() override
+	{
+		current = current->prev;
 		return *this;
 	}
 
 	Iterator operator--(int)
 	{
-		current = current->prev;
-		return *this;
+		Iterator temp = *this;
+		(*this)--;
+		return temp;
 	}
-
-	Iterator operator++()
-	{
-		current = current->next;
-		return *this;
-	}
-
-	Iterator operator--()
-	{
-		current = current->prev;
-		return *this;
-	}
-
-	// const Iterator operator++ (int) { current = current->next; return *this; }
-	// const Iterator operator-- (int) { current = current->prev; return *this; }
-	// const Iterator operator++ () { current = current->next; return *this; }
-	// const Iterator operator-- () { current = current->prev; return *this; }
 
 	bool operator!=(const Iterator& other) const
 	{
@@ -609,7 +589,12 @@ public:
 		return this->current == other.current;
 	}
 
-	T& operator*()
+	bool equal(const AbstractIterator<T>& other) const override
+	{
+		return &(this->current->data) == &(*other);
+	}
+
+	T& operator*() const override
 	{
 		return this->current->data;
 	}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IContainer.h"
+#include "Iterator.h"
 #include "Logger.h"
 #include <utility>
 
@@ -295,7 +296,7 @@ Array<T>& Array<T>::operator=(Array<T>&& other)
 }
 
 template <typename T>
-class Array<T>::Iterator
+class Array<T>::Iterator : public AbstractIterator<T>
 {
 private:
 	T* current;
@@ -311,30 +312,50 @@ public:
 	{
 	}
 
-	Iterator operator+(int n)
+	~Iterator()
 	{
-		return Iterator(current + n);
 	}
 
-	Iterator operator-(int n)
-	{
-		return Iterator(current - n);
-	}
+	// Iterator& operator++()
+	// {
+	// 	current++;
+	// 	return *this;
+	// }
 
-	Iterator& operator++()
+	// Iterator operator++(int)
+	// {
+	// 	Iterator iter = *this;
+	// 	++(*this);
+	// 	return iter;
+	// }
+
+	AbstractIterator<T>& operator++() override
 	{
 		current++;
 		return *this;
 	}
 
-	Iterator operator++(int)
+	Iterator& operator++(int) 
 	{
-		Iterator iter = *this;
-		++(*this);
-		return iter;
+		Iterator temp = *this;
+		current++;
+		return temp;
 	}
 
-	Iterator& operator--()
+	// Iterator& operator--()
+	// {
+	// 	current--;
+	// 	return *this;
+	// }
+
+	// Iterator operator--(int)
+	// {
+	// 	Iterator iter = *this;
+	// 	--(*this);
+	// 	return iter;
+	// }
+
+	AbstractIterator<T>& operator--() override
 	{
 		current--;
 		return *this;
@@ -342,9 +363,9 @@ public:
 
 	Iterator operator--(int)
 	{
-		Iterator iter = *this;
-		--(*this);
-		return iter;
+		Iterator temp = *this;
+		current--;
+		return temp;
 	}
 
 	bool operator!=(const Iterator& other) const
@@ -357,7 +378,12 @@ public:
 		return this->current == other.current;
 	}
 
-	T& operator*() const
+	bool equal(const AbstractIterator<T>& other) const override
+	{
+		return this->current == &(*other);
+	}
+
+	T& operator*() const override
 	{
 		return *(current);
 	}
