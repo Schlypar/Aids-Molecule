@@ -130,8 +130,8 @@ Sequence<T>* Sequence<T>::Map(Func<T> func)
 
 	Sequence<T>* result = this->Create();
 
-	for (Index i = 0; i < this->GetLength(); i++)
-		result->Append(func(this->Get(i)));
+	for (T e : *this)
+		result->Append(func(e));
 
 	return result;
 }
@@ -148,9 +148,9 @@ Sequence<T>* Sequence<T>::Where(Condition<T> condition)
 
 	Sequence<T>* result = this->Create();
 
-	for (Index i = 0; i < this->GetLength(); i++)
-		if (condition(this->Get(i)))
-			result->Append(this->Get(i));
+	for (T e : *this)
+		if (condition(e))
+			result->Append(e);
 
 	return result;
 }
@@ -167,8 +167,8 @@ Sequence<T>* Sequence<T>::GetSubsequence(const Index start, const Index end)
 
 	Sequence<T>* result = this->Create();
 
-	for (Index i = start; i <= end; i++)
-		result->Append(this->Get(i));
+	for (T e : *this)
+		result->Append(e);
 
 	return result;
 }
@@ -183,27 +183,15 @@ Sequence<T>* Sequence<T>::Concat(Sequence<T>* other)
 		throw(EXCEPTION_INDEX_OUT_OF_RANGE);
 	}
 
-	// Sequence<T>* result = this->Create();
+	Sequence<T>* result = this->Create();
 
-	// IIterator<T>* iter = this->_Begin();
-	// IIterator<T>* end = this->_End();
+	for (T e : *this)
+		result->Append(e);
 
-	// for (iter; !(iter->_isEquals(end)); iter->_Next())
-	// 	result->Append(iter->_GetCurrent());
+	for (T e : *other)
+		result->Append(e);
 
-	// delete iter;
-	// delete end;
-
-	// iter = other->_Begin();
-	// end = other->_End();
-
-	// for (iter; !(iter->_isEquals(end)); iter->_Next())
-	// 	result->Append(iter->_GetCurrent());
-
-	// delete iter;
-	// delete end;
-
-	// return result;
+	return result;
 }
 
 template <typename T>
