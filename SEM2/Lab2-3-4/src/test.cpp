@@ -1,45 +1,34 @@
+
+#include "Allocator.h"
 #include "Sequence/ArraySequence.h"
-#include "Tree/BinaryHeap.h"
-#include "Tree/BinaryTree.h"
-#include "Tree/MultiBinaryTree.h"
-#include "Tree/OrderedSet.h"
-#include "Tuple.h"
-#include "functional/Algorithms.h"
 #include <ADT.h>
+#include <Logger.h>
+#include <bits/ranges_algobase.h>
+#include <iterator>
+#include <stdexcept>
+#include <tuple>
 
-LogPriority Logger::priority = TracePriority;
+LogPriority Logger::priority = InfoPriority;
 
-template <typename T1, typename T2>
-using TreePtr = SharedPtr<Tree<T1, T2>>;
-
-template <typename T1, typename T2>
-using ConstTreePtr = SharedPtr<const Tree<T1, T2>>;
-
-template <typename T1, typename T2>
-using BinTreePtr = SharedPtr<BinaryTree<T1, T2>>;
-
-template <typename T1, typename T2>
-using BinHeapPtr = SharedPtr<BinaryHeap<T1, T2>>;
-
-template <typename T>
-using BinSearchPtr = SharedPtr<BinarySearchTree<T>>;
-
-template <typename T1, typename T2>
-using MultiBinTreePtr = SharedPtr<MultiBinaryTree<T1, T2>>;
-
-template <typename T1>
-using SetPtr = SharedPtr<OrderedSet<T1>>;
+int square(int e)
+{
+	return e * e;
+}
 
 int main()
 {
-	Logger::setPriority(ErrorPriority);
 
-	BinTreePtr<int, Pair<int, String>> tree = new BinaryTree<int, Pair<int, String>>({ 25, "root" },
-		[](const Pair<int, String>& pair) -> int { return pair.GetLeft(); });
+	std::vector<int> numbers = { 1, 2, 3, 4, 5 };
+	std::vector<int> results;
 
-	tree->Add({ 20, "left" })->Add({ 30, "right" });
+	auto const squarer = output_transformer(square);
 
-	print(tree, '\n');
+	std::copy(numbers.begin(), numbers.end(), squarer(std::back_inserter(results)));
+
+	for (auto e : results)
+		std::cout << e << " ";
+
+	std::cout << '\n';
 
 	return 0;
 }

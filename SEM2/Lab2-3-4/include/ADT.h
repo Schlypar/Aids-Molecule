@@ -7,6 +7,7 @@
 #include <Allocator.h>
 #include <Pointer.h>
 #include <complex.h>
+#include <Iterator.h>
 #include <str/CString.h>
 
 #include <Sequence/ArraySequence.h>
@@ -22,3 +23,5 @@
 #include <Tree/MultiBinaryTree.h>
 #include <Tree/MultiSearchTree.h>
 #include <Tree/OrderedSet.h>
+
+#include <functional/range.h>

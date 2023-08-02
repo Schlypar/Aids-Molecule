@@ -66,6 +66,7 @@ set(SOURCES
 set(SOURCES_HEADERS
         ${INCLUDE}/ADT.h
         ${INCLUDE}/Pointer.h
+        ${INCLUDE}/Iterator.h
         ${INCLUDE}/concepts.h
         ${INCLUDE}/Allocator.h
         ${INCLUDE}/complex.h
@@ -74,7 +75,7 @@ set(SOURCES_HEADERS
         ${INCLUDE}/Tuple.h
         ${INCLUDE}/str/CString.h
         ${INCLUDE}/str/CString.cpp
-        ${INCLUDE}/functional/Algorithms.h
+        ${INCLUDE}/functional/range.h
         ${INCLUDE}/Sequence/ListSequence.h
         ${INCLUDE}/Sequence/SegmentedList.h
         ${INCLUDE}/Sequence/Sequence.h
