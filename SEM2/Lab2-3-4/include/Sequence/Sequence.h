@@ -3,7 +3,7 @@
 #include "IContainer.h"
 #include "IIterator.h"
 
-#include "Array.h"
+#include "Iterator.h"
 #include "Logger.h"
 #include "Tuple.h"
 #include "concepts.h"
@@ -11,20 +11,74 @@
 template <typename T>
 class Sequence
 {
+protected:
+	template <Enumerable Container>
+	class IteratorWrapper : public AbstractIterator<T>
+	{
+		using ContainerIterator = typename Container::Iterator;
+
+	private:
+		IteratorWrapper()
+		    : iternal()
+		{
+		}
+
+	protected:
+		ContainerIterator iternal;
+
+	public:
+		IteratorWrapper(ContainerIterator iter)
+		    : iternal(iter)
+		{
+		}
+
+		AbstractIterator<T>& operator++() override
+		{
+			iternal++;
+			return *this;
+		}
+
+		AbstractIterator<T>& operator--() override
+		{
+			iternal--;
+			return *this;
+		}
+
+		T& operator*() const override
+		{
+			return *iternal;
+		}
+
+		bool operator==(const IteratorWrapper<Container>& other) const
+		{
+			return this->iternal == other.iternal;
+		}
+
+		bool operator!=(const IteratorWrapper<Container>& other) const
+		{
+			return !(this->iternal == other.iternal);
+		}
+
+		bool equal(const AbstractIterator<T>& other) const override
+		{
+			return this->iternal.equal(other);
+		}
+
+		AbstractIterator<T>* copy() const override
+		{
+			return this->iternal.copy();
+		}
+	};
+
 public:
 	virtual ~Sequence()
 	{
 	}
 
-	// Gets pointer to the first element
-	virtual T* GetFirstPointer() const = 0;
-	// Gets pointer to the last element
-	virtual T* GetEndPointer() const = 0;
+	class Iterator;
 
-	// Begin for abstract iterator
-	virtual IIterator<T>* _Begin() const = 0;
-	// End for abstract iterator
-	virtual IIterator<T>* _End() const = 0;
+	virtual Iterator begin() = 0;
+	virtual Iterator end() = 0;
 
 	virtual T& GetFirst() const = 0;
 	virtual T& GetLast() const = 0;
@@ -129,27 +183,27 @@ Sequence<T>* Sequence<T>::Concat(Sequence<T>* other)
 		throw(EXCEPTION_INDEX_OUT_OF_RANGE);
 	}
 
-	Sequence<T>* result = this->Create();
+	// Sequence<T>* result = this->Create();
 
-	IIterator<T>* iter = this->_Begin();
-	IIterator<T>* end = this->_End();
+	// IIterator<T>* iter = this->_Begin();
+	// IIterator<T>* end = this->_End();
 
-	for (iter; !(iter->_isEquals(end)); iter->_Next())
-		result->Append(iter->_GetCurrent());
+	// for (iter; !(iter->_isEquals(end)); iter->_Next())
+	// 	result->Append(iter->_GetCurrent());
 
-	delete iter;
-	delete end;
+	// delete iter;
+	// delete end;
 
-	iter = other->_Begin();
-	end = other->_End();
+	// iter = other->_Begin();
+	// end = other->_End();
 
-	for (iter; !(iter->_isEquals(end)); iter->_Next())
-		result->Append(iter->_GetCurrent());
+	// for (iter; !(iter->_isEquals(end)); iter->_Next())
+	// 	result->Append(iter->_GetCurrent());
 
-	delete iter;
-	delete end;
+	// delete iter;
+	// delete end;
 
-	return result;
+	// return result;
 }
 
 template <typename T>
@@ -206,3 +260,67 @@ T Sequence<T>::Reduce(Reducer<T> reducer, T base)
 
 	return base;
 }
+
+template <typename T>
+class Sequence<T>::Iterator
+{
+private:
+	AbstractIterator<T>* iter;
+
+public:
+	Iterator()
+	    : iter(new AbstractIterator<T>())
+	{
+	}
+
+	Iterator(AbstractIterator<T>* iter)
+	    : iter(iter)
+	{
+	}
+
+	~Iterator()
+	{
+		delete iter;
+	}
+
+	Iterator& operator++()
+	{
+		this->iter->operator++();
+		return *this;
+	}
+
+	Iterator operator++(int)
+	{
+		Iterator temp = this->iter->copy();
+		this->iter->operator++();
+		return temp;
+	}
+
+	Iterator& operator--()
+	{
+		this->iter->operator++();
+		return *this;
+	}
+
+	Iterator operator--(int)
+	{
+		Iterator temp = this->iter->copy();
+		this->iter->operator--();
+		return temp;
+	}
+
+	T& operator*() const
+	{
+		return *(*(this->iter));
+	}
+
+	bool operator==(const Iterator& other) const
+	{
+		return this->iter->equal(*other.iter);
+	}
+
+	bool operator!=(const Iterator& other) const
+	{
+		return !(this->iter->equal(*other.iter));
+	}
+};

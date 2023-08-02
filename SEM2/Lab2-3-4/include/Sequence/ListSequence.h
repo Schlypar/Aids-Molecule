@@ -8,132 +8,16 @@
 template <typename T>
 class ListSequence : public Sequence<T>
 {
+
+	template <Enumerable Container>
+	using IteratorWrapper = typename Sequence<T>::template IteratorWrapper<Container>;
+
+	using Iterator = typename Sequence<T>::Iterator;
+
 private:
 	SegmentedList<T> container;
 
 public:
-	class Iterator : IIterator<T>
-	{
-		Node<T>* current;
-
-	public:
-		Iterator()
-		    : current(nullptr)
-		{
-			Logger::Info("Used default constructor of ListSequence<T>::Iterator");
-		}
-
-		Iterator(Node<T>* data)
-		    : current(data)
-		{
-			Logger::Info("Used T* constructor of ListSequence<T>::Iterator");
-		}
-
-		Iterator(IIterator<T>* other)
-		    : current(((Iterator*) other)->current)
-		{
-			Logger::Info("Used IIterator* constructor of ListSequence<T>::Iterator");
-			Logger::Info("Deleted heap pointer of IIterator<T>*");
-			delete other;
-		}
-
-		Iterator& operator+(int n)
-		{
-			while (n > 0)
-			{
-				this->Next();
-				n--;
-			}
-
-			return *this;
-		}
-
-		Iterator& operator-(int n)
-		{
-			while (n > 0)
-			{
-				current = current->prev;
-				n--;
-			}
-
-			return *this;
-		}
-
-		Iterator& operator++()
-		{
-			current = current->next;
-			return *this;
-		}
-
-		Iterator& operator--()
-		{
-			current = current->prev;
-			return *this;
-		}
-
-		bool operator!=(Iterator& other) const
-		{
-			return this->current != other.current;
-		}
-
-		bool operator==(Iterator& other) const
-		{
-			return this->current == other.current;
-		}
-
-		T& operator*() const
-		{
-			return this->current->data;
-		}
-
-		IIterator<T>* _Next() override
-		{
-			current = current->next;
-			return this;
-		}
-
-		IIterator<T>* _Prev() override
-		{
-			current = current->prev;
-			return this;
-		}
-
-		T& _GetCurrent() override
-		{
-			return this->current->data;
-		}
-
-		T* _GetPointer() override
-		{
-			return &this->current->data;
-		}
-
-		bool _isEquals(IIterator<T>* other) override
-		{
-			return this->current == ((Iterator*) other)->current;
-		}
-	};
-
-	IIterator<T>* _Begin() const override
-	{
-		return (IIterator<T>*) new (Iterator)(container.GetHead());
-	}
-
-	IIterator<T>* _End() const override
-	{
-		return (IIterator<T>*) new (Iterator)();
-	}
-
-	Iterator begin() const
-	{
-		return (Iterator) (this->_Begin());
-	}
-
-	Iterator end() const
-	{
-		return (Iterator) (this->_End());
-	}
-
 	ListSequence()
 	    : container()
 	{
@@ -173,6 +57,18 @@ public:
 	virtual ~ListSequence()
 	{
 		Logger::Info("Destroyed ListSequence<T>");
+	}
+
+	Iterator begin() override
+	{
+		AbstractIterator<T>* iter = new IteratorWrapper<SegmentedList<T>>(this->container.begin());
+		return Iterator(iter);
+	}
+
+	Iterator end() override
+	{
+		AbstractIterator<T>* iter = new IteratorWrapper<SegmentedList<T>>(this->container.end());
+		return Iterator(iter);
 	}
 
 	// Gets an intance of what is at the head
@@ -216,16 +112,6 @@ public:
 	bool isEmpty() const noexcept override
 	{
 		return GetLength() == 0;
-	}
-
-	T* GetFirstPointer() const override
-	{
-		return &container.GetFirst();
-	}
-
-	T* GetEndPointer() const override
-	{
-		return nullptr;
 	}
 
 	// Returns abstract class Sequence that underhood is ListSequence

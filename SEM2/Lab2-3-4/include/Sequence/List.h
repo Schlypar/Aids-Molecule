@@ -553,6 +553,11 @@ public:
 	{
 	}
 
+	Iterator(const Iterator& other)
+	    : current(other.current)
+	{
+	}
+
 	AbstractIterator<T>& operator++() override
 	{
 		current = current->next;
@@ -597,5 +602,10 @@ public:
 	T& operator*() const override
 	{
 		return this->current->data;
+	}
+
+	AbstractIterator<T>* copy() const override
+	{
+		return new Iterator(*this);
 	}
 };

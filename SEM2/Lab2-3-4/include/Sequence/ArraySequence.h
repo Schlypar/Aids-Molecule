@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Array.h"
+#include "Iterator.h"
 #include "Logger.h"
 #include "Sequence.h"
 #include <functional>
@@ -33,126 +34,15 @@ struct transformer
 template <typename T>
 class ArraySequence : public Sequence<T>
 {
+	template <Enumerable Container>
+	using IteratorWrapper = typename Sequence<T>::template IteratorWrapper<Container>;
+
+	using Iterator = typename Sequence<T>::Iterator;
+
 private:
 	Array<T> container;
 
 public:
-	class Iterator : IIterator<T>
-	{
-		T* current;
-
-	public:
-		Iterator()
-		{
-			Logger::Info("Used default constructor of ArraySequence<T>::Iterator");
-		}
-
-		Iterator(T* data)
-		    : current(data)
-		{
-			Logger::Info("Used T* constructor of ArraySequence<T>::Iterator");
-		}
-
-		Iterator(IIterator<T>* other)
-		    : current(((Iterator*) other)->current)
-		{
-			Logger::Info("Used IIterator* constructor of ArraySequence<T>::Iterator");
-			Logger::Info("Deleted heap pointer of IIterator<T>*");
-			delete other;
-		}
-
-		Iterator& operator+(int n)
-		{
-			while (n > 0)
-			{
-				this->Next();
-				n--;
-			}
-
-			return *this;
-		}
-
-		Iterator& operator-(int n)
-		{
-			while (n > 0)
-			{
-				this->Prev();
-				n--;
-			}
-
-			return *this;
-		}
-
-		Iterator operator++()
-		{
-			this->_Next();
-			return *this;
-		}
-
-		Iterator operator--()
-		{
-			this->_Prev();
-			return *this;
-		}
-
-		bool operator!=(const Iterator& other) const
-		{
-			return this->current != other.current;
-		}
-
-		bool operator==(const Iterator& other) const
-		{
-			return this->current == other.current;
-		}
-
-		T& operator*()
-		{
-			return *(this->current);
-		}
-
-		IIterator<T>* _Next() override
-		{
-			current++;
-			return this;
-		}
-
-		IIterator<T>* _Prev() override
-		{
-			current--;
-			return this;
-		}
-
-		T& _GetCurrent() override
-		{
-			return *(this->current);
-		}
-
-		bool _isEquals(IIterator<T>* other) override
-		{
-			return this->current == ((Iterator*) other)->current;
-		}
-	};
-
-	IIterator<T>* _Begin() const override
-	{
-		return (IIterator<T>*) new (Iterator)(GetFirstPointer());
-	}
-
-	IIterator<T>* _End() const override
-	{
-		return (IIterator<T>*) new (Iterator)(GetEndPointer());
-	}
-
-	Iterator begin()
-	{
-		return (Iterator) (this->_Begin());
-	}
-
-	Iterator end()
-	{
-		return (Iterator) (this->_End());
-	}
-
 	ArraySequence()
 	    : container()
 	{
@@ -188,6 +78,18 @@ public:
 	Sequence<T>* ArrayAllocator()
 	{
 		return (Sequence<T>*) new ArraySequence<T>();
+	}
+
+	Iterator begin() override
+	{
+		AbstractIterator<T>* iter = new IteratorWrapper<Array<T>>(this->container.begin());
+		return Iterator(iter);
+	}
+
+	Iterator end() override
+	{
+		AbstractIterator<T>* iter = new IteratorWrapper<Array<T>>(this->container.end());
+		return Iterator(iter);
 	}
 
 	// Gets an instance of the first element
@@ -227,16 +129,6 @@ public:
 	bool isEmpty() const noexcept override
 	{
 		return GetLength() == 0;
-	}
-
-	T* GetFirstPointer() const override
-	{
-		return &(GetFirst());
-	}
-
-	T* GetEndPointer() const override
-	{
-		return (&(GetLast()) + 1);
 	}
 
 	ArraySequence<int> operator|(fn::filter filter)

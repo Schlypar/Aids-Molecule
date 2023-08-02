@@ -312,6 +312,11 @@ public:
 	{
 	}
 
+	Iterator(const Iterator& other)
+	    : current(other.current)
+	{
+	}
+
 	~Iterator()
 	{
 	}
@@ -335,25 +340,12 @@ public:
 		return *this;
 	}
 
-	Iterator& operator++(int) 
+	Iterator operator++(int)
 	{
 		Iterator temp = *this;
 		current++;
 		return temp;
 	}
-
-	// Iterator& operator--()
-	// {
-	// 	current--;
-	// 	return *this;
-	// }
-
-	// Iterator operator--(int)
-	// {
-	// 	Iterator iter = *this;
-	// 	--(*this);
-	// 	return iter;
-	// }
 
 	AbstractIterator<T>& operator--() override
 	{
@@ -386,5 +378,10 @@ public:
 	T& operator*() const override
 	{
 		return *(current);
+	}
+
+	AbstractIterator<T>* copy() const override
+	{
+		return new Iterator(*this);
 	}
 };

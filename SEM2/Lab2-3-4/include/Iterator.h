@@ -88,6 +88,8 @@ public:
 
 	bool operator==(const AbstractIterator<T>& other) const
 	{
-		return equal(*this, other);
+		return this->equal(other);
 	}
+
+	virtual AbstractIterator<T>* copy() const = 0;
 };

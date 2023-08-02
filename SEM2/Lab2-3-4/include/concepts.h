@@ -5,7 +5,7 @@
 #include <iterator>
 
 template <typename Iterator, typename T>
-concept Iter = requires(Iterator iter)
+concept Iter = requires(Iterator iter, Iterator other)
 {
 	{iter++} -> std::convertible_to<Iterator>;
 	{++iter} -> std::convertible_to<Iterator>;
@@ -14,14 +14,25 @@ concept Iter = requires(Iterator iter)
 	{--iter} -> std::convertible_to<Iterator>;
 
 	{*iter} -> std::convertible_to<T>;
+
+	{iter.equal(other)} -> std::convertible_to<bool>;
+	{iter.copy()} -> std::convertible_to<Iterator>;
 };	
 
 template <typename Container>
-concept Enumerable = requires(Container container)
+concept hasBeginEnd = requires(Container container)
 {
 	container.begin();	
 	container.end();	
 };
+
+template <typename Container>
+concept hasIteratorType = requires{
+	typename Container::Iterator;
+};
+
+template <typename Container>
+concept Enumerable = hasBeginEnd<Container> && hasIteratorType<Container>;
 
 template <typename T>
 concept Equal = requires(T a, T b) {
