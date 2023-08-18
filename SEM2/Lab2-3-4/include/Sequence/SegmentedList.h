@@ -766,4 +766,9 @@ public:
 	{
 		return this->current->data;
 	}
+
+	AbstractIterator<T>* copy() const override
+	{
+		return new Iterator(*this);
+	}
 };

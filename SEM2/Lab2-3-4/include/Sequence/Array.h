@@ -73,8 +73,8 @@ public:
 	/*
 	 * Constructor for Array that takes any number of arguments
 	 *
-	 * If we write Array<int> arr = { 1,2,3 } then we get array containing ints and
-	 * array will be 1,2,3. Parameters are in order you wrote them
+	 * If we write Array<int> arr = { 1,2,3 } then we get array containing ints
+	 * and array will be 1,2,3. Parameters are in order you wrote them
 	 * */
 	template <typename... Args>
 	Array(T head, Args&&... args)
@@ -316,44 +316,18 @@ public:
 	{
 	}
 
-	// Iterator& operator++()
-	// {
-	// 	current++;
-	// 	return *this;
-	// }
-
-	// Iterator operator++(int)
-	// {
-	// 	Iterator iter = *this;
-	// 	++(*this);
-	// 	return iter;
-	// }
-
 	AbstractIterator<T>& operator++() override
 	{
 		current++;
 		return *this;
 	}
 
-	Iterator& operator++(int) 
+	Iterator& operator++(int)
 	{
 		Iterator temp = *this;
 		current++;
 		return temp;
 	}
-
-	// Iterator& operator--()
-	// {
-	// 	current--;
-	// 	return *this;
-	// }
-
-	// Iterator operator--(int)
-	// {
-	// 	Iterator iter = *this;
-	// 	--(*this);
-	// 	return iter;
-	// }
 
 	AbstractIterator<T>& operator--() override
 	{
@@ -386,5 +360,10 @@ public:
 	T& operator*() const override
 	{
 		return *(current);
+	}
+
+	AbstractIterator<T>* copy() const override
+	{
+		return new Iterator(*this);
 	}
 };

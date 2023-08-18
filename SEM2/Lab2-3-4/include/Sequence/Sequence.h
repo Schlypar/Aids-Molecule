@@ -4,6 +4,7 @@
 #include "IIterator.h"
 
 #include "Array.h"
+#include "Iterator.h"
 #include "Logger.h"
 #include "Tuple.h"
 #include "concepts.h"
@@ -16,15 +17,15 @@ public:
 	{
 	}
 
+	class Iterator;
+
+	virtual Iterator begin() = 0;
+	virtual Iterator end() = 0;
+
 	// Gets pointer to the first element
 	virtual T* GetFirstPointer() const = 0;
 	// Gets pointer to the last element
 	virtual T* GetEndPointer() const = 0;
-
-	// Begin for abstract iterator
-	virtual IIterator<T>* _Begin() const = 0;
-	// End for abstract iterator
-	virtual IIterator<T>* _End() const = 0;
 
 	virtual T& GetFirst() const = 0;
 	virtual T& GetLast() const = 0;
@@ -131,23 +132,23 @@ Sequence<T>* Sequence<T>::Concat(Sequence<T>* other)
 
 	Sequence<T>* result = this->Create();
 
-	IIterator<T>* iter = this->_Begin();
-	IIterator<T>* end = this->_End();
-
-	for (iter; !(iter->_isEquals(end)); iter->_Next())
-		result->Append(iter->_GetCurrent());
-
-	delete iter;
-	delete end;
-
-	iter = other->_Begin();
-	end = other->_End();
-
-	for (iter; !(iter->_isEquals(end)); iter->_Next())
-		result->Append(iter->_GetCurrent());
-
-	delete iter;
-	delete end;
+	// IIterator<T>* iter = this->_Begin();
+	// IIterator<T>* end = this->_End();
+	//
+	// for (iter; !(iter->_isEquals(end)); iter->_Next())
+	// 	result->Append(iter->_GetCurrent());
+	//
+	// delete iter;
+	// delete end;
+	//
+	// iter = other->_Begin();
+	// end = other->_End();
+	//
+	// for (iter; !(iter->_isEquals(end)); iter->_Next())
+	// 	result->Append(iter->_GetCurrent());
+	//
+	// delete iter;
+	// delete end;
 
 	return result;
 }
@@ -206,3 +207,72 @@ T Sequence<T>::Reduce(Reducer<T> reducer, T base)
 
 	return base;
 }
+
+template <typename T>
+class Sequence<T>::Iterator
+{
+private:
+	AbstractIterator<T>* iter;
+
+public:
+	Iterator()
+	    : iter(nullptr)
+	{
+	}
+
+	Iterator(AbstractIterator<T>* iter)
+	    : iter(iter)
+	{
+	}
+
+	Iterator(const Iterator& other)
+	    : iter(other.iter->copy())
+	{
+	}
+
+	Iterator& operator++()
+	{
+		++(*this->iter);
+		return *this;
+	}
+
+	Iterator operator++(int)
+	{
+		Iterator tmp = *this;
+		++(*iter);
+		return tmp;
+	}
+
+	Iterator& operator--()
+	{
+		--(*this->iter);
+		return *this;
+	}
+
+	Iterator operator--(int)
+	{
+		Iterator tmp = *this;
+		--(*iter);
+		return tmp;
+	}
+
+	~Iterator()
+	{
+		delete iter;
+	}
+
+	T& operator*()
+	{
+		return *(*this->iter);
+	}
+
+	bool operator==(const Iterator& other) const
+	{
+		return this->iter->equal(*other.iter);
+	}
+
+	bool operator!=(const Iterator& other) const
+	{
+		return !(this->iter->equal(*other.iter));
+	}
+};

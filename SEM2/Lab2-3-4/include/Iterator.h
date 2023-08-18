@@ -77,14 +77,14 @@ public:
 	}
 
 	virtual AbstractIterator<T>& operator++() = 0;
-	// virtual AbstractIterator<T> operator++(int) = 0;
 
 	virtual AbstractIterator<T>& operator--() = 0;
-	// virtual AbstractIterator<T> operator--(int) = 0;
 
 	virtual T& operator*() const = 0;
 
 	virtual bool equal(const AbstractIterator<T>& other) const = 0;
+
+	virtual AbstractIterator<T>* copy() const = 0;
 
 	bool operator==(const AbstractIterator<T>& other) const
 	{
