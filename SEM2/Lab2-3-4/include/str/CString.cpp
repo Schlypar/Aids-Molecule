@@ -66,7 +66,11 @@ bool String::isThere(const String& suspect) const noexcept
 	if (this->Length() < suspect.Length())
 		return false;
 
-	Index suspectStart = LFind(suspect[0]);
+	int suspectStart = LFind(suspect[0]);
+
+	if (suspectStart == -1)
+		return false;
+
 	Index suspectEnd = suspectStart + suspect.Length() - 1;
 	Size segmentLength = suspectEnd - suspectStart;
 
