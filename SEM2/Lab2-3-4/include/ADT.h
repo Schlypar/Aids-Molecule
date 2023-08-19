@@ -5,9 +5,9 @@
 #include <Linal/Matrix.h>
 
 #include <Allocator.h>
+#include <Iterator.h>
 #include <Pointer.h>
 #include <complex.h>
-#include <Iterator.h>
 #include <str/CString.h>
 
 #include <Sequence/ArraySequence.h>

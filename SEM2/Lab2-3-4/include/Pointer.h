@@ -1,17 +1,54 @@
 #pragma once
 
 #include <cstddef>
+#include <functional>
 #include <utility>
+
+template <typename T>
+class Deleter
+{
+private:
+	std::function<void(T*)> deleter;
+
+public:
+	Deleter()
+	    : deleter([](T* block) -> void { delete block; })
+	{
+	}
+
+	Deleter(int kostyl)
+	    : deleter([](T* block) -> void { delete[] block; })
+	{
+	}
+
+	Deleter(const Deleter<T>& other)
+	    : deleter(other.deleter)
+	{
+	}
+
+	void delete_block(T* block)
+	{
+		this->deleter(block);
+	}
+};
 
 template <class T>
 class UniquePtr
+
 {
 private:
 	T* ptr;
+	Deleter<T> deleter = Deleter<T>();
 
 public:
 	UniquePtr() noexcept
 	    : ptr(nullptr)
+	{
+	}
+
+	UniquePtr(int kostyl) noexcept
+	    : ptr(nullptr)
+	    , deleter(kostyl)
 	{
 	}
 
@@ -20,21 +57,40 @@ public:
 	{
 	}
 
+	UniquePtr(std::nullptr_t, int kostyl) noexcept
+	    : ptr(nullptr)
+	    , deleter(kostyl)
+	{
+	}
+
 	UniquePtr(T* object) noexcept
 	    : ptr(object)
 	{
 	}
 
+	UniquePtr(T* object, int kostyl) noexcept
+	    : ptr(object)
+	    , deleter(kostyl)
+	{
+	}
+
 	UniquePtr(UniquePtr<T>&& other) noexcept
 	    : ptr(nullptr)
+	    , deleter(other.deleter)
 	{
 		this->swap(other);
+		other.deleter = nullptr;
 	}
 
 	~UniquePtr()
 	{
 		if (this->ptr != nullptr)
-			delete ptr;
+			deleter.delete_block(ptr);
+	}
+
+	void setDeleter(const Deleter<T>& deleter)
+	{
+		this->deleter = deleter;
 	}
 
 	UniquePtr<T>& operator=(UniquePtr<T>&& other) noexcept
@@ -119,7 +175,8 @@ public:
 	void reset() noexcept
 	{
 		T* temp = release();
-		delete temp;
+		// delete temp;
+		deleter.delete_block(temp);
 	}
 };
 
@@ -135,11 +192,19 @@ class SharedPtr
 private:
 	T* ptr;
 	int* counter;
+	Deleter<T> deleter = Deleter<T>();
 
 public:
 	SharedPtr() noexcept
 	    : ptr()
 	    , counter(new int(0))
+	{
+	}
+
+	SharedPtr(int kostyl) noexcept
+	    : ptr()
+	    , counter(new int(0))
+	    , deleter(kostyl)
 	{
 	}
 
@@ -149,15 +214,30 @@ public:
 	{
 	}
 
+	SharedPtr(std::nullptr_t, int kostyl) noexcept
+	    : ptr(nullptr)
+	    , counter(0)
+	    , deleter(kostyl)
+	{
+	}
+
 	SharedPtr(T* object) noexcept
 	    : ptr(object)
 	    , counter(new int(1))
 	{
 	}
 
+	SharedPtr(T* object, int kostyl) noexcept
+	    : ptr(object)
+	    , counter(new int(1))
+	    , deleter(kostyl)
+	{
+	}
+
 	SharedPtr(const SharedPtr<T>& other) noexcept
 	    : ptr(other.ptr)
 	    , counter(other.counter)
+	    , deleter(other.deleter)
 	{
 		if (other.counter)
 			(*counter)++;
@@ -168,18 +248,16 @@ public:
 		cleanup();
 	}
 
+	void setDeleter(const Deleter<T>& deleter)
+	{
+		this->deleter = deleter;
+	}
+
 	SharedPtr<T>& operator=(const SharedPtr<T>& other) noexcept
 	{
-		// if (this->ptr && this->ptr != other.ptr && *(this->counter) <= 1)
-		// {
-		// 	delete counter;
-		// 	delete ptr;
-		// }
-
 		cleanup();
 
 		this->ptr = other.ptr;
-		// *(this->counter) = (*other.counter) + 1;
 		this->counter = other.counter;
 		if (counter)
 			(*counter)++;
@@ -225,6 +303,11 @@ public:
 		return *ptr;
 	}
 
+	T& operator[](int index) const
+	{
+		return ptr[index];
+	}
+
 	operator bool() const
 	{
 		return ptr;
@@ -264,14 +347,25 @@ public:
 		std::swap(counter, other.counter);
 	}
 
-private:
+	int UseCount() const
+	{
+		return *(this->counter);
+	}
+
+	bool Unique() const
+	{
+		return UseCount() == 1;
+	}
+
 	void reset() noexcept
 	{
 		T* temp = release();
 		*counter = 0;
-		delete temp;
+		// delete temp;
+		deleter.delete_block(temp);
 	}
 
+private:
 	void cleanup() noexcept
 	{
 		if (counter)
@@ -281,7 +375,7 @@ private:
 			if (*counter <= 0)
 			{
 				if (ptr != nullptr)
-					delete ptr;
+					deleter.delete_block(ptr);
 
 				delete counter;
 			}
@@ -300,10 +394,17 @@ class WeakPtr
 {
 private:
 	T* ptr;
+	Deleter<T> deleter = Deleter<T>();
 
 public:
 	WeakPtr() noexcept
 	    : ptr()
+	{
+	}
+
+	WeakPtr(int kostyl) noexcept
+	    : ptr()
+	    , deleter(kostyl)
 	{
 	}
 
@@ -312,19 +413,37 @@ public:
 	{
 	}
 
+	WeakPtr(std::nullptr_t, int kostyl) noexcept
+	    : ptr(nullptr)
+	    , deleter(kostyl)
+	{
+	}
+
 	WeakPtr(T* object) noexcept
 	    : ptr(object)
 	{
 	}
 
+	WeakPtr(T* object, int kostyl) noexcept
+	    : ptr(object)
+	    , deleter(kostyl)
+	{
+	}
+
 	WeakPtr(const WeakPtr<T>& other) noexcept
 	    : ptr(other.ptr)
+	    , deleter(other.deleter)
 	{
 	}
 
 	~WeakPtr() noexcept
 	{
-		delete ptr;
+		deleter.delete_block(ptr);
+	}
+
+	void setDeleter(const Deleter<T>& deleter)
+	{
+		this->deleter = deleter;
 	}
 
 	WeakPtr<T>& operator=(const WeakPtr<T>& other) noexcept
@@ -409,11 +528,15 @@ public:
 		std::swap(ptr, other.ptr);
 	}
 
-private:
 	void reset() noexcept
 	{
 		T* temp = release();
 		delete temp;
+	}
+
+	bool expired() const
+	{
+		return this->ptr == nullptr;
 	}
 };
 

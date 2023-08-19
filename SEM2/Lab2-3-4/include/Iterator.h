@@ -3,70 +3,64 @@
 #include <iterator>
 
 template <typename Iterator, typename TransformFunction>
-class output_transform_iterator
+class OutputTransformIterator
 {
-public:
-	using iterator_category = std::output_iterator_tag;
+private:
+	Iterator iterator_;
+	TransformFunction transformFunction_;
 
-	explicit output_transform_iterator(Iterator iterator, TransformFunction transformFunction)
+public:
+	using IteratorCategory = std::output_iterator_tag;
+
+	explicit OutputTransformIterator(Iterator iterator, TransformFunction transformFunction)
 	    : iterator_(iterator)
 	    , transformFunction_(transformFunction)
 	{
 	}
 
-	output_transform_iterator& operator++()
+	OutputTransformIterator& operator++()
 	{
 		++iterator_;
 		return *this;
 	}
 
-	output_transform_iterator& operator++(int)
+	OutputTransformIterator& operator++(int)
 	{
 		++*this;
 		return *this;
 	}
 
-	output_transform_iterator& operator*()
+	OutputTransformIterator& operator*()
 	{
 		return *this;
 	}
 
 	template <typename T>
-	output_transform_iterator& operator=(T const& value)
+	OutputTransformIterator& operator=(T const& value)
 	{
 		*iterator_ = transformFunction_(value);
 		return *this;
 	}
-
-private:
-	Iterator iterator_;
-	TransformFunction transformFunction_;
 };
 
 template <typename TransformFunction>
-class output_transformer
+class OutputTransformer
 {
+private:
+	TransformFunction transformFunction_;
+
 public:
-	explicit output_transformer(TransformFunction transformFunction)
+	explicit OutputTransformer(TransformFunction transformFunction)
 	    : transformFunction_(transformFunction)
 	{
 	}
 
 	template <typename Iterator>
-	output_transform_iterator<Iterator, TransformFunction> operator()(Iterator iterator) const
+	OutputTransformIterator<Iterator, TransformFunction> operator()(Iterator iterator) const
 	{
-		return output_transform_iterator<Iterator, TransformFunction>(iterator, transformFunction_);
+		return OutputTransformIterator<Iterator, TransformFunction>(iterator, transformFunction_);
 	}
-
-private:
-	TransformFunction transformFunction_;
 };
-
-// template <typename TransformFunction>
-// output_transformer<TransformFunction> make_output_transformer(TransformFunction transformFunction)
-// {
-// 	return output_transformer<TransformFunction>(transformFunction);
-// }
 
 template <typename T>
 class AbstractIterator

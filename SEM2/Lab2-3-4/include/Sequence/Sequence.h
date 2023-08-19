@@ -132,23 +132,11 @@ Sequence<T>* Sequence<T>::Concat(Sequence<T>* other)
 
 	Sequence<T>* result = this->Create();
 
-	// IIterator<T>* iter = this->_Begin();
-	// IIterator<T>* end = this->_End();
-	//
-	// for (iter; !(iter->_isEquals(end)); iter->_Next())
-	// 	result->Append(iter->_GetCurrent());
-	//
-	// delete iter;
-	// delete end;
-	//
-	// iter = other->_Begin();
-	// end = other->_End();
-	//
-	// for (iter; !(iter->_isEquals(end)); iter->_Next())
-	// 	result->Append(iter->_GetCurrent());
-	//
-	// delete iter;
-	// delete end;
+	for (auto e : *this)
+		result->Append(e);
+
+	for (auto e : *other)
+		result->Append(e);
 
 	return result;
 }
