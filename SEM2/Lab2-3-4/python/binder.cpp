@@ -223,7 +223,7 @@ void print_myimpl(SharedPtr<int> array, int size)
 PYBIND11_MODULE(smart_pointers, m)
 {
 	py::class_<ptr_wrapper<int>>(m, "pint");
-	py::class_<SharedPtr<int>>(m, "mypintt");
+	py::class_<SharedPtr<int>>(m, "mypint");
 
 	m.doc() = "Test";
 
@@ -234,11 +234,6 @@ PYBIND11_MODULE(smart_pointers, m)
 	m.def("generate_myimpl", &generate_mysmart_array, R"pbdoc(
 	       Generates my implementation of smart pointer to an array
 	   )pbdoc");
-
-	// m.def(
-	// 	"generate_stl", [](int size) -> std::shared_ptr<int[]> { return generate_stl_array(size); }, R"pbdoc(
-	//        Generates stl implementation of smart pointer to an array
-	//    )pbdoc");
 
 	m.def("sort_raw", &heapSortRaw, R"pbdoc(
 	       Sort an array that is represented by a raw pointer
@@ -251,12 +246,6 @@ PYBIND11_MODULE(smart_pointers, m)
 
 	       sort_raw(array, size)
 	   )pbdoc");
-
-	// m.def("sort_stl", &heapSortStl, R"pbdoc(
-	//        Sort an array that is represented by stl impl of pointer to an array
-	//
-	//        sort_raw(array, size)
-	//    )pbdoc");
 
 	m.def("print_raw", &print_raw, R"pbdoc(
             Prints array with given size
