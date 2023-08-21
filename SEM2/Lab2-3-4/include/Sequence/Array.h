@@ -329,6 +329,12 @@ public:
 		return temp;
 	}
 
+	Iterator& operator+(int offset)
+	{
+		current = current + offset;
+		return *this;
+	}
+
 	AbstractIterator<T>& operator--() override
 	{
 		current--;
@@ -340,6 +346,12 @@ public:
 		Iterator temp = *this;
 		current--;
 		return temp;
+	}
+
+	Iterator& operator-(int offset)
+	{
+		current = current - offset;
+		return *this;
 	}
 
 	bool operator!=(const Iterator& other) const

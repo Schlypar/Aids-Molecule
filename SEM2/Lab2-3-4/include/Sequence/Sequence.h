@@ -77,8 +77,8 @@ Sequence<T>* Sequence<T>::Map(Func<T> func)
 
 	Sequence<T>* result = this->Create();
 
-	for (Index i = 0; i < this->GetLength(); i++)
-		result->Append(func(this->Get(i)));
+	for (auto e : *this)
+		result->Append(func(e));
 
 	return result;
 }
@@ -95,9 +95,12 @@ Sequence<T>* Sequence<T>::Where(Condition<T> condition)
 
 	Sequence<T>* result = this->Create();
 
-	for (Index i = 0; i < this->GetLength(); i++)
-		if (condition(this->Get(i)))
-			result->Append(this->Get(i));
+	// for (Index i = 0; i < this->GetLength(); i++)
+	// 	if (condition(this->Get(i)))
+	// 		result->Append(this->Get(i));
+	for (auto e : *this)
+		if (condition(e))
+			result->Append(e);
 
 	return result;
 }

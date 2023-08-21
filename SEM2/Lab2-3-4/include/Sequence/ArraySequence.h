@@ -38,32 +38,46 @@ class ArraySequence : public Sequence<T>
 
 private:
 	Array<T> container;
+	int length = 0;
+
+	void Resize()
+	{
+		if (length == container.GetLength())
+			container.Realloc(container.GetLength() * 2);
+		else if (length > container.GetLength())
+			container.Realloc(length * 2);
+	}
 
 public:
 	ArraySequence()
 	    : container()
+	    , length(0)
 	{
 		container.Realloc(0);
 	}
 
 	ArraySequence(const T* data, Size count)
 	    : container(data, count)
+	    , length(count)
 	{
 	}
 
 	ArraySequence(const Sequence<T>& other)
 	    : container(other)
+	    , length(other.GetLength())
 	{
 	}
 
 	ArraySequence(Sequence<T>&& other)
 	    : container(other)
+	    , length(other.GetLength())
 	{
 	}
 
 	template <typename... Args>
 	ArraySequence(T head, Args... args)
 	    : container(head, args...)
+	    , length(sizeof...(args) + 1)
 	{
 	}
 
@@ -84,7 +98,7 @@ public:
 
 	Iterator end() override
 	{
-		return Iterator(new ContainerIterator(this->container.end()));
+		return Iterator(new ContainerIterator(this->container.begin() + this->length));
 	}
 
 	// Gets an instance of the first element
@@ -118,7 +132,7 @@ public:
 
 	Size GetLength() const noexcept override
 	{
-		return container.GetLength();
+		return this->length;
 	}
 
 	bool isEmpty() const noexcept override
@@ -184,7 +198,11 @@ public:
 			return stream;
 		}
 
-		stream << array.container;
+		// stream << array.container;
+		stream << "[ ";
+		for (auto e : array)
+			stream << e << " ";
+		stream << "]";
 
 		return stream;
 	}
@@ -201,12 +219,6 @@ public:
 		stream << array->container;
 
 		return stream;
-	}
-
-private:
-	void Resize()
-	{
-		container.Realloc(container.GetLength() * CAPACITY_TO_REAL_SIZE);
 	}
 };
 
@@ -252,8 +264,18 @@ T& ArraySequence<T>::Get(const Index index) const
 template <typename T>
 Sequence<T>* ArraySequence<T>::Append(const T& data)
 {
-	container.Realloc(container.GetLength() + 1);
-	container[container.GetLength() - 1] = data;
+	if (!container.isEmpty())
+	{
+		this->length++;
+		this->Resize();
+		container[length - 1] = data;
+	}
+	else
+	{
+		container.Realloc(1);
+		container[0] = data;
+		this->length++;
+	}
 
 	return this;
 }
@@ -261,7 +283,8 @@ Sequence<T>* ArraySequence<T>::Append(const T& data)
 template <typename T>
 Sequence<T>* ArraySequence<T>::Prepend(const T& data)
 {
-	container.Realloc(GetLength() + 1);
+	this->length++;
+	this->Resize();
 
 	for (Index i = GetLength(); i > 0; i--)
 		container[i] = container[i - 1];
@@ -281,7 +304,9 @@ void ArraySequence<T>::InsertAt(const Index index, const T& data)
 		throw EXCEPTION_INDEX_OUT_OF_RANGE;
 	}
 
-	container.Realloc(container.GetLength() + 1);
+	// container.Realloc(container.GetLength() + 1);
+	this->length++;
+	this->Resize();
 
 	for (Index i = GetLength(); i > index; i--)
 		container[i] = container[i - 1];
@@ -294,5 +319,7 @@ void ArraySequence<T>::Remove(const Index index)
 {
 	for (Index i = index; i < GetLength() - 1; i++)
 		container[i] = container[i + 1];
-	container.Realloc(container.GetLength() - 1);
+
+	this->length--;
+	// container.Realloc(container.GetLength() - 1);
 }
