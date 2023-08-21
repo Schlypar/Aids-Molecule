@@ -140,16 +140,6 @@ public:
 		return GetLength() == 0;
 	}
 
-	T* GetFirstPointer() const override
-	{
-		return &(GetFirst());
-	}
-
-	T* GetEndPointer() const override
-	{
-		return (&(GetLast()) + 1);
-	}
-
 	ArraySequence<int> operator|(fn::filter filter)
 	{
 		ArraySequence<T> result;

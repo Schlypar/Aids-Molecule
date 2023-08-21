@@ -110,16 +110,6 @@ public:
 		return GetLength() == 0;
 	}
 
-	T* GetFirstPointer() const override
-	{
-		return &container.GetFirst();
-	}
-
-	T* GetEndPointer() const override
-	{
-		return nullptr;
-	}
-
 	// Returns abstract class Sequence that underhood is ListSequence
 	Sequence<T>* Create() const override
 	{

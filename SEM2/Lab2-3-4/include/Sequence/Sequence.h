@@ -22,11 +22,6 @@ public:
 	virtual Iterator begin() = 0;
 	virtual Iterator end() = 0;
 
-	// Gets pointer to the first element
-	virtual T* GetFirstPointer() const = 0;
-	// Gets pointer to the last element
-	virtual T* GetEndPointer() const = 0;
-
 	virtual T& GetFirst() const = 0;
 	virtual T& GetLast() const = 0;
 	virtual T& Get(const Index index) const = 0;
@@ -95,9 +90,6 @@ Sequence<T>* Sequence<T>::Where(Condition<T> condition)
 
 	Sequence<T>* result = this->Create();
 
-	// for (Index i = 0; i < this->GetLength(); i++)
-	// 	if (condition(this->Get(i)))
-	// 		result->Append(this->Get(i));
 	for (auto e : *this)
 		if (condition(e))
 			result->Append(e);
