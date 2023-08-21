@@ -79,7 +79,6 @@ public:
 	    , deleter(other.deleter)
 	{
 		this->swap(other);
-		other.deleter = nullptr;
 	}
 
 	~UniquePtr()
