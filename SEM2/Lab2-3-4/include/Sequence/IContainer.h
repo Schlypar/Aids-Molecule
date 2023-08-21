@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <stddef.h>
@@ -22,7 +23,8 @@ template <typename T>
 using Func = T (*)(T&);
 
 template <typename T>
-using Condition = bool (*)(T&);
+using Condition = std::function<bool(T&)>;
+// using Condition = bool (*)(T&);
 
 template <typename T>
 using Reducer = T (*)(T, T);

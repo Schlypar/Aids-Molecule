@@ -5,31 +5,6 @@
 #include "Sequence.h"
 #include <functional>
 
-namespace fn
-{
-
-struct filter
-{
-	std::function<int(int)> _filter;
-
-	filter(std::function<int(int)> func)
-	    : _filter(func)
-	{
-	}
-};
-
-struct transformer
-{
-	std::function<int(int)> _transformer;
-
-	transformer(std::function<int(int)> func)
-	    : _transformer(func)
-	{
-	}
-};
-
-}
-
 template <typename T>
 class ArraySequence : public Sequence<T>
 {
@@ -140,7 +115,7 @@ public:
 		return GetLength() == 0;
 	}
 
-	ArraySequence<int> operator|(fn::filter filter)
+	ArraySequence<T> operator|(fn::filter<T> filter)
 	{
 		ArraySequence<T> result;
 
@@ -151,7 +126,7 @@ public:
 		return result;
 	}
 
-	ArraySequence<int> operator|(fn::transformer transformer)
+	ArraySequence<T> operator|(fn::transformer<T> transformer)
 	{
 		ArraySequence<T> result;
 

@@ -6,8 +6,36 @@
 #include "Array.h"
 #include "Iterator.h"
 #include "Logger.h"
+#include "Pointer.h"
 #include "Tuple.h"
 #include "concepts.h"
+
+namespace fn
+{
+
+template <typename T>
+struct filter
+{
+	std::function<T(T)> _filter;
+
+	filter(std::function<T(T)> func)
+	    : _filter(func)
+	{
+	}
+};
+
+template <typename T>
+struct transformer
+{
+	std::function<T(T)> _transformer;
+
+	transformer(std::function<T(T)> func)
+	    : _transformer(func)
+	{
+	}
+};
+
+}
 
 template <typename T>
 class Sequence
@@ -27,7 +55,7 @@ public:
 	virtual T& Get(const Index index) const = 0;
 
 	Sequence<T>* Map(T (*func)(T&));
-	Sequence<T>* Where(bool (*condition)(T&));
+	Sequence<T>* Where(std::function<bool(T&)> condition);
 
 	virtual Sequence<T>* GetSubsequence(const Index start, const Index end);
 	virtual Sequence<T>* Concat(Sequence<T>* other);
@@ -58,6 +86,15 @@ public:
 
 		return stream;
 	}
+
+	template <typename U>
+	friend SharedPtr<Sequence<U>> operator|(SharedPtr<Sequence<U>> sequence, fn::filter<U> filter);
+	template <typename U>
+	friend SharedPtr<Sequence<U>> operator|(SharedPtr<Sequence<U>> sequence, fn::transformer<U> transformer);
+	template <typename U>
+	friend UniquePtr<Sequence<U>> operator|(Sequence<U>* sequence, fn::filter<U> filter);
+	template <typename U>
+	friend UniquePtr<Sequence<U>> operator|(Sequence<U>* sequence, fn::transformer<U> transformer);
 };
 
 template <typename T>
@@ -118,20 +155,15 @@ Sequence<T>* Sequence<T>::GetSubsequence(const Index start, const Index end)
 template <typename T>
 Sequence<T>* Sequence<T>::Concat(Sequence<T>* other)
 {
-	if (this->isEmpty() || other->isEmpty())
-	{
-		Logger::Trace("At Concat() at Sequence.h");
-		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-		throw(EXCEPTION_INDEX_OUT_OF_RANGE);
-	}
-
 	Sequence<T>* result = this->Create();
 
-	for (auto e : *this)
-		result->Append(e);
+	if (this->isEmpty() == false)
+		for (auto e : *this)
+			result->Append(e);
 
-	for (auto e : *other)
-		result->Append(e);
+	if (other->isEmpty() == false)
+		for (auto e : *other)
+			result->Append(e);
 
 	return result;
 }
@@ -259,3 +291,49 @@ public:
 		return !(this->iter->equal(*other.iter));
 	}
 };
+
+template <typename U>
+SharedPtr<Sequence<U>> operator|(SharedPtr<Sequence<U>> sequence, fn::filter<U> filter)
+{
+	SharedPtr<Sequence<U>> result = sequence->Create();
+
+	for (U& data : *sequence)
+		if (filter._filter(data))
+			result->Append(data);
+
+	return result;
+}
+
+template <typename U>
+SharedPtr<Sequence<U>> operator|(SharedPtr<Sequence<U>> sequence, fn::transformer<U> transformer)
+{
+	SharedPtr<Sequence<U>> result = sequence->Create();
+
+	for (U& data : *sequence)
+		result->Append(transformer._transformer(data));
+
+	return result;
+}
+
+template <typename U>
+UniquePtr<Sequence<U>> operator|(Sequence<U>* sequence, fn::filter<U> filter)
+{
+	Sequence<U>* result = sequence->Create();
+
+	for (U& data : *sequence)
+		if (filter._filter(data))
+			result->Append(data);
+
+	return UniquePtr<Sequence<U>>(result);
+}
+
+template <typename U>
+UniquePtr<Sequence<U>> operator|(Sequence<U>* sequence, fn::transformer<U> transformer)
+{
+	Sequence<U>* result = sequence->Create();
+
+	for (U& data : *sequence)
+		result->Append(transformer._transformer(data));
+
+	return UniquePtr<Sequence<U>>(result);
+}
