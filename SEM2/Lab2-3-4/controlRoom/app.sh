@@ -4,4 +4,6 @@
 
 cd python
 
+source env/bin/activate
+
 python3 gui.py
