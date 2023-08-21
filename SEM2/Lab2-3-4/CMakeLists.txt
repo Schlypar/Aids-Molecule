@@ -35,6 +35,9 @@ set(SOURCES_HEADERS
         ${INCLUDE}/Sequence/Stack.h
         ${INCLUDE}/Sequence/Array.h
         ${INCLUDE}/Sequence/ArraySequence.h
+        ${INCLUDE}/Sorter/ISorter.h
+        ${INCLUDE}/Sorter/HeapSort.h
+        ${INCLUDE}/Sorter/QuickSort.h
         ${INCLUDE}/Tree/ITree.h
         ${INCLUDE}/Tree/BinaryTree.h
         ${INCLUDE}/Tree/BinarySearchTree.h

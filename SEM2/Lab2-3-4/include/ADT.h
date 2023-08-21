@@ -16,6 +16,9 @@
 #include <Sequence/ListSequence.h>
 #include <Sequence/Stack.h>
 
+#include <Sorter/HeapSort.h>
+#include <Sorter/ISorter.h>
+
 #include <Tree/BinaryHeap.h>
 #include <Tree/BinarySearchTree.h>
 #include <Tree/BinaryTree.h>
