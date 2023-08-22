@@ -18,6 +18,8 @@
 
 #include <Sorter/HeapSort.h>
 #include <Sorter/ISorter.h>
+#include <Sorter/QuickSort.h>
+#include <Sorter/ShellSort.h>
 
 #include <Tree/BinaryHeap.h>
 #include <Tree/BinarySearchTree.h>
@@ -26,5 +28,10 @@
 #include <Tree/MultiBinaryTree.h>
 #include <Tree/MultiSearchTree.h>
 #include <Tree/OrderedSet.h>
+
+#include <Dict/HashTable.h>
+#include <Dict/IDictionary.h>
+#include <Dict/IHasher.h>
+#include <Dict/STLHasher.h>
 
 #include <functional/range.h>

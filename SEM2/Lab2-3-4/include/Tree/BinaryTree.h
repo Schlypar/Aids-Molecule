@@ -2,6 +2,7 @@
 
 #include "ITree.h"
 #include "Logger.h"
+#include "Pair.h"
 #include "Pointer.h"
 #include "Sequence/ArraySequence.h"
 #include "Sequence/Sequence.h"
@@ -17,10 +18,13 @@ using NodePtr = TreeNode<T1, T2>*;
 template <Comparible Tkey, typename Tvalue>
 class BinaryTree : public Tree<Tkey, Tvalue>
 {
-
 protected:
 	WeakPtr<TreeNode<Tkey, Tvalue>> root;
 	KGen<Tkey, Tvalue> kGen = nullptr;
+
+	using Iterator = ArraySequence<Tvalue>::Iterator;
+
+	ArraySequence<Tvalue>* serializedTree = nullptr;
 
 public:
 	BinaryTree()
@@ -86,6 +90,17 @@ public:
 
 	virtual ~BinaryTree()
 	{
+		delete serializedTree;
+	}
+
+	Pair<Iterator, Iterator> beginend(TraverseOrder first, TraverseOrder second, TraverseOrder third)
+	{
+		delete serializedTree;
+		serializedTree = new ArraySequence<Tvalue>();
+
+		this->Traverse(first, second, third, [this](Tvalue& e) -> void { this->serializedTree->Append(e); });
+
+		return Pair<Iterator, Iterator>(serializedTree->begin(), serializedTree->end());
 	}
 
 	NodePtr<Tkey, Tvalue> GetRoot() const noexcept override
