@@ -38,6 +38,11 @@ set(SOURCES_HEADERS
         ${INCLUDE}/Sorter/ISorter.h
         ${INCLUDE}/Sorter/HeapSort.h
         ${INCLUDE}/Sorter/QuickSort.h
+        ${INCLUDE}/Sorter/ShellSort.h
+        ${INCLUDE}/Dict/IHasher.h
+        ${INCLUDE}/Dict/STLHasher.h
+        ${INCLUDE}/Dict/IDictionary.h
+        ${INCLUDE}/Dict/HashTable.h
         ${INCLUDE}/Tree/ITree.h
         ${INCLUDE}/Tree/BinaryTree.h
         ${INCLUDE}/Tree/BinarySearchTree.h
