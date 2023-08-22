@@ -8,7 +8,6 @@
 template <typename T>
 class ArraySequence : public Sequence<T>
 {
-	using Iterator = Sequence<T>::Iterator;
 	using ContainerIterator = Array<T>::Iterator;
 
 private:
@@ -24,6 +23,8 @@ private:
 	}
 
 public:
+	using Iterator = Sequence<T>::Iterator;
+
 	ArraySequence()
 	    : container()
 	    , length(0)

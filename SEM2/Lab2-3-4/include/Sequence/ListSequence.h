@@ -8,14 +8,14 @@
 template <typename T>
 class ListSequence : public Sequence<T>
 {
-
-	using Iterator = Sequence<T>::Iterator;
 	using ContainerIterator = SegmentedList<T>::Iterator;
 
 private:
 	SegmentedList<T> container;
 
 public:
+	using Iterator = Sequence<T>::Iterator;
+
 	ListSequence()
 	    : container()
 	{
