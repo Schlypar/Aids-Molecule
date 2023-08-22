@@ -21,4 +21,9 @@ public:
 
 		return copy;
 	}
+
+	ISorter<T>* Copy() const noexcept override
+	{
+		return new ShellSorter<T>();
+	}
 };

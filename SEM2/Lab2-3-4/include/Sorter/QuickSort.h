@@ -23,6 +23,11 @@ public:
 			->Concat(QuickSort(greater, comparator).Get());
 	}
 
+	ISorter<T>* Copy() const noexcept override
+	{
+		return new QuickSorter<T>();
+	}
+
 private:
 	SharedPtr<Sequence<T>> QuickSort(SharedPtr<Sequence<T>> sequence, std::function<int(const T&, const T&)> comparator)
 	{

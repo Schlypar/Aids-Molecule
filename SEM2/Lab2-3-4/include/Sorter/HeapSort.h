@@ -26,6 +26,11 @@ public:
 		return copy;
 	}
 
+	ISorter<T>* Copy() const noexcept override
+	{
+		return new HeapSorter<T>();
+	}
+
 private:
 	void Heapify(Sequence<T>* sequence, int size, int i, std::function<int(const T&, const T&)> comparator)
 	{
