@@ -2,6 +2,7 @@ import smart_pointers as ptr
 import matplotlib.pyplot as plt
 import numpy as np
 import time
+from random import randint
 
 
 def set_lables(ax, n):
@@ -64,7 +65,16 @@ def plot_bars(raw: tuple, smart: tuple) -> None:
     plt.show()
 
 
-def measure_raw() -> tuple:
+def generate_seed(size: int) -> list[int]:
+    result: list = []
+
+    for i in range(size):
+        result.append(randint(0, 10 * size))
+
+    return result
+
+
+def measure_raw(seeds: list) -> tuple:
     N: list = [10, 10**2, 10**3, 10**4, 10**5, 10**6]
 
     results: list = []
@@ -72,20 +82,20 @@ def measure_raw() -> tuple:
     for n in N:
         current_record = 0
 
-        for _ in range(100):
-            array = ptr.generate_raw(n)
+        for seed in seeds:
+            array = ptr.generate_raw(n, seed)
             start = time.time()
             ptr.sort_raw(array, n)
             end = time.time()
 
             current_record += end - start
 
-        results.append(current_record / 100)
+        results.append(current_record / len(seeds))
 
     return (results[0], results[1], results[2], results[3], results[4], results[5])
 
 
-def measure_smart() -> tuple:
+def measure_smart(seeds: list) -> tuple:
     N: list = [10, 10**2, 10**3, 10**4, 10**5, 10**6]
 
     results: list = []
@@ -93,15 +103,15 @@ def measure_smart() -> tuple:
     for n in N:
         current_record = 0
 
-        for _ in range(100):
-            array = ptr.generate_myimpl(n)
+        for seed in seeds:
+            array = ptr.generate_myimpl(n, seed)
             start = time.time()
             ptr.sort_myimpl(array, n)
             end = time.time()
 
             current_record += end - start
 
-        results.append(current_record / 100)
+        results.append(current_record / len(seeds))
 
     return (results[0], results[1], results[2], results[3], results[4], results[5])
 
@@ -144,6 +154,11 @@ def deserialise_record(file) -> tuple:
     return tuple(map(float, list(file.readline().split(" "))[:-1]))
 
 
+# seeds = generate_seed(250)
+#
+# save_record_raw(measure_raw(seeds))
+# save_record_smart(measure_smart(seeds))
+#
 # file_with_raw = open("raw_pointers.txt", "r+")
 # file_with_smart = open("smart_pointers.txt", "r+")
 #

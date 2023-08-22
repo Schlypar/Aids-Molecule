@@ -69,9 +69,9 @@ int set_size()
 	return size;
 }
 
-ptr_wrapper<int> generate_raw_array(int size)
+ptr_wrapper<int> generate_raw_array(int size, int seed)
 {
-	srand((unsigned) time(0));
+	srand(seed);
 	ptr_wrapper<int> array = new int[size];
 
 	for (auto i = 0; i < size; i++)
@@ -80,9 +80,9 @@ ptr_wrapper<int> generate_raw_array(int size)
 	return array;
 }
 
-SharedPtr<int> generate_mysmart_array(int size)
+SharedPtr<int> generate_mysmart_array(int size, int seed)
 {
-	srand((unsigned) time(0));
+	srand(seed);
 	SharedPtr<int> array = new int[size];
 	array.setDeleter(1);
 

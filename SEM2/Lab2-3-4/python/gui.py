@@ -150,13 +150,15 @@ class Ui_MainWindow(object):
         # self.tableWidget.setItem(X, Y, QTableWidgetItem("TEXT"))
 
         for row_number, raw, smart in zip(range(6), raw_data, smart_data):
-            self.tableWidget.setItem(row_number, 0, QTableWidgetItem(str(raw)))
-            self.tableWidget.setItem(row_number, 1, QTableWidgetItem(str(smart)))
+            # a: int = 10
+            # f"{(a * 100):.2g}"
+            self.tableWidget.setItem(row_number, 0, QTableWidgetItem(f"{raw:.7f}"))
+            self.tableWidget.setItem(row_number, 1, QTableWidgetItem(f"{smart:.7f}"))
             self.tableWidget.setItem(
-                row_number, 2, QTableWidgetItem(str((raw / smart) * 100))
+                row_number, 2, QTableWidgetItem(f"{(raw/smart * 100):.2f}")
             )
             self.tableWidget.setItem(
-                row_number, 3, QTableWidgetItem(str((smart / raw) * 100))
+                row_number, 3, QTableWidgetItem(f"{(smart/raw * 100):.2f}")
             )
 
     def show_graph_in_another_window(self):
