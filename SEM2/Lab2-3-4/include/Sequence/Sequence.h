@@ -16,7 +16,7 @@ namespace fn
 template <typename T>
 struct filter
 {
-	std::function<T(T)> _filter;
+	std::function<bool(T)> _filter;
 
 	filter(std::function<T(T)> func)
 	    : _filter(func)
