@@ -54,7 +54,7 @@ concept Greater = requires(T a, T b) {
 };
 
 template <typename T>
-concept Comparible = Equal<T> && Less<T> && Greater<T>;
+concept Comparable = Equal<T> && Less<T> && Greater<T>;
 
 template <typename T>
 concept Iterable = requires(T t) {

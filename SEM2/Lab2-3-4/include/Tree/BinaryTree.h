@@ -15,7 +15,7 @@ using TreeNode = typename Tree<T1, T2>::TreeNode;
 template <typename T1, typename T2>
 using NodePtr = TreeNode<T1, T2>*;
 
-template <Comparible Tkey, typename Tvalue>
+template <Comparable Tkey, typename Tvalue>
 class BinaryTree : public Tree<Tkey, Tvalue>
 {
 protected:
@@ -592,7 +592,7 @@ protected:
 	}
 };
 
-template <Comparible Tkey, typename Tvalue>
+template <Comparable Tkey, typename Tvalue>
 Size BinaryTree<Tkey, Tvalue>::Depth(NodePtr<Tkey, Tvalue> startNode) const noexcept
 {
 	if (startNode == nullptr)
@@ -611,7 +611,7 @@ Size BinaryTree<Tkey, Tvalue>::Depth(NodePtr<Tkey, Tvalue> startNode) const noex
 		return depth;
 }
 
-template <Comparible Tkey, typename Tvalue>
+template <Comparable Tkey, typename Tvalue>
 Size BinaryTree<Tkey, Tvalue>::Depth(NodePtr<Tkey, Tvalue> startNode, Size depth) const noexcept
 {
 	if (startNode == nullptr)
@@ -630,7 +630,7 @@ Size BinaryTree<Tkey, Tvalue>::Depth(NodePtr<Tkey, Tvalue> startNode, Size depth
 	return depth + std::max(leftDepth, rightDepth);
 }
 
-template <Comparible Tkey, typename Tvalue>
+template <Comparable Tkey, typename Tvalue>
 Size BinaryTree<Tkey, Tvalue>::Depth() const noexcept
 {
 	auto startNode = this->root.Get();
@@ -651,7 +651,7 @@ Size BinaryTree<Tkey, Tvalue>::Depth() const noexcept
 	return depth + std::max(leftDepth, rightDepth);
 }
 
-template <Comparible Tkey, typename Tvalue>
+template <Comparable Tkey, typename Tvalue>
 NodePtr<Tkey, Tvalue> BinaryTree<Tkey, Tvalue>::Find(const Tvalue& value) const noexcept
 {
 	if (root == nullptr)
@@ -672,7 +672,7 @@ NodePtr<Tkey, Tvalue> BinaryTree<Tkey, Tvalue>::Find(const Tvalue& value) const 
 			return nullptr;
 }
 
-template <Comparible Tkey, typename Tvalue>
+template <Comparable Tkey, typename Tvalue>
 NodePtr<Tkey, Tvalue> BinaryTree<Tkey, Tvalue>::Find(Sequence<TraverseOrder>* sequence) const
 {
 	if (!(sequence->isEmpty()) && root == nullptr)
@@ -685,7 +685,7 @@ NodePtr<Tkey, Tvalue> BinaryTree<Tkey, Tvalue>::Find(Sequence<TraverseOrder>* se
 	return Find(sequence, 0, GetRoot());
 }
 
-template <Comparible Tkey, typename Tvalue>
+template <Comparable Tkey, typename Tvalue>
 Tree<Tkey, Tvalue>* BinaryTree<Tkey, Tvalue>::Add(const Tvalue& value) noexcept
 {
 	if (root == nullptr)
@@ -734,7 +734,7 @@ Tree<Tkey, Tvalue>* BinaryTree<Tkey, Tvalue>::Add(const Tvalue& value) noexcept
 	return this;
 }
 
-template <Comparible Tkey, typename Tvalue>
+template <Comparable Tkey, typename Tvalue>
 void BinaryTree<Tkey, Tvalue>::DeleteRoot() noexcept
 {
 	if (root->left == nullptr && root->right == nullptr)
@@ -819,7 +819,7 @@ void BinaryTree<Tkey, Tvalue>::DeleteRoot() noexcept
 	}
 }
 
-template <Comparible Tkey, typename Tvalue>
+template <Comparable Tkey, typename Tvalue>
 void BinaryTree<Tkey, Tvalue>::Delete(const Tvalue& value) noexcept
 {
 	if (root == nullptr)
@@ -972,7 +972,7 @@ void BinaryTree<Tkey, Tvalue>::Delete(const Tvalue& value) noexcept
 	}
 }
 
-template <Comparible Tkey, typename Tvalue>
+template <Comparable Tkey, typename Tvalue>
 void BinaryTree<Tkey, Tvalue>::Traverse(NodePtr<Tkey, Tvalue> startNode, TraverseOrder first, TraverseOrder second,
 	TraverseOrder third, std::function<void(Tvalue&)> func)
 {
@@ -1032,7 +1032,7 @@ void BinaryTree<Tkey, Tvalue>::Traverse(NodePtr<Tkey, Tvalue> startNode, Travers
 	}
 }
 
-template <Comparible Tkey, typename Tvalue>
+template <Comparable Tkey, typename Tvalue>
 Tree<Tkey, Tvalue>* BinaryTree<Tkey, Tvalue>::Traverse(TraverseOrder first, TraverseOrder second, TraverseOrder third,
 	std::function<void(Tvalue&)> func) const
 {
@@ -1043,7 +1043,7 @@ Tree<Tkey, Tvalue>* BinaryTree<Tkey, Tvalue>::Traverse(TraverseOrder first, Trav
 	return result;
 }
 
-template <Comparible Tkey, typename Tvalue>
+template <Comparable Tkey, typename Tvalue>
 void BinaryTree<Tkey, Tvalue>::Traverse(TraverseOrder first, TraverseOrder second, TraverseOrder third,
 	std::function<void(Tvalue&)> func)
 {
@@ -1105,7 +1105,7 @@ void BinaryTree<Tkey, Tvalue>::Traverse(TraverseOrder first, TraverseOrder secon
 	}
 }
 
-template <Comparible Tkey, typename Tvalue>
+template <Comparable Tkey, typename Tvalue>
 void BinaryTree<Tkey, Tvalue>::Traverse(TraverseOrder first, TraverseOrder second, TraverseOrder third,
 	std::function<void(NodePtr<Tkey, Tvalue>)> funcWithNodes)
 {
@@ -1167,7 +1167,7 @@ void BinaryTree<Tkey, Tvalue>::Traverse(TraverseOrder first, TraverseOrder secon
 	}
 }
 
-template <Comparible Tkey, typename Tvalue>
+template <Comparable Tkey, typename Tvalue>
 void BinaryTree<Tkey, Tvalue>::Traverse(NodePtr<Tkey, Tvalue> startNode, TraverseOrder first, TraverseOrder second,
 	TraverseOrder third, std::function<void(NodePtr<Tkey, Tvalue>)> funcWithNodes)
 {

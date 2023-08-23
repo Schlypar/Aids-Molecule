@@ -10,7 +10,7 @@ C<T> -> single<T> or multi<Tvalue>
 
 */
 
-template <Comparible Tkey, typename Tvalue>
+template <Comparable Tkey, typename Tvalue>
 class MultiBinaryTree : public BinaryTree<Tkey, Multi<Tvalue>>
 {
 	template <typename T1, typename T2>

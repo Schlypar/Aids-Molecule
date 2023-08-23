@@ -4,7 +4,7 @@
 #include "Tree/BinaryTree.h"
 #include "concepts.h"
 
-template <Comparible T>
+template <Comparable T>
 class OrderedSet : private BinarySearchTree<T>
 {
 	template <typename T1, typename T2>
@@ -137,7 +137,7 @@ public:
 	}
 };
 
-template <Comparible T>
+template <Comparable T>
 OrderedSet<T>* OrderedSet<T>::Union(const OrderedSet<T>* other) const noexcept
 {
 	OrderedSet<T>* result = (OrderedSet<T>*) this->Copy();
@@ -147,7 +147,7 @@ OrderedSet<T>* OrderedSet<T>::Union(const OrderedSet<T>* other) const noexcept
 	return result;
 }
 
-template <Comparible T>
+template <Comparable T>
 OrderedSet<T>* OrderedSet<T>::Intersection(const OrderedSet<T>* other) const noexcept
 {
 	OrderedSet<T>* result = (OrderedSet<T>*) this->Create();
@@ -163,7 +163,7 @@ OrderedSet<T>* OrderedSet<T>::Intersection(const OrderedSet<T>* other) const noe
 	return result;
 }
 
-template <Comparible T>
+template <Comparable T>
 OrderedSet<T>* OrderedSet<T>::Difference(const OrderedSet<T>* other) const noexcept
 {
 	OrderedSet<T>* result = (OrderedSet<T>*) this->Create();
@@ -186,7 +186,7 @@ OrderedSet<T>* OrderedSet<T>::Difference(const OrderedSet<T>* other) const noexc
 	return result;
 }
 
-template <Comparible T>
+template <Comparable T>
 bool OrderedSet<T>::IncludesSubset(const OrderedSet<T>* other)
 {
 	bool result = true;
@@ -203,7 +203,7 @@ bool OrderedSet<T>::IncludesSubset(const OrderedSet<T>* other)
 	return result;
 }
 
-template <Comparible T>
+template <Comparable T>
 bool OrderedSet<T>::isEquals(const OrderedSet<T>* other)
 {
 	if (this->IncludesSubset(other) && other->IncludesSubset(this))

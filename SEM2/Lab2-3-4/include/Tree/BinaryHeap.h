@@ -4,7 +4,7 @@
 #include "Sequence/List.h"
 #include "Tree/ITree.h"
 
-template <Comparible P, typename T>
+template <Comparable P, typename T>
 class BinaryHeap : public BinaryTree<P, T>
 {
 	template <typename T1, typename T2>
@@ -92,7 +92,7 @@ private:
 	void Balance() noexcept override;
 };
 
-template <Comparible P, typename T>
+template <Comparable P, typename T>
 Tree<P, T>* BinaryHeap<P, T>::Add(const T& value) noexcept
 {
 	if (this->root == nullptr)
@@ -136,7 +136,7 @@ Tree<P, T>* BinaryHeap<P, T>::Add(const T& value) noexcept
 	return this;
 }
 
-template <Comparible P, typename T>
+template <Comparable P, typename T>
 void BinaryHeap<P, T>::Delete(const T& value) noexcept
 {
 	auto deleter = [this](NodePtr<P, T> node) -> void {
@@ -171,14 +171,14 @@ void BinaryHeap<P, T>::Delete(const T& value) noexcept
 	});
 }
 
-template <Comparible P, typename T>
+template <Comparable P, typename T>
 void BinaryHeap<P, T>::PushUp(NodePtr<P, T> node) noexcept
 {
 	std::swap(node->data, node->parent->data);
 	std::swap(node->key, node->parent->key);
 }
 
-template <Comparible P, typename T>
+template <Comparable P, typename T>
 void BinaryHeap<P, T>::PushDown(NodePtr<P, T> node) noexcept
 {
 	NodePtr<P, T> withMaxValue = nullptr;
@@ -193,7 +193,7 @@ void BinaryHeap<P, T>::PushDown(NodePtr<P, T> node) noexcept
 	std::swap(node->key, withMaxValue->key);
 }
 
-template <Comparible P, typename T>
+template <Comparable P, typename T>
 void BinaryHeap<P, T>::Balance() noexcept
 {
 	auto pushUp = [this](NodePtr<P, T> node) -> void {

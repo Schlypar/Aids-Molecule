@@ -3,7 +3,7 @@
 #include "MultiBinaryTree.h"
 #include "concepts.h"
 
-template <Comparible T>
+template <Comparable T>
 class MultiBinarySearch : public MultiBinaryTree<T, T>
 {
 	template <typename T1, typename T2>

@@ -4,7 +4,7 @@
 #include "Tree/ITree.h"
 #include "concepts.h"
 
-template <Comparible T>
+template <Comparable T>
 class BinarySearchTree : public BinaryTree<T, T>
 {
 
