@@ -14,6 +14,7 @@
 #include <Sequence/IContainer.h>
 #include <Sequence/IIterator.h>
 #include <Sequence/ListSequence.h>
+#include <Sequence/SortedSequence.h>
 #include <Sequence/Stack.h>
 
 #include <Sorter/HeapSort.h>
