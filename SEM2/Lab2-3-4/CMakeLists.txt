@@ -29,6 +29,7 @@ set(SOURCES_HEADERS
         ${INCLUDE}/str/CString.h
         ${INCLUDE}/str/CString.cpp
         ${INCLUDE}/functional/range.h
+        ${INCLUDE}/functional/mapreduce.h
         ${INCLUDE}/Sequence/ListSequence.h
         ${INCLUDE}/Sequence/SegmentedList.h
         ${INCLUDE}/Sequence/Sequence.h
@@ -51,6 +52,7 @@ set(SOURCES_HEADERS
         ${INCLUDE}/Tree/MultiSearchTree.h
         ${INCLUDE}/Tree/BinaryHeap.h
         ${INCLUDE}/Tree/MultiBinaryTree.h
+        ${INCLUDE}/Tree/BTree.h
         ${INCLUDE}/Linal/Matrix.h
         ${INCLUDE}/Linal/Vector.h)
 

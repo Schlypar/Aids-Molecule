@@ -22,6 +22,7 @@
 #include <Sorter/QuickSort.h>
 #include <Sorter/ShellSort.h>
 
+#include <Tree/BTree.h>
 #include <Tree/BinaryHeap.h>
 #include <Tree/BinarySearchTree.h>
 #include <Tree/BinaryTree.h>
