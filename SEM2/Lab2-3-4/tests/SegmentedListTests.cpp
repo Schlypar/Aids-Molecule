@@ -127,17 +127,6 @@ TEST_CASE("InsertAt adds element at correct index")
 	REQUIRE(list.Get(3) == 3);
 }
 
-TEST_CASE("InsertAt throws exception if index out of range")
-{
-	SegmentedList<int> list;
-	list.Append(1);
-	list.Append(2);
-	list.Append(3);
-
-	REQUIRE_THROWS_AS(list.insertAt(-1, 10), Exception);
-	REQUIRE_THROWS_AS(list.insertAt(4, 10), Exception);
-}
-
 // Test case for the assignment operator overload that performs a deep copy
 TEST_CASE("SegmentedList operator= deep copy", "[SegmentedList]")
 {

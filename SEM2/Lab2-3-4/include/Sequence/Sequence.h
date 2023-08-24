@@ -9,33 +9,8 @@
 #include "Pointer.h"
 #include "Tuple.h"
 #include "concepts.h"
+#include "functional/mapreduce.h"
 
-namespace fn
-{
-
-template <typename T>
-struct filter
-{
-	std::function<bool(T)> _filter;
-
-	filter(std::function<T(T)> func)
-	    : _filter(func)
-	{
-	}
-};
-
-template <typename T>
-struct transformer
-{
-	std::function<T(T)> _transformer;
-
-	transformer(std::function<T(T)> func)
-	    : _transformer(func)
-	{
-	}
-};
-
-}
 
 template <typename T>
 class Sequence

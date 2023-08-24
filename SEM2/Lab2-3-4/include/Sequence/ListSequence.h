@@ -67,6 +67,27 @@ public:
 		return Iterator(new ContainerIterator(this->container.end()));
 	}
 
+	ListSequence<T> operator|(fn::filter<T> filter)
+	{
+		ListSequence<T> result;
+
+		for (T& data : *this)
+			if (filter._filter(data))
+				result.Append(data);
+
+		return result;
+	}
+
+	ListSequence<T> operator|(fn::transformer<T> transformer)
+	{
+		ListSequence<T> result;
+
+		for (T& data : *this)
+			result.Append(transformer._transformer(data));
+
+		return result;
+	}
+
 	// Gets an intance of what is at the head
 	T& GetFirst() const override;
 
@@ -176,7 +197,7 @@ T& ListSequence<T>::GetFirst() const
 {
 	if (isEmpty())
 	{
-		Logger::Trace("At Get() at ArraySequence.h");
+		Logger::Trace("At Get() at ListSequence.h");
 		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
 		exit(EXIT_FAILURE);
 	}
@@ -189,7 +210,7 @@ T& ListSequence<T>::GetLast() const
 {
 	if (isEmpty())
 	{
-		Logger::Trace("At Get() at ArraySequence.h");
+		Logger::Trace("At Get() at ListSequence.h");
 		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
 		exit(EXIT_FAILURE);
 	}
@@ -202,7 +223,7 @@ T& ListSequence<T>::Get(const Index index) const
 {
 	if (isEmpty())
 	{
-		Logger::Trace("At Get() at ArraySequence.h");
+		Logger::Trace("At Get() at ListSequence.h");
 		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
 		exit(EXIT_FAILURE);
 	}

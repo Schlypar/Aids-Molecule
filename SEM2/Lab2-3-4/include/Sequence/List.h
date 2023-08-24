@@ -2,6 +2,7 @@
 
 #include "IContainer.h"
 #include "Iterator.h"
+#include "functional/mapreduce.h"
 
 template <typename T>
 struct Node
@@ -61,12 +62,12 @@ private:
 public:
 	class Iterator;
 
-	Iterator begin() noexcept
+	Iterator begin() const noexcept
 	{
 		return (Iterator) this->head;
 	}
 
-	Iterator end() noexcept
+	Iterator end() const noexcept
 	{
 		return nullptr;
 	}
@@ -132,6 +133,27 @@ public:
 			delete prev;
 		}
 		this->head = nullptr;
+	}
+
+	List<T> operator|(fn::filter<T> filter)
+	{
+		List<T> result;
+
+		for (T& data : *this)
+			if (filter._filter(data))
+				result.Append(data);
+
+		return result;
+	}
+
+	List<T> operator|(fn::transformer<T> transformer)
+	{
+		List<T> result;
+
+		for (T& data : *this)
+			result.Append(transformer._transformer(data));
+
+		return result;
 	}
 
 	// Makes empty list
@@ -218,7 +240,7 @@ public:
 	/*
 	 * Destroys old list and makes deep copy of other
 	 * */
-	List<T>& operator=(List<T>& other);
+	List<T>& operator=(const List<T>& other);
 
 	/*
 	 * Destroys old list and steals pointers from other
@@ -365,11 +387,23 @@ Node<T>* List<T>::GetTail() const
 template <typename T>
 void List<T>::InsertAt(Index index, const T& data)
 {
-	if (index > size || index < 0)
+	if (index < 0)
 	{
 		Logger::Trace("At InsertAt(const Index, const T&) at List.h");
 		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
 		throw EXCEPTION_INDEX_OUT_OF_RANGE;
+	}
+
+	if (index == 0)
+	{
+		Prepend(data);
+		return;
+	}
+
+	if (index >= GetLength())
+	{
+		Append(data);
+		return;
 	}
 
 	Node<T>* node = new Node<T>;
@@ -506,13 +540,17 @@ List<T>* List<T>::Prepend(const T& data)
 }
 
 template <typename T>
-List<T>& List<T>::operator=(List<T>& other)
+List<T>& List<T>::operator=(const List<T>& other)
 {
 	Logger::Info("Used copying operator = of List<T>");
 	this->Clear();
 
-	for (T data : other)
-		Append(data);
+	Node<T>* othercur = other.head;
+	while (othercur != nullptr)
+	{
+		Append(othercur->data);
+		othercur = othercur->next;
+	}
 
 	return *this;
 }

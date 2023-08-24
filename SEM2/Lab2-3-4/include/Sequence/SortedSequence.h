@@ -51,6 +51,36 @@ public:
 		delete sorter;
 	}
 
+	SortedSequence<T>& operator=(const SortedSequence<T>& other)
+	{
+		delete this->sequence;
+		delete this->sorter;
+
+		this->sequence = other.sequence->Copy();
+		this->sorter = other.sorter->Copy();
+		this->comparator = other.comparator;
+
+		return *this;
+	}
+
+	SortedSequence<T>& operator=(SortedSequence<T>&& other)
+	{
+		if (this->sequence != nullptr)
+			delete this->sequence;
+
+		if (this->sorter != nullptr)
+			delete this->sorter;
+
+		this->sequence = other.sequence;
+		this->sorter = other.sorter;
+		this->comparator = other.comparator;
+
+		other.sequence = nullptr;
+		other.sorter = nullptr;
+
+		return *this;
+	}
+
 	Iterator begin()
 	{
 		return this->sequence->begin();
@@ -64,10 +94,16 @@ public:
 	SortedSequence<T> operator|(fn::filter<T> filter)
 	{
 		SortedSequence<T> result;
+		result.sequence = this->sequence->Create();
+		result.comparator = this->comparator;
+		result.sorter = this->sorter->Copy();
+
+		auto cur = begin();
+		auto next = begin()++;
 
 		for (T& data : *this)
 			if (filter._filter(data))
-				result.Append(data);
+				result.sequence->Append(data);
 
 		return result;
 	}
@@ -75,11 +111,19 @@ public:
 	SortedSequence<T> operator|(fn::transformer<T> transformer)
 	{
 		SortedSequence<T> result;
+		result.sequence = this->sequence->Create();
+		result.comparator = this->comparator;
+		result.sorter = this->sorter->Copy();
 
 		for (T& data : *this)
-			result.Append(transformer._transformer(data));
+			result.sequence->Append(transformer._transformer(data));
 
 		return result;
+	}
+
+	int Compare(const T& a, const T& b) const
+	{
+		return this->comparator(a, b);
 	}
 
 	/**
@@ -98,27 +142,30 @@ public:
 
 	/**
 	 * @brief returns element at the positoin index.
-	 * pointer is nullptr
 	 *
 	 * @param index at which position to look for
-	 * @return copy of the element at the index
+	 * @return reference of the element at the index
 	 */
-	T Get(int index) const;
+	T& Get(int index) const;
+
+	T& operator[](int index) const
+	{
+		return Get(index);
+	}
 
 	/**
 	 * @brief O(1) operation that returns element at the begining of the sequence.
-	 * nullptr
 	 *
-	 * @return copy of the first element
+	 * @return reference of the first element
 	 */
-	T GetFirst() const;
+	T& GetFirst() const;
 
 	/**
 	 * @brief O(1) operation that return element at the end of the sequence.
 	 *
-	 * @return copy of the last element
+	 * @return reference of the last element
 	 */
-	T GetLast() const;
+	T& GetLast() const;
 
 	/**
 	 * @brief finds index of element. Returns -1 if element was not found.
@@ -213,19 +260,19 @@ bool SortedSequence<T>::isEmpty() const
 }
 
 template <typename T>
-T SortedSequence<T>::Get(int index) const
+T& SortedSequence<T>::Get(int index) const
 {
 	return sequence->Get(index);
 }
 
 template <typename T>
-T SortedSequence<T>::GetFirst() const
+T& SortedSequence<T>::GetFirst() const
 {
 	return sequence->GetFirst();
 }
 
 template <typename T>
-T SortedSequence<T>::GetLast() const
+T& SortedSequence<T>::GetLast() const
 {
 	return sequence->GetLast();
 }
@@ -256,13 +303,23 @@ SortedSequence<T> SortedSequence<T>::GetSubsequence(int startIndex, int endIndex
 template <typename T>
 void SortedSequence<T>::Add(const T& element)
 {
+	if (isEmpty())
+	{
+		this->sequence->Append(element);
+		return;
+	}
+
+	// std::cout << element << " VS " << sequence->GetFirst() << " AND GET LAST IS " << sequence->GetLast() << '\n';
+	// std::cout << comparator(element, element) << "\n";
+	// std::cout << comparator(element, sequence->GetLast()) << "\n";
+
 	if (comparator(element, sequence->GetFirst()) <= 0)
 	{
 		sequence->Prepend(element);
 		return;
 	}
 
-	if (comparator(element, sequence->GetFirst()) >= 0)
+	if (comparator(element, sequence->GetLast()) >= 0)
 	{
 		sequence->Append(element);
 		return;
@@ -271,7 +328,7 @@ void SortedSequence<T>::Add(const T& element)
 	auto cur = sequence->begin();
 	auto end = sequence->end();
 
-	while (element > *cur && cur != end)
+	while (comparator(element, *cur) > 0 && cur != end)
 		cur++;
 
 	sequence->InsertAt(this->IndexOf(*cur), element);

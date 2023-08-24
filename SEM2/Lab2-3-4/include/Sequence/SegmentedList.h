@@ -29,6 +29,14 @@ private:
 		const Size minSize = SEGMENT_MIN_SIZE;
 		const Size normSize = SEGMENT_NORM_SIZE;
 		const Size maxSize = SEGMENT_MAX_SIZE;
+
+		Segment()
+		{
+			prev = nullptr;
+			next = nullptr;
+			head = nullptr;
+			tail = nullptr;
+		}
 	};
 
 	Segment<T>* head;
@@ -45,7 +53,8 @@ public:
 
 	Iterator end() noexcept
 	{
-		return (Iterator) this->tail->tail->next;
+		// return (Iterator) this->tail->tail->next;
+		return Iterator();
 	}
 
 	SegmentedList()
@@ -241,38 +250,62 @@ void SegmentedList<T>::Clear()
 	if (isEmpty())
 		return;
 
-	Segment<T>* segment = this->head;
-	while (segment)
+	// Segment<T>* segment = this->head;
+	// while (segment)
+	// {
+	// 	Node<T>* pointer = nullptr;
+	// 	if (segment->head)
+	// 		pointer = segment->head->next;
+	//
+	// 	while (pointer && pointer != segment->tail->next)
+	// 	{
+	// 		if (pointer->prev)
+	// 			delete pointer->prev, pointer->prev = nullptr;
+	// 		pointer = pointer->next;
+	// 	}
+	//
+	// 	if (segment->tail)
+	// 	{
+	// 		delete (segment->tail);
+	// 		segment->tail = nullptr;
+	// 	}
+	//
+	// 	if (segment->next)
+	// 	{
+	// 		segment = segment->next;
+	// 		segment->prev->size = 0;
+	// 		delete segment->prev;
+	// 		segment->prev = nullptr;
+	// 	}
+	// 	else
+	// 		delete segment, segment = nullptr;
+	// }
+	//
+	// this->head = nullptr;
+
+	Node<T>* current = this->head->head;
+	Node<T>* prev;
+
+	Segment<T>* current_segment = this->head;
+	Segment<T>* prev_segment;
+
+	// while (current_segment != nullptr && current_segment != this->tail->next)
+	// {
+	// 	prev = current;
+	// 	current = current->next;
+	// 	delete (prev_segment);
+	// }
+
+	while (current != nullptr)
 	{
-		Node<T>* pointer = nullptr;
-		if (segment->head)
-			pointer = segment->head->next;
-
-		while (pointer && pointer != segment->tail->next)
-		{
-			if (pointer->prev)
-				delete pointer->prev, pointer->prev = nullptr;
-			pointer = pointer->next;
-		}
-
-		if (segment->tail)
-		{
-			delete (segment->tail);
-			segment->tail = nullptr;
-		}
-
-		if (segment->next)
-		{
-			segment = segment->next;
-			segment->prev->size = 0;
-			delete segment->prev;
-			segment->prev = nullptr;
-		}
-		else
-			delete segment, segment = nullptr;
+		prev = current;
+		current = current->next;
+		delete (prev);
 	}
 
-	this->head = nullptr;
+	// delete head;
+	delete tail;
+
 	size = 0;
 }
 
@@ -344,11 +377,23 @@ T& SegmentedList<T>::Get(const Index index) const
 template <typename T>
 void SegmentedList<T>::insertAt(Index index, const T& data)
 {
-	if (index <= 0 || index > this->size)
+	if (index < 0)
 	{
 		Logger::Trace("At InsertAt(const Index, const T&) at SegmentedList.h");
 		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
 		throw EXCEPTION_INDEX_OUT_OF_RANGE;
+	}
+
+	if (index == 0)
+	{
+		Prepend(data);
+		return;
+	}
+
+	if (index >= GetLength())
+	{
+		Append(data);
+		return;
 	}
 
 	Node<T>* node = new Node<T>;
