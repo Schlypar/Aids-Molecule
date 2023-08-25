@@ -93,7 +93,7 @@ private:
 	size_t t = 2; // minimum degree of tree (t >= 2) or branching factor
 
 	Sorter sorter = nullptr;       // sorter for SortedSequence. That's in the Node struct
-	CompFunc comparator = nullptr; // how to compare two Tkey values.
+	CompFunc comparator = nullptr; // how to compare two Tkey values. Should be able to return 0 if elements are the same
 
 public:
 	BTree(ISorter<KeyValue>* sorter, std::function<int(const Tkey&, const Tkey&)> comparator)
@@ -214,12 +214,12 @@ Tvalue BTree<Tkey, Tvalue>::Search(const Tkey& key) const
 	const Node& node = this->root;
 	int index = 0;
 
-	while (index < node.keys.GetLength() && key > node.keys[index].GetLeft())
+	while (index < node.keys.GetLength() && comparator(key, node.keys[index].GetLeft()) > 0)
 	{
 		index++;
 	}
 
-	if (index < node.keys.GetLength() && key == node.keys[index].GetLeft())
+	if (index < node.keys.GetLength() && comparator(key, node.keys[index].GetLeft()) == 0)
 	{
 		return node.keys[index].GetRight();
 	}
@@ -238,12 +238,12 @@ Tvalue BTree<Tkey, Tvalue>::Search(const Tkey& key, Node& node) const
 {
 	int index = 0;
 
-	while (index < node.keys.GetLength() && key > node.keys[index].GetLeft())
+	while (index < node.keys.GetLength() && comparator(key, node.keys[index].GetLeft()) > 0)
 	{
 		index++;
 	}
 
-	if (index < node.keys.GetLength() && key == node.keys[index].GetLeft())
+	if (index < node.keys.GetLength() && comparator(key, node.keys[index].GetLeft()) == 0)
 	{
 		return node.keys[index].GetRight();
 	}
@@ -367,7 +367,7 @@ void BTree<Tkey, Tvalue>::InsertNonFull(Node& node, const KeyValue& record) noex
 	}
 	else
 	{
-		while (index >= 0 && record.GetLeft() < node.keys[index].GetLeft())
+		while (index >= 0 && comparator(record.GetLeft(), node.keys[index].GetLeft()) < 0)
 		{
 			index--;
 		}
@@ -378,7 +378,7 @@ void BTree<Tkey, Tvalue>::InsertNonFull(Node& node, const KeyValue& record) noex
 		{
 			SplitChild(node, index);
 
-			if (record.GetLeft() > node.keys[index].GetLeft())
+			if (comparator(record.GetLeft(), node.keys[index].GetLeft()) > 0)
 			{
 				index++;
 			}
