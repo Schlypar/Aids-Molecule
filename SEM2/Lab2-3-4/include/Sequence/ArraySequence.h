@@ -263,14 +263,13 @@ Sequence<T>* ArraySequence<T>::Prepend(const T& data)
 template <typename T>
 void ArraySequence<T>::InsertAt(const Index index, const T& data)
 {
-	if (index >= GetLength())
+	if (index >= GetLength() || index < 0)
 	{
 		Logger::Trace("At InsertAt() at ArraySequence.h");
 		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
 		throw EXCEPTION_INDEX_OUT_OF_RANGE;
 	}
 
-	// container.Realloc(container.GetLength() + 1);
 	this->length++;
 	this->Resize();
 
@@ -283,6 +282,14 @@ void ArraySequence<T>::InsertAt(const Index index, const T& data)
 template <typename T>
 void ArraySequence<T>::Remove(const Index index)
 {
+
+	if (index >= GetLength() || index < 0)
+	{
+		Logger::Trace("At Remove() at ArraySequence.h");
+		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+		throw EXCEPTION_INDEX_OUT_OF_RANGE;
+	}
+
 	for (Index i = index; i < GetLength() - 1; i++)
 		container[i] = container[i + 1];
 

@@ -66,10 +66,14 @@ public:
 	SortedSequence<T>& operator=(SortedSequence<T>&& other)
 	{
 		if (this->sequence != nullptr)
+		{
 			delete this->sequence;
+		}
 
 		if (this->sorter != nullptr)
+		{
 			delete this->sorter;
+		}
 
 		this->sequence = other.sequence;
 		this->sorter = other.sorter;
@@ -91,40 +95,9 @@ public:
 		return this->sequence->end();
 	}
 
-	SortedSequence<T> operator|(fn::filter<T> filter)
-	{
-		SortedSequence<T> result;
-		result.sequence = this->sequence->Create();
-		result.comparator = this->comparator;
-		result.sorter = this->sorter->Copy();
+	SortedSequence<T> operator|(fn::filter<T> filter);
 
-		auto cur = begin();
-		auto next = begin()++;
-
-		for (T& data : *this)
-			if (filter._filter(data))
-				result.sequence->Append(data);
-
-		return result;
-	}
-
-	SortedSequence<T> operator|(fn::transformer<T> transformer)
-	{
-		SortedSequence<T> result;
-		result.sequence = this->sequence->Create();
-		result.comparator = this->comparator;
-		result.sorter = this->sorter->Copy();
-
-		for (T& data : *this)
-			result.sequence->Append(transformer._transformer(data));
-
-		return result;
-	}
-
-	int Compare(const T& a, const T& b) const
-	{
-		return this->comparator(a, b);
-	}
+	SortedSequence<T> operator|(fn::transformer<T> transformer);
 
 	/**
 	 * @brief calculates how much elements in the sequence.
@@ -191,6 +164,20 @@ public:
 	 */
 	void Add(const T& element);
 
+	/**
+     * @brief removes element at index from sequence
+     *
+     * @param index at what index to remove element from
+     */
+	void Remove(int index);
+
+	/**
+     * @brief removes element if its there. Throws exception if element is not in sequence
+     *
+     * @param element what to delete
+     */
+	void RemoveByValue(const T& element);
+
 	friend std::ostream& operator<<(std::ostream& stream, const SortedSequence<T>& sequence)
 	{
 		stream << sequence.sequence;
@@ -248,6 +235,44 @@ void SortedSequence<T>::SetComparator(std::function<int(const T&, const T&)> com
 }
 
 template <typename T>
+SortedSequence<T> SortedSequence<T>::operator|(fn::filter<T> filter)
+{
+	SortedSequence<T> result;
+	result.sequence = this->sequence->Create();
+	result.comparator = this->comparator;
+	result.sorter = this->sorter->Copy();
+
+	auto cur = begin();
+	auto next = begin()++;
+
+	for (T& data : *this)
+	{
+		if (filter._filter(data))
+		{
+			result.sequence->Append(data);
+		}
+	}
+
+	return result;
+}
+
+template <typename T>
+SortedSequence<T> SortedSequence<T>::operator|(fn::transformer<T> transformer)
+{
+	SortedSequence<T> result;
+	result.sequence = this->sequence->Create();
+	result.comparator = this->comparator;
+	result.sorter = this->sorter->Copy();
+
+	for (T& data : *this)
+	{
+		result.sequence->Append(transformer._transformer(data));
+	}
+
+	return result;
+}
+
+template <typename T>
 int SortedSequence<T>::GetLength() const
 {
 	return sequence->GetLength();
@@ -283,10 +308,16 @@ int SortedSequence<T>::IndexOf(const T& element) const
 	int index = 0;
 
 	for (auto& e : *this->sequence)
+	{
 		if (e == element)
+		{
 			return index;
+		}
 		else
+		{
 			index++;
+		}
+	}
 
 	return -1;
 }
@@ -329,9 +360,23 @@ void SortedSequence<T>::Add(const T& element)
 	auto end = sequence->end();
 
 	while (comparator(element, *cur) > 0 && cur != end)
+	{
 		cur++;
+	}
 
 	sequence->InsertAt(this->IndexOf(*cur), element);
+}
+
+template <typename T>
+void SortedSequence<T>::Remove(int index)
+{
+	this->sequence->Remove(index);
+}
+
+template <typename T>
+void SortedSequence<T>::RemoveByValue(const T& value)
+{
+	this->sequence->Remove(IndexOf(value));
 }
 
 template <typename U>
@@ -370,13 +415,19 @@ public:
 	SortedSequence<U> Build()
 	{
 		if (this->sequence.sequence == nullptr)
+		{
 			throw std::invalid_argument("Sequence is nullptr");
+		}
 
 		if (this->sequence.sorter == nullptr)
+		{
 			throw std::invalid_argument("Sorter is nullptr");
+		}
 
 		if (this->sequence.comparator == nullptr)
+		{
 			throw std::invalid_argument("Comparator is nullptr");
+		}
 
 		auto tmp = this->sequence.sequence;
 		this->sequence.sequence = this->sequence.sorter->Sort(tmp, this->sequence.comparator);

@@ -116,6 +116,13 @@ public:
 	// Removes exactly index inputed
 	void Remove(const Index index) override
 	{
+        if (index >= GetLength() || index < 0)
+        {
+            Logger::Trace("At Remove() at ArraySequence.h");
+            logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+            throw EXCEPTION_INDEX_OUT_OF_RANGE;
+        }
+
 		for (Index i = index; i < GetLength() - 1; i++)
 			container[i] = container[i + 1];
 		container.SetSize(GetLength() - 1);
