@@ -86,6 +86,15 @@ protected:
 
 			return *this;
 		}
+
+		bool operator==(const Node& other) const
+		{
+			bool result = this->keys == other.keys;
+			result = result && this->children == other.children;
+			result = result && this->isLeaf == other.isLeaf;
+
+			return result;
+		}
 	};
 
 private:
@@ -150,6 +159,13 @@ public:
 	 */
 	BTree<Tkey, Tvalue>* Insert(const Pair<Tkey, Tvalue>& record) noexcept;
 
+	/**
+     * @brief will delete node by its key. Will throw if key is not present in the tree
+     *
+     * @param key what to look for
+     */
+	void Delete(const Tkey& key);
+
 	friend std::ostream& operator<<(std::ostream& stream, const BTree<Tkey, Tvalue>& tree)
 	{
 		tree.print(stream);
@@ -176,6 +192,15 @@ private:
 	Tvalue Search(const Tkey& key, Node& node) const;
 
 	/**
+     * @brief recursive function that searches by key node, starting from node
+     *
+     * @param key for what to look for
+     * @param node starting node
+     * @return pair of found node (reference to it) and index where key will be
+     */
+	Pair<Node&, int> SearchForNode(const Tkey& key, Node& node) const;
+
+	/**
 	 * @brief takes non-full internal node and index of a full child and splits him
 	 *
 	 * @param node parent non-full node
@@ -190,6 +215,55 @@ private:
 	 * @param record what to insert
 	 */
 	void InsertNonFull(Node& node, const KeyValue& record) noexcept;
+
+	/**
+     * @brief recursive helper function for delete
+     *
+     * @param node starting node
+     * @param key which key to delete
+     */
+	void Delete(Node& node, const Tkey& key);
+
+	/**
+     * @brief if node is a leaf then tries to delete from it, otherwise branches off to different delete methods
+     *
+     * @param node from which node to delete (or from whose children to look for)
+     * @param key what to delete
+     * @param index index of key (or child)
+     */
+	void DeleteInternalNode(Node& node, const Tkey& key, int index);
+
+	/**
+     * @brief if node is a leaf then deletes from him, otherwise deletes from child
+     *
+     * @param node from which node to delete
+     */
+	Node& DeletePredecessor(Node& node);
+
+	/**
+     * @brief if node is a leaf then deletes from him, otherwise deletes from child
+     *
+     * @param node from which node to delete
+     */
+	Node& DeleteSuccessor(Node& node);
+
+	/**
+     * @brief merges children[i] and children[j] of node into one.
+     *
+     * @param node what node's children needs to be merged
+     * @param i index of first child
+     * @param j index of second child
+     */
+	void DeleteMerge(Node& node, int i, int j);
+
+	/**
+     * @brief like DeleteMerge, but different
+     *
+     * @param node from what node to look for
+     * @param i index of first child
+     * @param j index of second child
+     */
+	void DeleteSibling(Node& node, int i, int j);
 
 	/**
      * @brief prints tree to the standard output
@@ -258,6 +332,30 @@ Tvalue BTree<Tkey, Tvalue>::Search(const Tkey& key, Node& node) const
 }
 
 template <Comparable Tkey, typename Tvalue>
+Pair<typename BTree<Tkey, Tvalue>::Node&, int> BTree<Tkey, Tvalue>::SearchForNode(const Tkey& key, Node& node) const
+{
+	int index = 0;
+
+	while (index < node.keys.GetLength() && comparator(key, node.keys[index].GetLeft()) > 0)
+	{
+		index++;
+	}
+
+	if (index < node.keys.GetLength() && comparator(key, node.keys[index].GetLeft()) == 0)
+	{
+		return { node, index };
+	}
+	else if (node.isLeaf)
+	{
+		throw std::out_of_range("Couldnt find element by this key");
+	}
+	else
+	{
+		return SearchForNode(key, node.children[index]);
+	}
+}
+
+template <Comparable Tkey, typename Tvalue>
 void BTree<Tkey, Tvalue>::SplitChild(Node& node, int index) noexcept
 {
 	Node& fullChild = node.children[index];
@@ -270,7 +368,7 @@ void BTree<Tkey, Tvalue>::SplitChild(Node& node, int index) noexcept
 
 	int i = 0;
 
-	// slice of fullChild keys between t (inclusive) and 2t - 1 (exclusive)
+	// slice of fullChild keys between t and 2t - 1
 	node.children[index + 1].keys = fullChild.keys
 		| fn::filter<KeyValue>(
 						[&i, this](KeyValue& pair) -> bool
@@ -283,7 +381,7 @@ void BTree<Tkey, Tvalue>::SplitChild(Node& node, int index) noexcept
 
 	i = 0;
 
-	// slice of fullChild keys between 0 (inclusive) and t - 1 (exclusive)
+	// slice of fullChild keys between 0 and t - 1
 	node.children[index].keys = fullChild.keys
 		| fn::filter<KeyValue>(
 					    [&i, this](KeyValue& pair) -> bool
@@ -298,7 +396,7 @@ void BTree<Tkey, Tvalue>::SplitChild(Node& node, int index) noexcept
 
 	if (!fullChild.isLeaf)
 	{
-		// slice of fullChild children between t (inclusive) and 2t - 1 (exclusive)
+		// slice of fullChild children between t and 2t - 1
 		node.children[index + 1].children = fullChild.children
 			| fn::filter<Node>(
 							    [&i, this](Node& node) -> bool
@@ -311,7 +409,7 @@ void BTree<Tkey, Tvalue>::SplitChild(Node& node, int index) noexcept
 
 		i = 0;
 
-		// slice of fullChild children between 0 (inclusive) and t - 1 (exclusive)
+		// slice of fullChild children between 0 and t - 1
 		node.children[index].children = fullChild.children
 			| fn::filter<Node>(
 							[&i, this](Node& node) -> bool
@@ -385,6 +483,343 @@ void BTree<Tkey, Tvalue>::InsertNonFull(Node& node, const KeyValue& record) noex
 		}
 
 		InsertNonFull(node.children[index], record);
+	}
+}
+
+template <Comparable Tkey, typename Tvalue>
+void BTree<Tkey, Tvalue>::Delete(const Tkey& key)
+{
+	Pair<Node&, int> pair = SearchForNode(key, root);
+
+	Node& node = pair.GetLeft();
+	int deletionIndex = pair.GetRight();
+
+	Pair<Tkey, Tvalue> value = node.keys[deletionIndex];
+
+	int index = 0;
+
+	while (index < node.keys.GetLength() && comparator(key, node.keys[index].GetLeft()) > 0)
+	{
+		index++;
+	}
+
+	if (node.isLeaf)
+	{
+		if (index < node.keys.GetLength() && comparator(node.keys[index].GetLeft(), key) == 0)
+		{
+			node.keys.Remove(index);
+		}
+
+		return;
+	}
+
+	if (index < node.keys.GetLength() && comparator(node.keys[index].GetLeft(), key) == 0)
+	{
+		DeleteInternalNode(node, key, index);
+		node.keys.RemoveByValue(value);
+
+		return;
+	}
+	else if (node.children[index].keys.GetLength() >= t)
+	{
+		Delete(node.children[index], key);
+	}
+	else
+	{
+		if (index != 0 && index + 2 < node.children.GetLength())
+		{
+
+			if (node.children[index - 1].keys.GetLength() >= t)
+			{
+				DeleteSibling(node, index, index - 1);
+			}
+			else if (node.children[index + 1].keys.GetLength() >= t)
+			{
+				DeleteSibling(node, index, index + 1);
+			}
+			else
+			{
+				DeleteMerge(node, index, index + 1);
+			}
+		}
+		else if (index == 0)
+		{
+			if (node.children[index + 1].keys.GetLength() >= t)
+			{
+				DeleteSibling(node, index, index + 1);
+			}
+			else
+			{
+				DeleteMerge(node, index, index + 1);
+			}
+		}
+		else if (index + 1 == node.children.GetLength())
+		{
+
+			if (node.children[index - 1].keys.GetLength() >= t)
+			{
+				DeleteSibling(node, index, index - 1);
+			}
+			else
+			{
+				DeleteMerge(node, index, index - 1);
+			}
+		}
+
+		Delete(node.children[index], key);
+	}
+}
+
+template <Comparable Tkey, typename Tvalue>
+void BTree<Tkey, Tvalue>::Delete(Node& node, const Tkey& key)
+{
+	int index = 0;
+
+	while (index < node.keys.GetLength() && comparator(key, node.keys[index].GetLeft()) > 0)
+	{
+		index++;
+	}
+
+	if (node.isLeaf)
+	{
+		if (index < node.keys.GetLength() && comparator(node.keys[index].GetLeft(), key) == 0)
+		{
+			node.keys.Remove(index);
+		}
+
+		return;
+	}
+
+	if (index < node.keys.GetLength() && comparator(node.keys[index].GetLeft(), key) == 0)
+	{
+		DeleteInternalNode(node, key, index);
+		return;
+	}
+	else if (node.children[index].keys.GetLength() >= t)
+	{
+		Delete(node.children[index], key);
+	}
+	else
+	{
+		if (index != 0 && index + 2 < node.children.GetLength())
+		{
+			if (node.children[index - 1].keys.GetLength() >= t)
+			{
+				DeleteSibling(node, index, index - 1);
+			}
+			else if (node.children[index + 1].keys.GetLength() >= t)
+			{
+				DeleteSibling(node, index, index + 1);
+			}
+			else
+			{
+				DeleteMerge(node, index, index + 1);
+			}
+		}
+		else if (index == 0)
+		{
+			if (node.children[index + 1].keys.GetLength() >= t)
+			{
+				DeleteSibling(node, index, index + 1);
+			}
+			else
+			{
+				DeleteMerge(node, index, index + 1);
+			}
+		}
+		else if (index + 1 == node.children.GetLength())
+		{
+			if (node.children[index - 1].keys.GetLength() >= t)
+			{
+				DeleteSibling(node, index, index - 1);
+			}
+			else
+			{
+				DeleteMerge(node, index, index - 1);
+			}
+		}
+
+		Delete(node.children[index], key);
+	}
+}
+
+template <Comparable Tkey, typename Tvalue>
+void BTree<Tkey, Tvalue>::DeleteInternalNode(Node& node, const Tkey& key, int index)
+{
+	if (node.isLeaf)
+	{
+		if (comparator(node.keys[index].GetLeft(), key) == 0)
+		{
+			node.keys.Remove(index);
+		}
+
+		return;
+	}
+
+	if (node.children[index].keys.GetLength() >= t)
+	{
+		Node& predecessor = DeletePredecessor(node.children[index]);
+
+		node.keys.Add(predecessor.keys.GetLast());
+		predecessor.keys.RemoveByValue(predecessor.keys.GetLast());
+
+		return;
+	}
+	else if (node.children[index + 1].keys.GetLength() >= t)
+	{
+		Node& successor = DeleteSuccessor(node.children[index + 1]);
+
+		node.keys.Add(successor.keys.GetFirst());
+		successor.keys.Remove(0);
+
+		return;
+	}
+	else
+	{
+		DeleteMerge(node, index, index + 1);
+		DeleteInternalNode(node.children[index], key, t - 1);
+	}
+}
+
+template <Comparable Tkey, typename Tvalue>
+BTree<Tkey, Tvalue>::Node& BTree<Tkey, Tvalue>::DeletePredecessor(Node& node)
+{
+	if (node.isLeaf)
+	{
+		return node;
+	}
+
+	int n = node.keys.GetLength() - 1;
+
+	if (node.children[n].keys.GetLength() >= t)
+	{
+		DeleteSibling(node, n + 1, n);
+	}
+	else
+	{
+		DeleteMerge(node, n, n + 1);
+	}
+
+	return DeletePredecessor(node.children[n]);
+}
+
+template <Comparable Tkey, typename Tvalue>
+BTree<Tkey, Tvalue>::Node& BTree<Tkey, Tvalue>::DeleteSuccessor(Node& node)
+{
+	if (node.isLeaf)
+	{
+		return node;
+	}
+
+	if (node.children[1].keys.GetLength() >= t)
+	{
+		DeleteSibling(node, 0, 1);
+	}
+	else
+	{
+		DeleteMerge(node, 0, 1);
+	}
+
+	return DeleteSuccessor(node.children[0]);
+}
+
+template <Comparable Tkey, typename Tvalue>
+void BTree<Tkey, Tvalue>::DeleteMerge(Node& node, int i, int j)
+{
+	Node& currentNode = node.children[i];
+
+	Node& newNode = currentNode;
+
+	if (j > i)
+	{
+		Node& rightSideNode = node.children[j];
+		currentNode.keys.Add(node.keys[i]);
+
+		for (int k = 0; k < rightSideNode.keys.GetLength(); k++)
+		{
+			currentNode.keys.Add(rightSideNode.keys[k]);
+
+			if (rightSideNode.children.GetLength() > 0)
+			{
+				currentNode.children.Append(rightSideNode.children[k]);
+			}
+		}
+
+		if (rightSideNode.children.GetLength() > 0)
+		{
+			currentNode.children.Append(rightSideNode.children.GetLast());
+			rightSideNode.children.Remove(rightSideNode.children.GetLength() - 1);
+		}
+
+		node.keys.Remove(i);
+		node.children.Remove(j);
+	}
+	else
+	{
+		Node& leftSideNode = node.children[j];
+		leftSideNode.keys.Add(node.keys[j]);
+
+		for (int k = 0; k < currentNode.keys.GetLength(); k++)
+		{
+			leftSideNode.keys.Add(currentNode.keys[k]);
+
+			if (leftSideNode.children.GetLength() > 0)
+			{
+				leftSideNode.children.Append(currentNode.children[k]);
+			}
+		}
+
+		if (leftSideNode.children.GetLength() > 0)
+		{
+			leftSideNode.children.Append(currentNode.children.GetLast());
+			currentNode.children.Remove(currentNode.children.GetLength() - 1);
+		}
+
+		newNode = leftSideNode;
+
+		node.keys.Remove(i);
+		node.children.Remove(j);
+	}
+
+	if (newNode == root && node.keys.GetLength() == 0)
+	{
+		root = newNode;
+	}
+}
+
+template <Comparable Tkey, typename Tvalue>
+void BTree<Tkey, Tvalue>::DeleteSibling(Node& node, int i, int j)
+{
+	Node& currentNode = node.children[i];
+
+	if (i < j)
+	{
+		Node& rightSideNode = node.children[j];
+		currentNode.keys.Add(node.keys[i]);
+
+		node.keys[i] = rightSideNode.keys[0];
+
+		if (rightSideNode.children.GetLength() > 0)
+		{
+			currentNode.children.Append(rightSideNode.children[0]);
+			rightSideNode.children.Remove(0);
+		}
+
+		rightSideNode.children.Remove(0);
+	}
+	else
+	{
+		Node& leftSideNode = node.children[j];
+		currentNode.keys.Add(node.keys[i - 1]);
+
+		node.keys[i - 1] = leftSideNode.keys.GetLast();
+		leftSideNode.keys.RemoveByValue(leftSideNode.keys.GetLast());
+
+		if (leftSideNode.children.GetLength() > 0)
+		{
+			currentNode.children.InsertAt(0, leftSideNode.children.GetFirst());
+			leftSideNode.children.Remove(0);
+		}
 	}
 }
 
