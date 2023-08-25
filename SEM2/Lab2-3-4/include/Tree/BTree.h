@@ -237,6 +237,7 @@ private:
      * @brief if node is a leaf then deletes from him, otherwise deletes from child
      *
      * @param node from which node to delete
+     * @return returns reference to the node that needs to be manipulated
      */
 	Node& DeletePredecessor(Node& node);
 
@@ -244,6 +245,7 @@ private:
      * @brief if node is a leaf then deletes from him, otherwise deletes from child
      *
      * @param node from which node to delete
+     * @return returns reference to the node that needs to be manipulated
      */
 	Node& DeleteSuccessor(Node& node);
 
