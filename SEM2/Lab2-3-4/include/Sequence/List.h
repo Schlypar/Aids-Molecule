@@ -46,7 +46,9 @@ private:
 	Node<T>* GetNode(const Index index)
 	{
 		if (index >= size || index < 0)
+		{
 			throw EXCEPTION_INDEX_OUT_OF_RANGE;
+		}
 
 		Node<T>* pointer = this->head;
 		int counter = 0;
@@ -85,7 +87,9 @@ public:
 	{
 		Logger::Info("Copied List<T>");
 		for (Size i = 0; i < other.size; i++)
+		{
 			Append(other.Get(i));
+		}
 	}
 
 	List(List<T>&& other) noexcept
@@ -102,7 +106,9 @@ public:
 	{
 		Logger::Info("Copied List<T> from array");
 		for (Index i = 0; i < count; i++)
+		{
 			Append(data[i]);
+		}
 
 		size = count;
 	}
@@ -122,7 +128,9 @@ public:
 	{
 		Logger::Info("Destoryed List<T>");
 		if (isEmpty())
+		{
 			return;
+		}
 
 		Node<T>* pointer = this->head;
 
@@ -140,8 +148,12 @@ public:
 		List<T> result;
 
 		for (T& data : *this)
+		{
 			if (filter._filter(data))
+			{
 				result.Append(data);
+			}
+		}
 
 		return result;
 	}
@@ -151,7 +163,9 @@ public:
 		List<T> result;
 
 		for (T& data : *this)
+		{
 			result.Append(transformer._transformer(data));
+		}
 
 		return result;
 	}
@@ -247,6 +261,8 @@ public:
 	 * */
 	List<T>& operator=(List<T>&& other);
 
+	bool operator==(const List<T>& other) const;
+
 	bool isEmpty() const override
 	{
 		return size == 0;
@@ -268,7 +284,9 @@ public:
 
 		stream << "[ ";
 		for (Index i = 0; i < list.GetLength(); i++)
+		{
 			stream << list.Get(i) << " ";
+		}
 		stream << "]";
 
 		return stream;
@@ -279,7 +297,9 @@ template <typename T>
 void List<T>::Clear() noexcept
 {
 	if (isEmpty())
+	{
 		return;
+	}
 
 	Node<T>* current = this->head;
 	while (current != this->tail)
@@ -474,7 +494,9 @@ void List<T>::Remove(Index index)
 
 	Node<T>* node = this->head;
 	for (Size i = 0; i < index; i++)
+	{
 		node = node->next;
+	}
 
 	node->prev->next = node->next;
 	node->next->prev = node->prev;
@@ -568,6 +590,34 @@ List<T>& List<T>::operator=(List<T>&& other)
 	other.head = nullptr;
 
 	return *this;
+}
+
+template <typename T>
+bool List<T>::operator==(const List<T>& other) const
+{
+	if (this->GetLength() != other.GetLength())
+	{
+		return false;
+	}
+
+	auto thiscur = this->begin();
+	auto thisend = this->end();
+
+	auto othercur = other.begin();
+	auto otherend = other.end();
+
+	while (thiscur != thisend && othercur != otherend)
+	{
+		if (*thiscur != *othercur)
+		{
+			return false;
+		}
+
+		++thiscur;
+		++othercur;
+	}
+
+	return true;
 }
 
 template <typename T>

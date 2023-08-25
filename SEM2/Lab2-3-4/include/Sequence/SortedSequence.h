@@ -85,6 +85,33 @@ public:
 		return *this;
 	}
 
+	bool operator==(const SortedSequence<T>& other) const
+	{
+		if (this->sequence->GetLength() != other.sequence->GetLength())
+		{
+			return false;
+		}
+
+		auto thiscur = this->sequence->begin();
+		auto thisend = this->sequence->end();
+
+		auto othercur = other.sequence->begin();
+		auto otherend = other.sequence->end();
+
+		while (thiscur != thisend && othercur != otherend)
+		{
+			if (*thiscur != *othercur)
+			{
+				return false;
+			}
+
+			++thiscur;
+			++othercur;
+		}
+
+		return true;
+	}
+
 	Iterator begin()
 	{
 		return this->sequence->begin();
