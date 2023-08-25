@@ -135,7 +135,7 @@ public:
 	}
 
 	/**
-	 * @brief finds element by its key with O(log(n)) complexity
+	 * @brief finds element by its key with O(log(n)) complexity. Throws if element was not found
 	 *
 	 * @param key by which key to find value
 	 * @return copy of the found element
@@ -143,7 +143,8 @@ public:
 	Tvalue Search(const Tkey& key) const;
 
 	/**
-	 * @brief will insert record at the B tree and will reconstruct it if needed
+	 * @brief will insert record at the B tree and will reconstruct it if needed. 
+     * Does nothing if same key already appears in the tree
 	 *
 	 * @param record what to insert
 	 */
