@@ -59,7 +59,9 @@ public:
 	    , count(0)
 	{
 		for (auto& e : args)
+		{
 			Add(e);
+		}
 	}
 
 	HashTable(IHasher<Tkey>* hasher, std::initializer_list<Pair<Tkey, Tvalue>> args)
@@ -68,7 +70,9 @@ public:
 	    , count(0)
 	{
 		for (auto& e : args)
+		{
 			Add(e);
+		}
 	}
 
 	~HashTable()
@@ -77,7 +81,7 @@ public:
 	}
 
 	/**
-	 * @brief adds record to the hash table and increments member count
+	 * @brief adds record to the hash table and increments member count. Will throw if key already is in table
 	 *
 	 * @param record contains Key-Value pair
 	 * @return pointer to the base class IDict
@@ -130,7 +134,9 @@ public:
 	{
 		size_t index = 0;
 		for (CollisionList& list : hashTable.hashTable)
+		{
 			(list.isEmpty()) ? stream << index++ << "\t=> [----]\n" : stream << index++ << "\t=> " << list << "\n";
+		}
 
 		return stream;
 	}
@@ -156,9 +162,13 @@ private:
 	{
 		// return (count > multiplier * GetCapacity()) ? true : false;
 		if (count > 0.8 * GetCapacity())
+		{
 			return true;
+		}
 		else
+		{
 			return false;
+		}
 	}
 };
 
@@ -166,7 +176,14 @@ template <typename Tkey, typename Tvalue>
 IDict<Tkey, Tvalue>* HashTable<Tkey, Tvalue>::Add(Pair<Tkey, Tvalue> record)
 {
 	if (hashTable.isEmpty())
+	{
 		hashTable.Realloc(DEFAULT_SIZE);
+	}
+
+	if (ContainsKey(record.GetLeft()))
+	{
+		throw std::invalid_argument("Key already is in table");
+	}
 
 	if (NeedToReconstruct())
 	{
@@ -174,8 +191,12 @@ IDict<Tkey, Tvalue>* HashTable<Tkey, Tvalue>::Add(Pair<Tkey, Tvalue> record)
 		newTable.Realloc(size_t(hashTable.GetLength() * 2));
 
 		for (CollisionList& list : hashTable)
+		{
 			for (Pair<Tkey, Tvalue>& record : list)
+			{
 				newTable[hasher->Hash(record.GetLeft()) % newTable.GetLength()].Append(record);
+			}
+		}
 
 		this->hashTable = std::move(newTable);
 	}
@@ -208,8 +229,12 @@ Tvalue HashTable<Tkey, Tvalue>::Get(const Tkey& key)
 	CollisionList& list = hashTable[Hash(key)];
 
 	for (Pair<Tkey, Tvalue>& record : list)
+	{
 		if (record.GetLeft() == key)
+		{
 			return record.GetRight();
+		}
+	}
 
 	throw std::out_of_range("Value was not found");
 }
@@ -220,8 +245,12 @@ bool HashTable<Tkey, Tvalue>::ContainsKey(const Tkey& key) const noexcept
 	CollisionList& list = hashTable[Hash(key)];
 
 	for (Pair<Tkey, Tvalue>& record : list)
+	{
 		if (record.GetLeft() == key)
+		{
 			return true;
+		}
+	}
 
 	return false;
 }
