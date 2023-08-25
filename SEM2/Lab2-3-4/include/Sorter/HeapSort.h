@@ -15,7 +15,9 @@ public:
 		Sequence<T>* copy = sequence->Copy();
 
 		for (int i = copy->GetLength() / 2 - 1; i >= 0; i--)
+		{
 			Heapify(copy, copy->GetLength(), i, comparator);
+		}
 
 		for (int i = copy->GetLength() - 1; i > 0; i--)
 		{
@@ -40,10 +42,14 @@ private:
 		int right = 2 * i + 2;
 
 		if (left < size && comparator(sequence->Get(left), sequence->Get(largest)) > 0)
+		{
 			largest = left;
+		}
 
 		if (right < size && comparator(sequence->Get(right), sequence->Get(largest)) > 0)
+		{
 			largest = right;
+		}
 
 		if (largest != i)
 		{

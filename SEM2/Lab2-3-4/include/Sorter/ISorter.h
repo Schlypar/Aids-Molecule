@@ -14,5 +14,5 @@ public:
 
 	virtual Sequence<T>* Sort(Sequence<T>* sequence, std::function<int(const T&, const T&)> comparator) = 0;
 
-    virtual ISorter<T>* Copy() const noexcept = 0;
+	virtual ISorter<T>* Copy() const noexcept = 0;
 };
