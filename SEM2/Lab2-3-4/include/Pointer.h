@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <functional>
+#include <iostream>
 #include <utility>
 
 template <typename T>
@@ -12,12 +13,14 @@ private:
 
 public:
 	Deleter()
-	    : deleter([](T* block) -> void { delete block; })
+	    : deleter([](T* block) -> void
+		      { delete block; })
 	{
 	}
 
 	Deleter(int kostyl)
-	    : deleter([](T* block) -> void { delete[] block; })
+	    : deleter([](T* block) -> void
+		      { delete[] block; })
 	{
 	}
 
@@ -84,7 +87,9 @@ public:
 	~UniquePtr()
 	{
 		if (this->ptr != nullptr)
+		{
 			deleter.delete_block(ptr);
+		}
 	}
 
 	void setDeleter(const Deleter<T>& deleter)
@@ -188,22 +193,24 @@ void swap(UniquePtr<T>& left, UniquePtr<T>& right)
 template <class T>
 class SharedPtr
 {
+
+	template <typename U>
+	friend class WeakPtr;
+
 private:
 	T* ptr;
 	int* counter;
 	Deleter<T> deleter = Deleter<T>();
 
+	int* GetCounter() const
+	{
+		return counter;
+	}
+
 public:
 	SharedPtr() noexcept
 	    : ptr()
 	    , counter(new int(0))
-	{
-	}
-
-	SharedPtr(int kostyl) noexcept
-	    : ptr()
-	    , counter(new int(0))
-	    , deleter(kostyl)
 	{
 	}
 
@@ -213,23 +220,9 @@ public:
 	{
 	}
 
-	SharedPtr(std::nullptr_t, int kostyl) noexcept
-	    : ptr(nullptr)
-	    , counter(0)
-	    , deleter(kostyl)
-	{
-	}
-
 	SharedPtr(T* object) noexcept
 	    : ptr(object)
 	    , counter(new int(1))
-	{
-	}
-
-	SharedPtr(T* object, int kostyl) noexcept
-	    : ptr(object)
-	    , counter(new int(1))
-	    , deleter(kostyl)
 	{
 	}
 
@@ -239,7 +232,9 @@ public:
 	    , deleter(other.deleter)
 	{
 		if (other.counter)
+		{
 			(*counter)++;
+		}
 	}
 
 	~SharedPtr() noexcept
@@ -259,7 +254,9 @@ public:
 		this->ptr = other.ptr;
 		this->counter = other.counter;
 		if (counter)
+		{
 			(*counter)++;
+		}
 
 		return *this;
 	}
@@ -269,14 +266,6 @@ public:
 		reset();
 
 		return *this;
-	}
-
-	SharedPtr(SharedPtr<T>&& other)
-	    : ptr(other.ptr)
-	    , counter(other.counter)
-	{
-		other.ptr = nullptr;
-		other.counter = nullptr;
 	}
 
 	SharedPtr<T>& operator=(SharedPtr<T>&& other)
@@ -320,11 +309,6 @@ public:
 	bool operator==(std::nullptr_t) const
 	{
 		return ptr == nullptr;
-	}
-
-	operator T()
-	{
-		return ptr;
 	}
 
 	T* Get() const noexcept
@@ -374,7 +358,9 @@ private:
 			if (*counter <= 0)
 			{
 				if (ptr != nullptr)
+				{
 					deleter.delete_block(ptr);
+				}
 
 				delete counter;
 			}
@@ -541,6 +527,83 @@ public:
 
 template <class T>
 void swap(SloppyPtr<T>& left, SloppyPtr<T>& right)
+{
+	left.swap(right);
+}
+
+template <typename T>
+class WeakPtr
+{
+private:
+	T* pointer;
+	int* counter;
+
+public:
+	WeakPtr()
+	    : pointer(nullptr)
+	    , counter(nullptr)
+	{
+	}
+
+	WeakPtr(const SharedPtr<T>& ptr)
+	    : pointer(ptr.ptr)
+	    , counter(ptr.counter)
+	{
+		(*counter)++;
+	}
+
+	~WeakPtr() = default;
+
+	WeakPtr& operator=(const SharedPtr<T>& other)
+	{
+		this->pointer = other.ptr;
+		this->counter = other.counter;
+
+		return *this;
+	}
+
+	WeakPtr& operator=(const WeakPtr<T>& other)
+	{
+		this->pointer = other.pointer;
+		this->counter = other.counter;
+
+		return *this;
+	}
+
+	bool Expired() const
+	{
+		return UseCount() == 0;
+	}
+
+	int UseCount() const
+	{
+		return *counter;
+	}
+
+	SharedPtr<T> Lock() const
+	{
+		if (Expired())
+		{
+			return SharedPtr<T>(nullptr);
+		}
+
+		SharedPtr<T> ptr = nullptr;
+		ptr.ptr = this->pointer;
+		ptr.counter = this->counter;
+
+		(*counter)++;
+
+		return ptr;
+	}
+
+	void swap(const WeakPtr<T>& other)
+	{
+		swap(this->pointer, other.pointer);
+	}
+};
+
+template <typename T>
+void swap(WeakPtr<T>& left, WeakPtr<T>& right)
 {
 	left.swap(right);
 }
