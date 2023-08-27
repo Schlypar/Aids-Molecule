@@ -135,7 +135,7 @@ public:
 		return stream;
 	}
 
-	friend std::ostream& operator<<(std::ostream& stream, const WeakPtr<Stack<T>>& stack)
+	friend std::ostream& operator<<(std::ostream& stream, const SloppyPtr<Stack<T>>& stack)
 	{
 		// stream << stack->stack;
 

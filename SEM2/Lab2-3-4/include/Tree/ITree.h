@@ -43,8 +43,8 @@ public:
 		Tvalue data;
 
 		TreeNode* parent;
-		WeakPtr<TreeNode> left;
-		WeakPtr<TreeNode> right;
+		SloppyPtr<TreeNode> left;
+		SloppyPtr<TreeNode> right;
 
 		TreeNode()
 		    : key(Tkey())

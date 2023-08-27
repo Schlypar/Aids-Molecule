@@ -389,53 +389,53 @@ void swap(SharedPtr<T>& left, SharedPtr<T>& right)
 }
 
 template <class T>
-class WeakPtr
+class SloppyPtr
 {
 private:
 	T* ptr;
 	Deleter<T> deleter = Deleter<T>();
 
 public:
-	WeakPtr() noexcept
+	SloppyPtr() noexcept
 	    : ptr()
 	{
 	}
 
-	WeakPtr(int kostyl) noexcept
+	SloppyPtr(int kostyl) noexcept
 	    : ptr()
 	    , deleter(kostyl)
 	{
 	}
 
-	WeakPtr(std::nullptr_t) noexcept
+	SloppyPtr(std::nullptr_t) noexcept
 	    : ptr(nullptr)
 	{
 	}
 
-	WeakPtr(std::nullptr_t, int kostyl) noexcept
+	SloppyPtr(std::nullptr_t, int kostyl) noexcept
 	    : ptr(nullptr)
 	    , deleter(kostyl)
 	{
 	}
 
-	WeakPtr(T* object) noexcept
+	SloppyPtr(T* object) noexcept
 	    : ptr(object)
 	{
 	}
 
-	WeakPtr(T* object, int kostyl) noexcept
+	SloppyPtr(T* object, int kostyl) noexcept
 	    : ptr(object)
 	    , deleter(kostyl)
 	{
 	}
 
-	WeakPtr(const WeakPtr<T>& other) noexcept
+	SloppyPtr(const SloppyPtr<T>& other) noexcept
 	    : ptr(other.ptr)
 	    , deleter(other.deleter)
 	{
 	}
 
-	~WeakPtr() noexcept
+	~SloppyPtr() noexcept
 	{
 		deleter.delete_block(ptr);
 	}
@@ -445,14 +445,14 @@ public:
 		this->deleter = deleter;
 	}
 
-	WeakPtr<T>& operator=(const WeakPtr<T>& other) noexcept
+	SloppyPtr<T>& operator=(const SloppyPtr<T>& other) noexcept
 	{
 		this->ptr = other.ptr;
 
 		return *this;
 	}
 
-	WeakPtr<T>& operator=(std::nullptr_t) noexcept
+	SloppyPtr<T>& operator=(std::nullptr_t) noexcept
 	{
 		// reset();
 		ptr = nullptr;
@@ -460,7 +460,7 @@ public:
 		return *this;
 	}
 
-	WeakPtr(WeakPtr<T>&& other)
+	SloppyPtr(SloppyPtr<T>&& other)
 	{
 		// if (this->ptr)
 		// 	delete ptr;
@@ -469,7 +469,7 @@ public:
 		other.ptr = nullptr;
 	}
 
-	WeakPtr<T>& operator=(WeakPtr<T>&& other)
+	SloppyPtr<T>& operator=(SloppyPtr<T>&& other)
 	{
 		// if (this->ptr)
 		// 	delete ptr;
@@ -522,7 +522,7 @@ public:
 		return result;
 	}
 
-	void swap(WeakPtr<T>& other) noexcept
+	void swap(SloppyPtr<T>& other) noexcept
 	{
 		std::swap(ptr, other.ptr);
 	}
@@ -540,7 +540,7 @@ public:
 };
 
 template <class T>
-void swap(WeakPtr<T>& left, WeakPtr<T>& right)
+void swap(SloppyPtr<T>& left, SloppyPtr<T>& right)
 {
 	left.swap(right);
 }

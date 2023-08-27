@@ -19,7 +19,7 @@ template <Comparable Tkey, typename Tvalue>
 class BinaryTree : public Tree<Tkey, Tvalue>
 {
 protected:
-	WeakPtr<TreeNode<Tkey, Tvalue>> root;
+	SloppyPtr<TreeNode<Tkey, Tvalue>> root;
 	KGen<Tkey, Tvalue> kGen = nullptr;
 
 	using Iterator = ArraySequence<Tvalue>::Iterator;
