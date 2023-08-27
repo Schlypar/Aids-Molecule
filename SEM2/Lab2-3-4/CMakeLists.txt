@@ -93,6 +93,9 @@ add_executable(${TEST_PROJECT_NAME}
         ${TEST_DIR}/ArrayTests.cpp 
         ${TEST_DIR}/SegmentedListTests.cpp
         ${TEST_DIR}/SequenceTests.cpp
+        ${TEST_DIR}/SorterTests.cpp
+        ${TEST_DIR}/SortedSequenceTests.cpp
+        ${TEST_DIR}/HashTableTests.cpp
         ${TEST_DIR}/MatrixTests.cpp
         ${TEST_DIR}/BinaryTreeTests.cpp
         ${TEST_DIR}/BinaryHeapTests.cpp

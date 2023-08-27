@@ -51,66 +51,11 @@ public:
 		delete sorter;
 	}
 
-	SortedSequence<T>& operator=(const SortedSequence<T>& other)
-	{
-		delete this->sequence;
-		delete this->sorter;
+	SortedSequence<T>& operator=(const SortedSequence<T>& other);
 
-		this->sequence = other.sequence->Copy();
-		this->sorter = other.sorter->Copy();
-		this->comparator = other.comparator;
+	SortedSequence<T>& operator=(SortedSequence<T>&& other);
 
-		return *this;
-	}
-
-	SortedSequence<T>& operator=(SortedSequence<T>&& other)
-	{
-		if (this->sequence != nullptr)
-		{
-			delete this->sequence;
-		}
-
-		if (this->sorter != nullptr)
-		{
-			delete this->sorter;
-		}
-
-		this->sequence = other.sequence;
-		this->sorter = other.sorter;
-		this->comparator = other.comparator;
-
-		other.sequence = nullptr;
-		other.sorter = nullptr;
-
-		return *this;
-	}
-
-	bool operator==(const SortedSequence<T>& other) const
-	{
-		if (this->sequence->GetLength() != other.sequence->GetLength())
-		{
-			return false;
-		}
-
-		auto thiscur = this->sequence->begin();
-		auto thisend = this->sequence->end();
-
-		auto othercur = other.sequence->begin();
-		auto otherend = other.sequence->end();
-
-		while (thiscur != thisend && othercur != otherend)
-		{
-			if (*thiscur != *othercur)
-			{
-				return false;
-			}
-
-			++thiscur;
-			++othercur;
-		}
-
-		return true;
-	}
+	bool operator==(const SortedSequence<T>& other) const;
 
 	Iterator begin()
 	{
@@ -192,7 +137,7 @@ public:
 	void Add(const T& element);
 
 	/**
-     * @brief removes element at index from sequence
+     * @brief removes element at index from sequence. Throws if index out of bounds
      *
      * @param index at what index to remove element from
      */
@@ -242,6 +187,70 @@ private:
 	 */
 	void SetComparator(std::function<int(const T&, const T&)> comparator);
 };
+
+template <typename T>
+SortedSequence<T>& SortedSequence<T>::operator=(const SortedSequence<T>& other)
+{
+	delete this->sequence;
+	delete this->sorter;
+
+	this->sequence = other.sequence->Copy();
+	this->sorter = other.sorter->Copy();
+	this->comparator = other.comparator;
+
+	return *this;
+}
+
+template <typename T>
+SortedSequence<T>& SortedSequence<T>::operator=(SortedSequence<T>&& other)
+{
+	if (this->sequence != nullptr)
+	{
+		delete this->sequence;
+	}
+
+	if (this->sorter != nullptr)
+	{
+		delete this->sorter;
+	}
+
+	this->sequence = other.sequence;
+	this->sorter = other.sorter;
+	this->comparator = other.comparator;
+
+	other.sequence = nullptr;
+	other.sorter = nullptr;
+
+	return *this;
+}
+
+template <typename T>
+bool SortedSequence<T>::operator==(const SortedSequence<T>& other) const
+{
+	if (this->sequence->GetLength() != other.sequence->GetLength())
+	{
+		return false;
+	}
+
+	auto thiscur = this->sequence->begin();
+	auto thisend = this->sequence->end();
+
+	auto othercur = other.sequence->begin();
+	auto otherend = other.sequence->end();
+
+	while (thiscur != thisend && othercur != otherend)
+	{
+		if (*thiscur != *othercur)
+		{
+			return false;
+		}
+
+		++thiscur;
+		++othercur;
+	}
+
+	return true;
+}
 
 template <typename T>
 void SortedSequence<T>::SetSequence(Sequence<T>* sequence)
@@ -302,6 +311,11 @@ SortedSequence<T> SortedSequence<T>::operator|(fn::transformer<T> transformer)
 template <typename T>
 int SortedSequence<T>::GetLength() const
 {
+	if (this->sequence == nullptr)
+	{
+		return 0;
+	}
+
 	return sequence->GetLength();
 }
 
@@ -448,11 +462,14 @@ public:
 
 		if (this->sequence.sorter == nullptr)
 		{
+			delete this->sequence.sequence;
 			throw std::invalid_argument("Sorter is nullptr");
 		}
 
 		if (this->sequence.comparator == nullptr)
 		{
+			delete this->sequence.sequence;
+			delete this->sequence.sorter;
 			throw std::invalid_argument("Comparator is nullptr");
 		}
 

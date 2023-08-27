@@ -12,17 +12,17 @@ public:
 	{
 		if (sequence->isEmpty())
 		{
-			return sequence;
+			return sequence->Create();
 		}
 
 		T middle = sequence->Get(sequence->GetLength() / 2);
 
-		SharedPtr<Sequence<T>> lesser = sequence->Where([middle](T& e) -> bool
-								{ return e < middle; });
-		SharedPtr<Sequence<T>> equal = sequence->Where([middle](T& e) -> bool
-							       { return e == middle; });
-		SharedPtr<Sequence<T>> greater = sequence->Where([middle](T& e) -> bool
-								 { return e > middle; });
+		SharedPtr<Sequence<T>> lesser = sequence->Where([middle, comparator](T& e) -> bool
+								{ return (comparator(e, middle) < 0) ? true : false; });
+		SharedPtr<Sequence<T>> equal = sequence->Where([middle, comparator](T& e) -> bool
+							       { return (comparator(e, middle) == 0) ? true : false; });
+		SharedPtr<Sequence<T>> greater = sequence->Where([middle, comparator](T& e) -> bool
+								 { return (comparator(e, middle) > 0) ? true : false; });
 
 		return (UniquePtr<Sequence<T>>(QuickSort(lesser, comparator)
 						       ->Concat(equal.Get())))
@@ -44,12 +44,12 @@ private:
 
 		T middle = sequence->Get(sequence->GetLength() / 2);
 
-		SharedPtr<Sequence<T>> lesser = sequence->Where([middle](T& e) -> bool
-								{ return e < middle; });
-		SharedPtr<Sequence<T>> equal = sequence->Where([middle](T& e) -> bool
-							       { return e == middle; });
-		SharedPtr<Sequence<T>> greater = sequence->Where([middle](T& e) -> bool
-								 { return e > middle; });
+		SharedPtr<Sequence<T>> lesser = sequence->Where([middle, comparator](T& e) -> bool
+								{ return (comparator(e, middle) < 0) ? true : false; });
+		SharedPtr<Sequence<T>> equal = sequence->Where([middle, comparator](T& e) -> bool
+							       { return (comparator(e, middle) == 0) ? true : false; });
+		SharedPtr<Sequence<T>> greater = sequence->Where([middle, comparator](T& e) -> bool
+								 { return (comparator(e, middle) > 0) ? true : false; });
 
 		return SharedPtr<Sequence<T>>((UniquePtr<Sequence<T>>(QuickSort(lesser, comparator)
 									      ->Concat(equal.Get())))

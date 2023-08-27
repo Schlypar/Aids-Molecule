@@ -19,34 +19,20 @@ class HashTable : IDict<Tkey, Tvalue>
 
 private:
 	AssociativeArray hashTable;
-	IHasher<Tkey>* hasher = new STLHasher<Tkey>();
+	IHasher<Tkey>* hasher;
 	size_t count;
 
 	float multiplier = 0.8;
 
 public:
 	HashTable()
-	    : hashTable()
+	    : hashTable(DEFAULT_SIZE)
 	    , hasher(new STLHasher<Tkey>())
 	    , count(0)
 	{
 	}
 
 	HashTable(IHasher<Tkey>* hasher)
-	    : hashTable(DEFAULT_SIZE)
-	    , hasher(hasher)
-	    , count(0)
-	{
-	}
-
-	HashTable(size_t count)
-	    : hashTable(DEFAULT_SIZE)
-	    , hasher(new STLHasher<Tkey>())
-	    , count(0)
-	{
-	}
-
-	HashTable(size_t count, IHasher<Tkey>* hasher)
 	    : hashTable(DEFAULT_SIZE)
 	    , hasher(hasher)
 	    , count(0)
@@ -75,10 +61,30 @@ public:
 		}
 	}
 
+	HashTable(const HashTable<Tkey, Tvalue>& other)
+	    : hashTable(other.hashTable)
+	    , hasher(other.hasher->Copy())
+	    , count(other.count)
+	{
+	}
+
+	HashTable(HashTable<Tkey, Tvalue>&& other)
+	    : hashTable(std::move(other.hashTable))
+	    , hasher(other.hasher)
+	    , count(other.count)
+	{
+		other.count = 0;
+		other.hasher = nullptr;
+	}
+
 	~HashTable()
 	{
 		delete hasher;
 	}
+
+	HashTable<Tkey, Tvalue>& operator=(const HashTable<Tkey, Tvalue>& other);
+
+	HashTable<Tkey, Tvalue>& operator=(HashTable<Tkey, Tvalue>&& other);
 
 	/**
 	 * @brief adds record to the hash table and increments member count. Will throw if key already is in table
@@ -89,7 +95,8 @@ public:
 	IDict<Tkey, Tvalue>* Add(Pair<Tkey, Tvalue> record) override;
 
 	/**
-	 * @brief removes element by its key and decrements member count
+	 * @brief removes element by its key and decrements member count.
+     * Throws if key is not in the table
 	 *
 	 * @param key key by which we find what to deleted
 	 */
@@ -173,6 +180,33 @@ private:
 };
 
 template <typename Tkey, typename Tvalue>
+HashTable<Tkey, Tvalue>& HashTable<Tkey, Tvalue>::operator=(const HashTable<Tkey, Tvalue>& other)
+{
+	this->hashTable = other.hashTable;
+
+	delete this->hasher;
+	this->hashTable = other.hasher->Copy();
+
+	this->count = other.count;
+
+	return *this;
+}
+
+template <typename Tkey, typename Tvalue>
+HashTable<Tkey, Tvalue>& HashTable<Tkey, Tvalue>::operator=(HashTable<Tkey, Tvalue>&& other)
+{
+	this->hashTable = std::move(other.hashTable);
+
+	this->hashTable = other.hasher->Copy();
+	other.hasher = nullptr;
+
+	this->count = other.count;
+	other.count = 0;
+
+	return *this;
+}
+
+template <typename Tkey, typename Tvalue>
 IDict<Tkey, Tvalue>* HashTable<Tkey, Tvalue>::Add(Pair<Tkey, Tvalue> record)
 {
 	if (hashTable.isEmpty())
@@ -210,6 +244,11 @@ IDict<Tkey, Tvalue>* HashTable<Tkey, Tvalue>::Add(Pair<Tkey, Tvalue> record)
 template <typename Tkey, typename Tvalue>
 void HashTable<Tkey, Tvalue>::Remove(const Tkey& key)
 {
+	if (!ContainsKey(key))
+	{
+		throw std::out_of_range("No key was found");
+	}
+
 	CollisionList& list = hashTable[Hash(key)];
 
 	for (int i = 0; i < list.GetLength(); i++)
