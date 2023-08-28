@@ -209,14 +209,14 @@ private:
 
 public:
 	SharedPtr() noexcept
-	    : ptr()
+	    : ptr(nullptr)
 	    , counter(new int(0))
 	{
 	}
 
 	SharedPtr(std::nullptr_t) noexcept
 	    : ptr(nullptr)
-	    , counter(0)
+	    , counter(new int(0))
 	{
 	}
 
@@ -598,8 +598,8 @@ public:
 
 	void swap(const WeakPtr<T>& other)
 	{
-        std::swap(this->pointer, other.pointer);
-        std::swap(this->counter, other.counter);
+		std::swap(this->pointer, other.pointer);
+		std::swap(this->counter, other.counter);
 	}
 };
 
