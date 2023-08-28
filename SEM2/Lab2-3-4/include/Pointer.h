@@ -598,7 +598,8 @@ public:
 
 	void swap(const WeakPtr<T>& other)
 	{
-		swap(this->pointer, other.pointer);
+        std::swap(this->pointer, other.pointer);
+        std::swap(this->counter, other.counter);
 	}
 };
 
