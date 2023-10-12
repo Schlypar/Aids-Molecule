@@ -86,7 +86,8 @@ class Ui_MainWindow(object):
         self.horizontalLayoutWidget_2.setGeometry(QtCore.QRect(10, 0, 771, 31))
         self.horizontalLayoutWidget_2.setObjectName("horizontalLayoutWidget_2")
 
-        self.graph_layout = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget_2)
+        self.graph_layout = QtWidgets.QHBoxLayout(
+            self.horizontalLayoutWidget_2)
         self.graph_layout.setContentsMargins(0, 0, 0, 0)
         self.graph_layout.setObjectName("graph_layout")
 
@@ -152,8 +153,10 @@ class Ui_MainWindow(object):
         for row_number, raw, smart in zip(range(6), raw_data, smart_data):
             # a: int = 10
             # f"{(a * 100):.2g}"
-            self.tableWidget.setItem(row_number, 0, QTableWidgetItem(f"{raw:.7f}"))
-            self.tableWidget.setItem(row_number, 1, QTableWidgetItem(f"{smart:.7f}"))
+            self.tableWidget.setItem(
+                row_number, 0, QTableWidgetItem(f"{raw:.7f}"))
+            self.tableWidget.setItem(
+                row_number, 1, QTableWidgetItem(f"{smart:.7f}"))
             self.tableWidget.setItem(
                 row_number, 2, QTableWidgetItem(f"{(raw/smart * 100):.2f}")
             )
@@ -176,6 +179,7 @@ if __name__ == "__main__":
     import sys
 
     app = QtWidgets.QApplication(sys.argv)
+
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)

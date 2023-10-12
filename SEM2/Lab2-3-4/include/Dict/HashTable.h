@@ -6,8 +6,6 @@
 #include "STLHasher.h"
 #include "Sequence/ArraySequence.h"
 #include <initializer_list>
-#include <ostream>
-#include <stdexcept>
 
 #define DEFAULT_SIZE 10
 
@@ -103,12 +101,20 @@ public:
 	void Remove(const Tkey& key) override;
 
 	/**
-	 * @brief Gets element by its key
+	 * @brief Gets element by its key. Throws if there wasnt such a key
 	 *
 	 * @param key key of the element
 	 * @return copy of element
 	 */
 	Tvalue Get(const Tkey& key) override;
+
+	/**
+	 * @brief Gets element by its key. Throws if there wasnt such a key
+	 *
+	 * @param key key of the element
+	 * @return reference of element
+	 */
+	Tvalue& GetMut(const Tkey& key) override;
 
 	Tvalue operator[](const Tkey& key)
 	{
@@ -272,6 +278,23 @@ Tvalue HashTable<Tkey, Tvalue>::Get(const Tkey& key)
 		if (record.GetLeft() == key)
 		{
 			return record.GetRight();
+		}
+	}
+
+	throw std::out_of_range("Value was not found");
+}
+
+template <typename Tkey, typename Tvalue>
+Tvalue& HashTable<Tkey, Tvalue>::GetMut(const Tkey& key)
+{
+	CollisionList& list = hashTable[Hash(key)];
+
+	for (Pair<Tkey, Tvalue>& record : list)
+	{
+		if (record.GetLeft() == key)
+		{
+			// return record.GetRight();
+			return record.right;
 		}
 	}
 

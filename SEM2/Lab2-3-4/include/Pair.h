@@ -6,11 +6,10 @@
 template <typename L, typename R>
 class Pair
 {
-private:
+public:
 	L left;
 	R right;
 
-public:
 	Pair()
 	    : left(L())
 	    , right(R())

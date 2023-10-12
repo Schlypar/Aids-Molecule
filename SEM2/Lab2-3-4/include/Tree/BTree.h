@@ -8,6 +8,7 @@
 #include "Sorter/HeapSort.h"
 #include "concepts.h"
 #include <functional>
+#include <ostream>
 #include <stdexcept>
 
 template <Comparable Tkey, typename Tvalue>
@@ -442,6 +443,8 @@ BTree<Tkey, Tvalue>* BTree<Tkey, Tvalue>::Insert(const Pair<Tkey, Tvalue>& recor
 			newRoot.children.InsertAt(0, oldRoot);
 
 			SplitChild(newRoot, 0);
+            // std::cout << "==================\n";
+            // this->print(std::cout,newRoot, 0);
 			InsertNonFull(newRoot, record);
 
 			this->root = std::move(newRoot);

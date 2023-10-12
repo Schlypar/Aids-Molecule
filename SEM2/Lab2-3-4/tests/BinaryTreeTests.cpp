@@ -86,7 +86,7 @@ TEST_CASE("Binary tree can be copied from pointer to another")
 	BinTreePtr<int, int> tree = new BinaryTree<int, int>(startValue);
 	tree->Add(0)->Add(2);
 
-	BinTreePtr<int, int> copy = new BinaryTree<int, int>(tree);
+	BinTreePtr<int, int> copy = new BinaryTree<int, int>(*tree.Get());
 
 	REQUIRE(tree->GetRoot() != copy->GetRoot());
 

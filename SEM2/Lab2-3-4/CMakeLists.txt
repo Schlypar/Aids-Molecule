@@ -43,6 +43,7 @@ set(SOURCES_HEADERS
         ${INCLUDE}/Sorter/ShellSort.h
         ${INCLUDE}/Dict/IHasher.h
         ${INCLUDE}/Dict/STLHasher.h
+        ${INCLUDE}/Dict/PtrHasher.h
         ${INCLUDE}/Dict/IDictionary.h
         ${INCLUDE}/Dict/HashTable.h
         ${INCLUDE}/Tree/ITree.h

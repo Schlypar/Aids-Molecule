@@ -1,57 +1,125 @@
 #pragma once
 
+#include "Dict/HashTable.h"
+#include "Dict/PtrHasher.h"
 #include <cstddef>
 #include <functional>
 #include <iostream>
+#include <ostream>
 #include <utility>
 
-template <typename T>
-class Deleter
+enum DeleterType
 {
-private:
-	std::function<void(T*)> deleter;
+	ArrayDeleter,
+	ValueDeleter,
+};
 
-public:
-	Deleter()
-	    : deleter([](T* block) -> void
-		      { delete block; })
+struct PointerData
+{
+	int count;
+	DeleterType deleteType;
+
+	PointerData()
+	    : count(0)
+	    , deleteType(ValueDeleter)
 	{
 	}
 
-	Deleter(int kostyl)
-	    : deleter([](T* block) -> void
-		      { delete[] block; })
+	PointerData(DeleterType deleteType)
+	    : count(1)
+	    , deleteType(deleteType)
 	{
 	}
 
-	Deleter(const Deleter<T>& other)
-	    : deleter(other.deleter)
+	PointerData(int count, DeleterType deleteType)
+	    : count(count)
+	    , deleteType(deleteType)
 	{
 	}
 
-	void delete_block(T* block)
+	friend std::ostream& operator<<(std::ostream& stream, const PointerData& ptrData)
 	{
-		this->deleter(block);
+		switch (ptrData.deleteType)
+		{
+			case ArrayDeleter:
+				stream << "(" << ptrData.count << ", ArrayDeleter)";
+				break;
+			case ValueDeleter:
+				stream << "(" << ptrData.count << ", ValueDeleter)";
+				break;
+		}
+
+		return stream;
 	}
 };
 
+static HashTable<void*, PointerData> MemoryTracker = HashTable<void*, PointerData>(new PtrHasher<void*>());
+
+template <typename T>
+static bool DeletePointer(T* ptr)
+{
+
+	if (ptr != nullptr)
+	{
+		PointerData& data = MemoryTracker.GetMut((void*) ptr);
+
+		if (data.count > 0)
+		{
+			data.count--;
+
+			if (data.count <= 0)
+			{
+				switch (data.deleteType)
+				{
+					case ValueDeleter:
+						delete ptr;
+						return true;
+					case ArrayDeleter:
+						delete[] ptr;
+						return true;
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+template <typename T>
+static void IncrementPointerCount(T* ptr, DeleterType deleterType)
+{
+	try
+	{
+		PointerData& data = MemoryTracker.GetMut((void*) ptr);
+		data.count++;
+	}
+	catch (...)
+	{
+		MemoryTracker.Add({ (void*) ptr, PointerData(1, deleterType) });
+	}
+}
+
+template <typename T>
+static void Untrack(T* ptr)
+{
+	try
+	{
+		MemoryTracker.Remove((void*) ptr);
+	}
+	catch (...)
+	{
+	}
+}
+
 template <class T>
 class UniquePtr
-
 {
 private:
 	T* ptr;
-	Deleter<T> deleter = Deleter<T>();
 
 public:
 	UniquePtr() noexcept
 	    : ptr(nullptr)
-	{
-	}
-
-	UniquePtr(int kostyl) noexcept
-	    : ptr(nullptr)
-	    , deleter(kostyl)
 	{
 	}
 
@@ -60,41 +128,43 @@ public:
 	{
 	}
 
-	UniquePtr(std::nullptr_t, int kostyl) noexcept
-	    : ptr(nullptr)
-	    , deleter(kostyl)
-	{
-	}
-
 	UniquePtr(T* object) noexcept
 	    : ptr(object)
 	{
+		try
+		{
+			PointerData& data = MemoryTracker.GetMut(this->ptr);
+			data.count++;
+		}
+		catch (...)
+		{
+			MemoryTracker.Add({ (void*) this->ptr, PointerData(1, ValueDeleter) });
+		}
 	}
 
-	UniquePtr(T* object, int kostyl) noexcept
+	UniquePtr(T* object, DeleterType deleterType) noexcept
 	    : ptr(object)
-	    , deleter(kostyl)
 	{
+		try
+		{
+			PointerData& data = MemoryTracker.GetMut(this->ptr);
+			data.count++;
+		}
+		catch (...)
+		{
+			MemoryTracker.Add({ (void*) this->ptr, PointerData(1, ValueDeleter) });
+		}
 	}
 
 	UniquePtr(UniquePtr<T>&& other) noexcept
 	    : ptr(nullptr)
-	    , deleter(other.deleter)
 	{
 		this->swap(other);
 	}
 
 	~UniquePtr()
 	{
-		if (this->ptr != nullptr)
-		{
-			deleter.delete_block(ptr);
-		}
-	}
-
-	void setDeleter(const Deleter<T>& deleter)
-	{
-		this->deleter = deleter;
+		DeletePointer(this->ptr);
 	}
 
 	UniquePtr<T>& operator=(UniquePtr<T>&& other) noexcept
@@ -179,8 +249,28 @@ public:
 	void reset() noexcept
 	{
 		T* temp = release();
-		// delete temp;
-		deleter.delete_block(temp);
+		PointerData& data = MemoryTracker.GetMut((void*) temp);
+
+		if (data.count > 0)
+		{
+			data.count--;
+			switch (data.deleteType)
+			{
+				case ValueDeleter:
+					delete temp;
+					break;
+				case ArrayDeleter:
+					delete[] temp;
+					break;
+			}
+		}
+	}
+
+	friend std::ostream& operator<<(std::ostream& stream, const UniquePtr<T>& ptr)
+	{
+		stream << ptr.ptr;
+
+		return stream;
 	}
 };
 
@@ -199,42 +289,35 @@ class SharedPtr
 
 private:
 	T* ptr;
-	int* counter;
-	Deleter<T> deleter = Deleter<T>();
-
-	int* GetCounter() const
-	{
-		return counter;
-	}
 
 public:
 	SharedPtr() noexcept
 	    : ptr(nullptr)
-	    , counter(new int(0))
 	{
 	}
 
 	SharedPtr(std::nullptr_t) noexcept
 	    : ptr(nullptr)
-	    , counter(new int(0))
 	{
 	}
 
 	SharedPtr(T* object) noexcept
 	    : ptr(object)
-	    , counter(new int(1))
 	{
+		IncrementPointerCount(object, ValueDeleter);
+	}
+
+	SharedPtr(T* object, DeleterType deleterType) noexcept
+	    : ptr(object)
+	{
+		IncrementPointerCount(object, deleterType);
 	}
 
 	SharedPtr(const SharedPtr<T>& other) noexcept
 	    : ptr(other.ptr)
-	    , counter(other.counter)
-	    , deleter(other.deleter)
 	{
-		if (other.counter)
-		{
-			(*counter)++;
-		}
+
+		IncrementPointerCount(other.ptr, ValueDeleter);
 	}
 
 	~SharedPtr() noexcept
@@ -242,22 +325,12 @@ public:
 		cleanup();
 	}
 
-	void setDeleter(const Deleter<T>& deleter)
-	{
-		this->deleter = deleter;
-	}
-
 	SharedPtr<T>& operator=(const SharedPtr<T>& other) noexcept
 	{
 		cleanup();
 
 		this->ptr = other.ptr;
-		this->counter = other.counter;
-		if (counter)
-		{
-			(*counter)++;
-		}
-
+		IncrementPointerCount(this->ptr, ValueDeleter);
 		return *this;
 	}
 
@@ -273,10 +346,8 @@ public:
 		cleanup();
 
 		ptr = other.ptr;
-		counter = other.counter;
 
 		other.ptr = nullptr;
-		other.counter = nullptr;
 
 		return *this;
 	}
@@ -320,14 +391,13 @@ public:
 	{
 		T* result = nullptr;
 		std::swap(result, ptr);
-		*counter = 0;
+		Untrack(result);
 		return result;
 	}
 
 	void swap(SharedPtr<T>& other) noexcept
 	{
 		std::swap(ptr, other.ptr);
-		std::swap(counter, other.counter);
 	}
 
 	int UseCount() const
@@ -343,28 +413,13 @@ public:
 	void reset() noexcept
 	{
 		T* temp = release();
-		*counter = 0;
-		// delete temp;
-		deleter.delete_block(temp);
+		DeletePointer(temp);
 	}
 
 private:
 	void cleanup() noexcept
 	{
-		if (counter)
-		{
-			(*counter)--;
-
-			if (*counter <= 0)
-			{
-				if (ptr != nullptr)
-				{
-					deleter.delete_block(ptr);
-				}
-
-				delete counter;
-			}
-		}
+		DeletePointer(this->ptr);
 	}
 };
 
@@ -373,6 +428,108 @@ void swap(SharedPtr<T>& left, SharedPtr<T>& right)
 {
 	left.swap(right);
 }
+
+template <typename T>
+class WeakPtr
+{
+private:
+	T* ptr;
+
+public:
+	WeakPtr()
+	    : ptr(nullptr)
+	{
+	}
+
+	WeakPtr(const SharedPtr<T>& ptr)
+	    : ptr(ptr.ptr)
+	{
+	}
+
+	~WeakPtr() = default;
+
+	WeakPtr& operator=(const SharedPtr<T>& other)
+	{
+		this->ptr = other.ptr;
+
+		return *this;
+	}
+
+	WeakPtr& operator=(const WeakPtr<T>& other)
+	{
+		this->ptr = other.ptr;
+
+		return *this;
+	}
+
+	bool Expired() const
+	{
+		// return UseCount() == 0;
+		PointerData& data = MemoryTracker.GetMut((void*) this->ptr);
+		return data.count == 0;
+	}
+
+	int UseCount() const
+	{
+		// return *counter;
+		PointerData& data = MemoryTracker.GetMut((void*) this->ptr);
+		return data.count;
+	}
+
+	SharedPtr<T> Lock() const
+	{
+		if (Expired())
+		{
+			return SharedPtr<T>(nullptr);
+		}
+
+		SharedPtr<T> ptr = nullptr;
+		ptr.ptr = this->ptr;
+
+		return ptr;
+	}
+
+	void swap(WeakPtr<T>& other)
+	{
+		std::swap(this->ptr, other.ptr);
+	}
+};
+
+template <typename T>
+void swap(WeakPtr<T>& left, WeakPtr<T>& right)
+{
+	left.swap(right);
+}
+
+template <typename T>
+class Deleter
+{
+private:
+	std::function<void(T*)> deleter;
+
+public:
+	Deleter()
+	    : deleter([](T* block) -> void
+		      { delete block; })
+	{
+	}
+
+	Deleter(int kostyl)
+	    : deleter([](T* block) -> void
+		      { delete[] block; })
+	{
+	}
+
+	Deleter(const Deleter<T>& other)
+	    : deleter(other.deleter)
+	{
+	}
+
+	void delete_block(T* block)
+	{
+		this->deleter(block);
+	}
+};
 
 template <class T>
 class SloppyPtr
@@ -527,84 +684,6 @@ public:
 
 template <class T>
 void swap(SloppyPtr<T>& left, SloppyPtr<T>& right)
-{
-	left.swap(right);
-}
-
-template <typename T>
-class WeakPtr
-{
-private:
-	T* pointer;
-	int* counter;
-
-public:
-	WeakPtr()
-	    : pointer(nullptr)
-	    , counter(nullptr)
-	{
-	}
-
-	WeakPtr(const SharedPtr<T>& ptr)
-	    : pointer(ptr.ptr)
-	    , counter(ptr.counter)
-	{
-		(*counter)++;
-	}
-
-	~WeakPtr() = default;
-
-	WeakPtr& operator=(const SharedPtr<T>& other)
-	{
-		this->pointer = other.ptr;
-		this->counter = other.counter;
-
-		return *this;
-	}
-
-	WeakPtr& operator=(const WeakPtr<T>& other)
-	{
-		this->pointer = other.pointer;
-		this->counter = other.counter;
-
-		return *this;
-	}
-
-	bool Expired() const
-	{
-		return UseCount() == 0;
-	}
-
-	int UseCount() const
-	{
-		return *counter;
-	}
-
-	SharedPtr<T> Lock() const
-	{
-		if (Expired())
-		{
-			return SharedPtr<T>(nullptr);
-		}
-
-		SharedPtr<T> ptr = nullptr;
-		ptr.ptr = this->pointer;
-		ptr.counter = this->counter;
-
-		(*counter)++;
-
-		return ptr;
-	}
-
-	void swap(const WeakPtr<T>& other)
-	{
-		std::swap(this->pointer, other.pointer);
-		std::swap(this->counter, other.counter);
-	}
-};
-
-template <typename T>
-void swap(WeakPtr<T>& left, WeakPtr<T>& right)
 {
 	left.swap(right);
 }

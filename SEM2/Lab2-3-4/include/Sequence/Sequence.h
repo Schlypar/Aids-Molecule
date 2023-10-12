@@ -6,7 +6,6 @@
 #include "Array.h"
 #include "Iterator.h"
 #include "Logger.h"
-#include "Pointer.h"
 #include "Tuple.h"
 #include "concepts.h"
 #include "functional/mapreduce.h"
@@ -62,14 +61,14 @@ public:
 		return stream;
 	}
 
-	template <typename U>
-	friend SharedPtr<Sequence<U>> operator|(SharedPtr<Sequence<U>> sequence, fn::filter<U> filter);
-	template <typename U>
-	friend SharedPtr<Sequence<U>> operator|(SharedPtr<Sequence<U>> sequence, fn::transformer<U> transformer);
-	template <typename U>
-	friend UniquePtr<Sequence<U>> operator|(Sequence<U>* sequence, fn::filter<U> filter);
-	template <typename U>
-	friend UniquePtr<Sequence<U>> operator|(Sequence<U>* sequence, fn::transformer<U> transformer);
+	// template <typename U>
+	// friend SharedPtr<Sequence<U>> operator|(SharedPtr<Sequence<U>> sequence, fn::filter<U> filter);
+	// template <typename U>
+	// friend SharedPtr<Sequence<U>> operator|(SharedPtr<Sequence<U>> sequence, fn::transformer<U> transformer);
+	// template <typename U>
+	// friend UniquePtr<Sequence<U>> operator|(Sequence<U>* sequence, fn::filter<U> filter);
+	// template <typename U>
+	// friend UniquePtr<Sequence<U>> operator|(Sequence<U>* sequence, fn::transformer<U> transformer);
 };
 
 template <typename T>
@@ -267,48 +266,48 @@ public:
 	}
 };
 
-template <typename U>
-SharedPtr<Sequence<U>> operator|(SharedPtr<Sequence<U>> sequence, fn::filter<U> filter)
-{
-	SharedPtr<Sequence<U>> result = sequence->Create();
-
-	for (U& data : *sequence)
-		if (filter._filter(data))
-			result->Append(data);
-
-	return result;
-}
-
-template <typename U>
-SharedPtr<Sequence<U>> operator|(SharedPtr<Sequence<U>> sequence, fn::transformer<U> transformer)
-{
-	SharedPtr<Sequence<U>> result = sequence->Create();
-
-	for (U& data : *sequence)
-		result->Append(transformer._transformer(data));
-
-	return result;
-}
-
-template <typename U>
-UniquePtr<Sequence<U>> operator|(Sequence<U>* sequence, fn::filter<U> filter)
-{
-	Sequence<U>* result = sequence->Create();
-
-	for (U& data : *sequence)
-		if (filter._filter(data))
-			result->Append(data);
-
-	return UniquePtr<Sequence<U>>(result);
-}
-
-template <typename U>
-UniquePtr<Sequence<U>> operator|(Sequence<U>* sequence, fn::transformer<U> transformer)
-{
-	Sequence<U>* result = sequence->Create();
-
-	for (U& data : *sequence)
-		result->Append(transformer._transformer(data));
-
-	return UniquePtr<Sequence<U>>(result);
-}
+// template <typename U>
+// SharedPtr<Sequence<U>> operator|(SharedPtr<Sequence<U>> sequence, fn::filter<U> filter)
+// {
+// 	SharedPtr<Sequence<U>> result = sequence->Create();
+//
+// 	for (U& data : *sequence)
+// 		if (filter._filter(data))
+// 			result->Append(data);
+//
+// 	return result;
+// }
+//
+// template <typename U>
+// SharedPtr<Sequence<U>> operator|(SharedPtr<Sequence<U>> sequence, fn::transformer<U> transformer)
+// {
+// 	SharedPtr<Sequence<U>> result = sequence->Create();
+//
+// 	for (U& data : *sequence)
+// 		result->Append(transformer._transformer(data));
+//
+// 	return result;
+// }
+//
+// template <typename U>
+// UniquePtr<Sequence<U>> operator|(Sequence<U>* sequence, fn::filter<U> filter)
+// {
+// 	Sequence<U>* result = sequence->Create();
+//
+// 	for (U& data : *sequence)
+// 		if (filter._filter(data))
+// 			result->Append(data);
+//
+// 	return UniquePtr<Sequence<U>>(result);
+// }
+//
+// template <typename U>
+// UniquePtr<Sequence<U>> operator|(Sequence<U>* sequence, fn::transformer<U> transformer)
+// {
+// 	Sequence<U>* result = sequence->Create();
+//
+// 	for (U& data : *sequence)
+// 		result->Append(transformer._transformer(data));
+//
+// 	return UniquePtr<Sequence<U>>(result);
+// }

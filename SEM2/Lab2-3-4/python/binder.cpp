@@ -5,7 +5,7 @@
 #include <pybind11/stl.h>
 #include <utility>
 
-LogPriority Logger::priority = InfoPriority;
+LogPriority Logger::priority = FatalPriority;
 
 namespace py = pybind11;
 
@@ -83,8 +83,8 @@ ptr_wrapper<int> generate_raw_array(int size, int seed)
 SharedPtr<int> generate_mysmart_array(int size, int seed)
 {
 	srand(seed);
-	SharedPtr<int> array = new int[size];
-	array.setDeleter(1);
+	SharedPtr<int> array = {new int[size], ArrayDeleter};
+	// array.setDeleter(1);
 
 	for (auto i = 0; i < size; i++)
 		array[i] = rand() % 100 - rand() % 200;
