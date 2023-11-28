@@ -7,7 +7,7 @@
 #include "Sequence/ArraySequence.h"
 #include <initializer_list>
 
-#define DEFAULT_SIZE 10
+#define DEFAULT_SIZE 16
 
 template <typename Tkey, typename Tvalue>
 class HashTable : IDict<Tkey, Tvalue>
@@ -227,7 +227,7 @@ IDict<Tkey, Tvalue>* HashTable<Tkey, Tvalue>::Add(Pair<Tkey, Tvalue> record)
 
 	if (NeedToReconstruct())
 	{
-		Array<CollisionList> newTable;
+		AssociativeArray newTable;
 		newTable.Realloc(size_t(hashTable.GetLength() * 2));
 
 		for (CollisionList& list : hashTable)
