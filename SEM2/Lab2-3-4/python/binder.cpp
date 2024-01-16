@@ -75,7 +75,9 @@ ptr_wrapper<int> generate_raw_array(int size, int seed)
 	ptr_wrapper<int> array = new int[size];
 
 	for (auto i = 0; i < size; i++)
+	{
 		array[i] = rand() % 100 - rand() % 200;
+	}
 
 	return array;
 }
@@ -83,11 +85,13 @@ ptr_wrapper<int> generate_raw_array(int size, int seed)
 SharedPtr<int> generate_mysmart_array(int size, int seed)
 {
 	srand(seed);
-	SharedPtr<int> array = {new int[size], ArrayDeleter};
+	SharedPtr<int> array = { new int[size] };
 	// array.setDeleter(1);
 
 	for (auto i = 0; i < size; i++)
+	{
 		array[i] = rand() % 100 - rand() % 200;
+	}
 
 	return array;
 }
@@ -98,7 +102,9 @@ std::shared_ptr<int[]> generate_stl_array(int size)
 	std::shared_ptr<int[]> array(new int[size]);
 
 	for (auto i = 0; i < size; i++)
+	{
 		array[i] = rand() % 100 - rand() % 200;
+	}
 
 	return array;
 }
@@ -111,10 +117,14 @@ void heapify_raw(ptr_wrapper<int> array, int size, int i)
 	int right = 2 * i + 2;
 
 	if (left < size && array[left] > array[largest])
+	{
 		largest = left;
+	}
 
 	if (right < size && array[right] > array[largest])
+	{
 		largest = right;
+	}
 
 	if (largest != i)
 	{
@@ -132,10 +142,14 @@ void heapify_mysmart(SharedPtr<int> array, int size, int i)
 	int right = 2 * i + 2;
 
 	if (left < size && array[left] > array[largest])
+	{
 		largest = left;
+	}
 
 	if (right < size && array[right] > array[largest])
+	{
 		largest = right;
+	}
 
 	if (largest != i)
 	{
@@ -153,10 +167,14 @@ void heapify_stl(std::shared_ptr<int[]> array, int size, int i)
 	int right = 2 * i + 2;
 
 	if (left < size && array[left] > array[largest])
+	{
 		largest = left;
+	}
 
 	if (right < size && array[right] > array[largest])
+	{
 		largest = right;
+	}
 
 	if (largest != i)
 	{
@@ -169,7 +187,9 @@ void heapify_stl(std::shared_ptr<int[]> array, int size, int i)
 void heapSortRaw(ptr_wrapper<int> array, int size)
 {
 	for (int i = size / 2 - 1; i >= 0; i--)
+	{
 		heapify_raw(array, size, i);
+	}
 
 	for (int i = size - 1; i > 0; i--)
 	{
@@ -183,7 +203,9 @@ void heapSortRaw(ptr_wrapper<int> array, int size)
 void heapSortMysmart(SharedPtr<int> array, int size)
 {
 	for (int i = size / 2 - 1; i >= 0; i--)
+	{
 		heapify_mysmart(array, size, i);
+	}
 
 	for (int i = size - 1; i > 0; i--)
 	{
@@ -195,7 +217,9 @@ void heapSortMysmart(SharedPtr<int> array, int size)
 void heapSortStl(std::shared_ptr<int[]> array, int size)
 {
 	for (int i = size / 2 - 1; i >= 0; i--)
+	{
 		heapify_stl(array, size, i);
+	}
 
 	for (int i = size - 1; i > 0; i--)
 	{
@@ -207,7 +231,9 @@ void heapSortStl(std::shared_ptr<int[]> array, int size)
 void print_raw(ptr_wrapper<int> array, int size)
 {
 	for (auto i = 0; i < size; i++)
+	{
 		std::cout << array[i] << " ";
+	}
 
 	std::cout << '\n';
 }
@@ -215,7 +241,9 @@ void print_raw(ptr_wrapper<int> array, int size)
 void print_myimpl(SharedPtr<int> array, int size)
 {
 	for (auto i = 0; i < size; i++)
+	{
 		std::cout << array[i] << " ";
+	}
 
 	std::cout << '\n';
 }

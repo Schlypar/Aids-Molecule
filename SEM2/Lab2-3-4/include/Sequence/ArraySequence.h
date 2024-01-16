@@ -17,9 +17,13 @@ private:
 	void Resize()
 	{
 		if (length == container.GetLength())
+		{
 			container.Realloc(container.GetLength() * 2);
+		}
 		else if (length > container.GetLength())
+		{
 			container.Realloc(length * 2);
+		}
 	}
 
 public:
@@ -121,8 +125,12 @@ public:
 		ArraySequence<T> result;
 
 		for (T& data : *this)
+		{
 			if (filter._filter(data))
+			{
 				result.Append(data);
+			}
+		}
 
 		return result;
 	}
@@ -132,7 +140,9 @@ public:
 		ArraySequence<T> result;
 
 		for (T& data : *this)
+		{
 			result.Append(transformer._transformer(data));
+		}
 
 		return result;
 	}
@@ -167,7 +177,9 @@ public:
 		// stream << array.container;
 		stream << "[ ";
 		for (auto e : array)
+		{
 			stream << e << " ";
+		}
 		stream << "]";
 
 		return stream;
@@ -253,7 +265,9 @@ Sequence<T>* ArraySequence<T>::Prepend(const T& data)
 	this->Resize();
 
 	for (Index i = GetLength(); i > 0; i--)
+	{
 		container[i] = container[i - 1];
+	}
 
 	container[0] = data;
 
@@ -274,7 +288,9 @@ void ArraySequence<T>::InsertAt(const Index index, const T& data)
 	this->Resize();
 
 	for (Index i = GetLength(); i > index; i--)
+	{
 		container[i] = container[i - 1];
+	}
 
 	container[index] = data;
 }
@@ -282,7 +298,6 @@ void ArraySequence<T>::InsertAt(const Index index, const T& data)
 template <typename T>
 void ArraySequence<T>::Remove(const Index index)
 {
-
 	if (index >= GetLength() || index < 0)
 	{
 		Logger::Trace("At Remove() at ArraySequence.h");
@@ -291,8 +306,9 @@ void ArraySequence<T>::Remove(const Index index)
 	}
 
 	for (Index i = index; i < GetLength() - 1; i++)
+	{
 		container[i] = container[i + 1];
+	}
 
 	this->length--;
-	// container.Realloc(container.GetLength() - 1);
 }

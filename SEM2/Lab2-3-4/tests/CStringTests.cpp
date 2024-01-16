@@ -3,7 +3,6 @@
 #include "moduleTest.h"
 
 #include "str/CString.h"
-#include <catch2/catch.hpp>
 
 TEST_CASE("Default constructor of String class")
 {

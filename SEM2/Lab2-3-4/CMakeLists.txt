@@ -107,5 +107,5 @@ add_executable(${TEST_PROJECT_NAME}
 
 target_include_directories(${TEST_PROJECT_NAME} PRIVATE ${SOURCE_DIR})
 target_include_directories(${TEST_PROJECT_NAME} PRIVATE ${INCLUDE})
-# target_link_libraries(${TEST_PROJECT_NAME} PRIVATE Catch2::Catch2WithMain)
+target_link_libraries(${TEST_PROJECT_NAME} PRIVATE Catch2::Catch2WithMain)
 
