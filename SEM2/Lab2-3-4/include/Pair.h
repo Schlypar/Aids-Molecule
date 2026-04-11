@@ -4,75 +4,71 @@
 #include <utility>
 
 template <typename L, typename R>
-class Pair
-{
+class Pair {
 public:
-	L left;
-	R right;
+    L left;
+    R right;
 
-	Pair()
-	    : left(L())
-	    , right(R())
-	{
-	}
+    Pair()
+        : left(L())
+        , right(R())
+    {
+    }
 
-	Pair(const L& left, const R& right)
-	    : left(left)
-	    , right(right)
-	{
-	}
+    Pair(const L& left, const R& right)
+        : left(left)
+        , right(right)
+    {
+    }
 
-	Pair(const Pair<L, R>& other)
-	    : left(other.left)
-	    , right(other.right)
-	{
-	}
+    Pair(const Pair<L, R>& other)
+        : left(other.left)
+        , right(other.right)
+    {
+    }
 
-	Pair(Pair<L, R>&& other)
-	    : left(std::move(other.left))
-	    , right(std::move(other.right))
-	{
-	}
+    Pair(Pair<L, R>&& other)
+        : left(std::move(other.left))
+        , right(std::move(other.right))
+    {
+    }
 
-	~Pair()
-	{
-	}
+    ~Pair()
+    {
+    }
 
-	L GetLeft() const noexcept
-	{
-		return left;
-	}
+    L GetLeft() const noexcept {
+        return left;
+    }
 
-	R GetRight() const noexcept
-	{
-		return right;
-	}
+    R GetRight() const noexcept {
+        return right;
+    }
 
-	Pair& operator=(const Pair<L, R>& other)
-	{
-		left = other.left;
-		right = other.right;
+    Pair& operator=(const Pair<L, R>& other)
+    {
+        left = other.left;
+        right = other.right;
 
-		return *this;
-	}
+        return *this;
+    }
 
-	Pair& operator=(Pair<L, R>&& other)
-	{
-		left = std::move(other.left);
-		right = std::move(other.right);
+    Pair& operator=(Pair<L, R>&& other)
+    {
+        left = std::move(other.left);
+        right = std::move(other.right);
 
-		return *this;
-	}
+        return *this;
+    }
 
-	bool operator==(const Pair<L, R>& other) const noexcept
-	{
-		return (left == other.left) && (right == other.right);
-	}
+    bool operator==(const Pair<L, R>& other) const noexcept {
+        return (left == other.left) && (right == other.right);
+    }
 
-	friend std::ostream& operator<<(std::ostream& stream, const Pair<L, R>& pair)
-	{
-		stream << "(" << pair.left << ", " << pair.right << ")";
+    friend std::ostream& operator<<(std::ostream& stream, const Pair<L, R>& pair)
+    {
+        stream << "(" << pair.left << ", " << pair.right << ")";
 
-		return stream;
-	}
+        return stream;
+    }
 };

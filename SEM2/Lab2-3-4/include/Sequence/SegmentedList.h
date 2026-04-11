@@ -12,808 +12,744 @@
 #define SEGMENT_MAX_SIZE 18
 
 template <typename T>
-class SegmentedList : IContainer<T>
-{
+class SegmentedList: IContainer<T> {
 private:
-	template <typename Type>
-	struct Segment
-	{
-		Segment<Type>* prev;
-		Segment<Type>* next;
+    template <typename Type>
+    struct Segment {
+        Segment<Type>* prev;
+        Segment<Type>* next;
 
-		Node<Type>* head;
-		Node<Type>* tail;
+        Node<Type>* head;
+        Node<Type>* tail;
 
-		Size size;
+        Size size;
 
-		const Size minSize = SEGMENT_MIN_SIZE;
-		const Size normSize = SEGMENT_NORM_SIZE;
-		const Size maxSize = SEGMENT_MAX_SIZE;
+        const Size minSize = SEGMENT_MIN_SIZE;
+        const Size normSize = SEGMENT_NORM_SIZE;
+        const Size maxSize = SEGMENT_MAX_SIZE;
 
-		Segment()
-		{
-			prev = nullptr;
-			next = nullptr;
-			head = nullptr;
-			tail = nullptr;
-		}
-	};
+        Segment() {
+            prev = nullptr;
+            next = nullptr;
+            head = nullptr;
+            tail = nullptr;
+        }
+    };
 
-	Segment<T>* head;
-	Segment<T>* tail;
-	Size size;
+    Segment<T>* head;
+    Segment<T>* tail;
+    Size size;
 
 public:
-	class Iterator;
+    class Iterator;
 
-	Iterator begin() noexcept
-	{
-		return (Iterator) this->head->head;
-	}
+    Iterator begin() noexcept {
+        return (Iterator)this->head->head;
+    }
 
-	Iterator end() noexcept
-	{
-		// return (Iterator) this->tail->tail->next;
-		return Iterator();
-	}
+    Iterator end() noexcept {
+        // return (Iterator) this->tail->tail->next;
+        return Iterator();
+    }
 
-	SegmentedList()
-	    : head(nullptr)
-	    , tail(nullptr)
-	    , size(0)
-	{
-		Logger::Info("Default constructor of SegmentedList<T>");
-	}
+    SegmentedList()
+        : head(nullptr)
+        , tail(nullptr)
+        , size(0)
+    {
+        Logger::Info("Default constructor of SegmentedList<T>");
+    }
 
-	SegmentedList(const SegmentedList<T>& other)
-	    : size(0)
-	{
-		Logger::Info("Copied SegmentedList<T>");
-		for (Size i = 0; i < other.size; i++)
-			Append(other.Get(i));
-	}
+    SegmentedList(const SegmentedList<T>& other)
+        : size(0)
+    {
+        Logger::Info("Copied SegmentedList<T>");
+        for (Size i = 0; i < other.size; i++) {
+            Append(other.Get(i));
+        }
+    }
 
-	SegmentedList(SegmentedList<T>&& other)
-	    : head(other.head)
-	    , tail(other.tail)
-	    , size(other.size)
-	{
-		Logger::Info("Moved SegmentedList<T>");
-		other.head = nullptr;
-		other.size = 0;
-	}
+    SegmentedList(SegmentedList<T>&& other)
+        : head(other.head)
+        , tail(other.tail)
+        , size(other.size)
+    {
+        Logger::Info("Moved SegmentedList<T>");
+        other.head = nullptr;
+        other.size = 0;
+    }
 
-	SegmentedList(const T* data, Size count)
-	    : size(0)
-	{
-		Logger::Info("Copied SegmentedList<T> from array");
-		for (Size i = 0; i < count; i++)
-			Append(data[i]);
-	}
+    SegmentedList(const T* data, Size count)
+        : size(0)
+    {
+        Logger::Info("Copied SegmentedList<T> from array");
+        for (Size i = 0; i < count; i++) {
+            Append(data[i]);
+        }
+    }
 
-	SegmentedList(const List<T>& other)
-	    : size(0)
-	{
-		Logger::Info("Copied SegmentedList<T> from List<T>");
-		for (Size i = 0; i < other.GetLength(); i++)
-			Append(other.Get(i));
-	}
+    SegmentedList(const List<T>& other)
+        : size(0)
+    {
+        Logger::Info("Copied SegmentedList<T> from List<T>");
+        for (Size i = 0; i < other.GetLength(); i++) {
+            Append(other.Get(i));
+        }
+    }
 
-	SegmentedList(List<T>&& other)
-	    : size(0)
-	{
-		Logger::Info("Moved SegmentedList<T> from List<T>");
-		for (Size i = 0; i < other.GetLength(); i++)
-			Append(std::move(other.Get(i)));
+    SegmentedList(List<T>&& other)
+        : size(0)
+    {
+        Logger::Info("Moved SegmentedList<T> from List<T>");
+        for (Size i = 0; i < other.GetLength(); i++) {
+            Append(std::move(other.Get(i)));
+        }
 
-		other.Clear();
-	}
+        other.Clear();
+    }
 
-	template <typename... Args>
-	SegmentedList(T head, Args... args)
-	    : size(0)
-	{
-		Logger::Info("Parameter Pack constructor of List<T> of size %u", sizeof...(args) + 1);
+    template <typename... Args>
+    SegmentedList(T head, Args... args)
+        : size(0)
+    {
+        Logger::Info("Parameter Pack constructor of List<T> of size %u", sizeof...(args) + 1);
 
-		Append(head);
+        Append(head);
 
-		((Append(args)), ...);
-	}
+        ((Append(args)), ...);
+    }
 
-	~SegmentedList()
-	{
-		Logger::Info("Destroyed SegmentedList<T>");
-		Clear();
-	}
+    ~SegmentedList() {
+        Logger::Info("Destroyed SegmentedList<T>");
+        Clear();
+    }
 
-	// Degrades list to initial state (empty list)
-	void Clear();
+    // Degrades list to initial state (empty list)
+    void Clear();
 
-	/*
-	 * Return an instance of what is at the head
-	 * */
-	T& GetFirst() const;
+    /*
+     * Return an instance of what is at the head
+     * */
+    T& GetFirst() const;
 
-	/*
-	 * Return an instance of what is at the tail
-	 * */
-	T& GetLast() const;
+    /*
+     * Return an instance of what is at the tail
+     * */
+    T& GetLast() const;
 
-	/*
-	 * Returns an instance of what is ath the index
-	 * */
-	T& Get(const Index index) const override;
+    /*
+     * Returns an instance of what is ath the index
+     * */
+    T& Get(const Index index) const override;
 
-	Size GetLength() const override
-	{
-		return this->size;
-	}
+    Size GetLength() const override {
+        return this->size;
+    }
 
-	// Returns poitner to the head node
-	Node<T>* GetHead() const
-	{
-		return (this->head) ? this->head->head : nullptr;
-	}
+    // Returns poitner to the head node
+    Node<T>* GetHead() const {
+        return (this->head) ? this->head->head : nullptr;
+    }
 
-	// Returns poitner to the tail node
-	Node<T>* GetTail() const
-	{
-		return (this->tail) ? this->tail->tail : nullptr;
-	}
+    // Returns poitner to the tail node
+    Node<T>* GetTail() const {
+        return (this->tail) ? this->tail->tail : nullptr;
+    }
 
-	/*
-	 * Inserts exactly at the index inputed.
-	 * */
-	void insertAt(Index index, const T& data);
+    /*
+     * Inserts exactly at the index inputed.
+     * */
+    void insertAt(Index index, const T& data);
 
-	bool isEmpty() const override
-	{
-		return size == 0;
-	}
+    bool isEmpty() const override {
+        return size == 0;
+    }
 
-	void Append(const T& data);
+    void Append(const T& data);
 
-	void Prepend(const T& data);
+    void Prepend(const T& data);
 
-	/*
-	 * Returns an instance of what is ath the index
-	 * */
-	T& operator[](const Index index)
-	{
-		return Get(index);
-	}
+    /*
+     * Returns an instance of what is ath the index
+     * */
+    T& operator[](const Index index) {
+        return Get(index);
+    }
 
-	/*
-	 * Destroys old list and makes deep copy of other
-	 * */
-	SegmentedList<T>& operator=(const SegmentedList<T>& other);
+    /*
+     * Destroys old list and makes deep copy of other
+     * */
+    SegmentedList<T>& operator=(const SegmentedList<T>& other);
 
-	/*
-	 * Destroys old list and steals pointer from another
-	 * */
-	SegmentedList<T>& operator=(SegmentedList<T>&& other);
+    /*
+     * Destroys old list and steals pointer from another
+     * */
+    SegmentedList<T>& operator=(SegmentedList<T>&& other);
 
-	/*
-	 * Two lists are equal if they are the same size and
-	 * have the same elements in the same order
-	 * */
-	bool operator==(const SegmentedList<T>& other);
+    /*
+     * Two lists are equal if they are the same size and
+     * have the same elements in the same order
+     * */
+    bool operator==(const SegmentedList<T>& other);
 
-	void SetSize(Size newSize)
-	{
-		this->size = newSize;
-	}
+    void SetSize(Size newSize) {
+        this->size = newSize;
+    }
 
-	friend std::ostream& operator<<(std::ostream& stream, const SegmentedList<T>& list)
-	{
-		stream << "[ ";
+    friend std::ostream& operator<<(std::ostream& stream, const SegmentedList<T>& list) {
+        stream << "[ ";
 
-		for (Index i = 0; i < list.GetLength(); i++)
-			stream << list.Get(i) << " ";
+        for (Index i = 0; i < list.GetLength(); i++) {
+            stream << list.Get(i) << " ";
+        }
 
-		stream << "]";
+        stream << "]";
 
-		return stream;
-	}
+        return stream;
+    }
 
 private:
-	bool SegmentIsEmpty(Segment<T>* segment)
-	{
-		return (segment) ? segment->size == 0 : true;
-	}
+    bool SegmentIsEmpty(Segment<T>* segment) {
+        return (segment) ? segment->size == 0 : true;
+    }
 
-	/*
-	 * Returns segment that has greater size.
-	 * If sizes are equal then returns left (segmentOne)
-	 * */
-	Segment<T>* maxFrom(Segment<T>* segmentOne, Segment<T>* segmentTwo);
+    /*
+     * Returns segment that has greater size.
+     * If sizes are equal then returns left (segmentOne)
+     * */
+    Segment<T>* maxFrom(Segment<T>* segmentOne, Segment<T>* segmentTwo);
 
-	/*
-	 * Returns segment that has smaller size.
-	 * If sizes are equal then returns left (segmentOne)
-	 * */
-	Segment<T>* minFrom(Segment<T>* segmentOne, Segment<T>* segmentTwo);
+    /*
+     * Returns segment that has smaller size.
+     * If sizes are equal then returns left (segmentOne)
+     * */
+    Segment<T>* minFrom(Segment<T>* segmentOne, Segment<T>* segmentTwo);
 
-	/*
-	 * If one segment becomes too small (determined by the parameter in the segment itself)
-	 * then we take elements from the bigger neighbour and transef them to the current.
-	 *
-	 * If one segment becomes too big (determined by the parameter in the segment itself)
-	 * then we give elements from it to smallest neighbour and transfer them to the smaller one.
-	 * */
-	void ResizeSegments();
+    /*
+     * If one segment becomes too small (determined by the parameter in the segment itself)
+     * then we take elements from the bigger neighbour and transef them to the current.
+     *
+     * If one segment becomes too big (determined by the parameter in the segment itself)
+     * then we give elements from it to smallest neighbour and transfer them to the smaller one.
+     * */
+    void ResizeSegments();
 };
 
 template <typename T>
-void SegmentedList<T>::Clear()
-{
-	if (isEmpty())
-		return;
+void SegmentedList<T>::Clear() {
+    if (isEmpty()) {
+        return;
+    }
 
-	// Segment<T>* segment = this->head;
-	// while (segment)
-	// {
-	// 	Node<T>* pointer = nullptr;
-	// 	if (segment->head)
-	// 		pointer = segment->head->next;
-	//
-	// 	while (pointer && pointer != segment->tail->next)
-	// 	{
-	// 		if (pointer->prev)
-	// 			delete pointer->prev, pointer->prev = nullptr;
-	// 		pointer = pointer->next;
-	// 	}
-	//
-	// 	if (segment->tail)
-	// 	{
-	// 		delete (segment->tail);
-	// 		segment->tail = nullptr;
-	// 	}
-	//
-	// 	if (segment->next)
-	// 	{
-	// 		segment = segment->next;
-	// 		segment->prev->size = 0;
-	// 		delete segment->prev;
-	// 		segment->prev = nullptr;
-	// 	}
-	// 	else
-	// 		delete segment, segment = nullptr;
-	// }
-	//
-	// this->head = nullptr;
+    // Segment<T>* segment = this->head;
+    // while (segment)
+    // {
+    // 	Node<T>* pointer = nullptr;
+    // 	if (segment->head)
+    // 		pointer = segment->head->next;
+    //
+    // 	while (pointer && pointer != segment->tail->next)
+    // 	{
+    // 		if (pointer->prev)
+    // 			delete pointer->prev, pointer->prev = nullptr;
+    // 		pointer = pointer->next;
+    // 	}
+    //
+    // 	if (segment->tail)
+    // 	{
+    // 		delete (segment->tail);
+    // 		segment->tail = nullptr;
+    // 	}
+    //
+    // 	if (segment->next)
+    // 	{
+    // 		segment = segment->next;
+    // 		segment->prev->size = 0;
+    // 		delete segment->prev;
+    // 		segment->prev = nullptr;
+    // 	}
+    // 	else
+    // 		delete segment, segment = nullptr;
+    // }
+    //
+    // this->head = nullptr;
 
-	Node<T>* current = this->head->head;
-	Node<T>* prev;
+    Node<T>* current = this->head->head;
+    Node<T>* prev;
 
-	Segment<T>* current_segment = this->head;
-	Segment<T>* prev_segment;
+    Segment<T>* current_segment = this->head;
+    Segment<T>* prev_segment;
 
-	// while (current_segment != nullptr && current_segment != this->tail->next)
-	// {
-	// 	prev = current;
-	// 	current = current->next;
-	// 	delete (prev_segment);
-	// }
+    // while (current_segment != nullptr && current_segment != this->tail->next)
+    // {
+    // 	prev = current;
+    // 	current = current->next;
+    // 	delete (prev_segment);
+    // }
 
-	while (current != nullptr)
-	{
-		prev = current;
-		current = current->next;
-		delete (prev);
-	}
+    while (current != nullptr) {
+        prev = current;
+        current = current->next;
+        delete (prev);
+    }
 
-	// delete head;
-	delete tail;
+    // delete head;
+    delete tail;
 
-	size = 0;
+    size = 0;
 }
 
 template <typename T>
-T& SegmentedList<T>::GetFirst() const
-{
-	if (isEmpty())
-	{
-		Logger::Trace("At GetFirst() at SegmentedList.h");
-		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-		throw EXCEPTION_INDEX_OUT_OF_RANGE;
-	}
-	return this->head->head->data;
+T& SegmentedList<T>::GetFirst() const {
+    if (isEmpty()) {
+        Logger::Trace("At GetFirst() at SegmentedList.h");
+        logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+        throw EXCEPTION_INDEX_OUT_OF_RANGE;
+    }
+    return this->head->head->data;
 }
 
 template <typename T>
-T& SegmentedList<T>::GetLast() const
-{
-	if (isEmpty())
-	{
-		Logger::Trace("At GetLast() at SegmentedList.h");
-		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-		throw EXCEPTION_INDEX_OUT_OF_RANGE;
-	}
-	return this->tail->tail->data;
+T& SegmentedList<T>::GetLast() const {
+    if (isEmpty()) {
+        Logger::Trace("At GetLast() at SegmentedList.h");
+        logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+        throw EXCEPTION_INDEX_OUT_OF_RANGE;
+    }
+    return this->tail->tail->data;
 }
 
 template <typename T>
-T& SegmentedList<T>::Get(const Index index) const
-{
-	if (isEmpty())
-	{
-		Logger::Trace("At Get() at SegmentedList.h");
-		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-		throw EXCEPTION_INDEX_OUT_OF_RANGE;
-	}
+T& SegmentedList<T>::Get(const Index index) const {
+    if (isEmpty()) {
+        Logger::Trace("At Get() at SegmentedList.h");
+        logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+        throw EXCEPTION_INDEX_OUT_OF_RANGE;
+    }
 
-	if (index < 0 || index >= this->size)
-	{
-		Logger::Trace("At Get() at SegmentedList.h");
-		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-		throw EXCEPTION_INDEX_OUT_OF_RANGE;
-	}
+    if (index < 0 || index >= this->size) {
+        Logger::Trace("At Get() at SegmentedList.h");
+        logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+        throw EXCEPTION_INDEX_OUT_OF_RANGE;
+    }
 
-	Segment<T>* segment = this->head;
-	Index indexFromStart = 0;
-	const Index maxIndex = size;
+    Segment<T>* segment = this->head;
+    Index indexFromStart = 0;
+    const Index maxIndex = size;
 
-	while (segment)
-	{
-		Index indexLengthOfSegment = segment->size;
+    while (segment) {
+        Index indexLengthOfSegment = segment->size;
 
-		if ((index >= indexFromStart && index <= indexFromStart + indexLengthOfSegment - 1) || (index < this->head->size))
-		{
-			Node<T>* current = segment->head;
-			Index indexWithinSegment = index - indexFromStart;
+        if ((index >= indexFromStart && index <= indexFromStart + indexLengthOfSegment - 1) || (index < this->head->size)) {
+            Node<T>* current = segment->head;
+            Index indexWithinSegment = index - indexFromStart;
 
-			for (Index i = 0; i < indexWithinSegment; i++)
-				current = current->next;
+            for (Index i = 0; i < indexWithinSegment; i++) {
+                current = current->next;
+            }
 
-			return current->data;
-		}
-		indexFromStart += indexLengthOfSegment;
-		segment = segment->next;
-	}
-	return GetFirst();
+            return current->data;
+        }
+        indexFromStart += indexLengthOfSegment;
+        segment = segment->next;
+    }
+    return GetFirst();
 }
 
 template <typename T>
-void SegmentedList<T>::insertAt(Index index, const T& data)
-{
-	if (index < 0)
-	{
-		Logger::Trace("At InsertAt(const Index, const T&) at SegmentedList.h");
-		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-		throw EXCEPTION_INDEX_OUT_OF_RANGE;
-	}
+void SegmentedList<T>::insertAt(Index index, const T& data) {
+    if (index < 0) {
+        Logger::Trace("At InsertAt(const Index, const T&) at SegmentedList.h");
+        logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+        throw EXCEPTION_INDEX_OUT_OF_RANGE;
+    }
 
-	if (index == 0)
-	{
-		Prepend(data);
-		return;
-	}
+    if (index == 0) {
+        Prepend(data);
+        return;
+    }
 
-	if (index >= GetLength())
-	{
-		Append(data);
-		return;
-	}
+    if (index >= GetLength()) {
+        Append(data);
+        return;
+    }
 
-	Node<T>* node = new Node<T>;
-	node->data = data;
-	node->next = nullptr;
-	node->prev = nullptr;
+    Node<T>* node = new Node<T>;
+    node->data = data;
+    node->next = nullptr;
+    node->prev = nullptr;
 
-	Segment<T>* segment = this->head;
-	Index indexFromStart = 0;
-	const Index maxIndex = size;
+    Segment<T>* segment = this->head;
+    Index indexFromStart = 0;
+    const Index maxIndex = size;
 
-	while (segment)
-	{
-		Index indexLengthOfSegment = segment->size;
+    while (segment) {
+        Index indexLengthOfSegment = segment->size;
 
-		if ((index >= maxIndex - indexFromStart && index <= indexFromStart + indexLengthOfSegment - 1)
-			|| (index < this->head->size))
-		{
-			Node<T>* current = segment->head;
-			Index indexWithinSegment = index - indexFromStart;
+        if ((index >= maxIndex - indexFromStart && index <= indexFromStart + indexLengthOfSegment - 1) || (index < this->head->size)) {
+            Node<T>* current = segment->head;
+            Index indexWithinSegment = index - indexFromStart;
 
-			for (Index i = 0; i < indexWithinSegment; i++)
-				current = current->next;
+            for (Index i = 0; i < indexWithinSegment; i++) {
+                current = current->next;
+            }
 
-			if (current == segment->head)
-				segment->head = node;
+            if (current == segment->head) {
+                segment->head = node;
+            }
 
-			if (current == segment->tail)
-				segment->tail = node;
+            if (current == segment->tail) {
+                segment->tail = node;
+            }
 
-			current->prev->next = node;
-			node->prev = current->prev;
+            current->prev->next = node;
+            node->prev = current->prev;
 
-			node->next = current;
-			current->prev = node;
+            node->next = current;
+            current->prev = node;
 
-			segment->size += 1;
-			size++;
+            segment->size += 1;
+            size++;
 
-			ResizeSegments();
-			return;
-		}
-		indexFromStart += indexLengthOfSegment;
-		segment = segment->next;
-	}
+            ResizeSegments();
+            return;
+        }
+        indexFromStart += indexLengthOfSegment;
+        segment = segment->next;
+    }
 }
 
 template <typename T>
-void SegmentedList<T>::Append(const T& data)
-{
-	Node<T>* pointer = new Node<T>;
+void SegmentedList<T>::Append(const T& data) {
+    Node<T>* pointer = new Node<T>;
 
-	pointer->data = data;
-	pointer->next = nullptr;
-	pointer->prev = nullptr;
+    pointer->data = data;
+    pointer->next = nullptr;
+    pointer->prev = nullptr;
 
-	if (isEmpty())
-	{
-		Segment<T>* segment = new Segment<T>;
+    if (isEmpty()) {
+        Segment<T>* segment = new Segment<T>;
 
-		segment->prev = nullptr;
-		segment->next = nullptr;
+        segment->prev = nullptr;
+        segment->next = nullptr;
 
-		segment->head = pointer;
-		segment->tail = pointer;
+        segment->head = pointer;
+        segment->tail = pointer;
 
-		this->head = segment;
-		this->tail = segment;
+        this->head = segment;
+        this->tail = segment;
 
-		segment->size = 1;
-		size++;
-	}
-	else if (this->tail->size < SEGMENT_NORM_SIZE)
-	{
-		Node<T>* segmentTail = this->tail->tail;
+        segment->size = 1;
+        size++;
+    } else if (this->tail->size < SEGMENT_NORM_SIZE) {
+        Node<T>* segmentTail = this->tail->tail;
 
-		segmentTail->next = pointer;
-		pointer->prev = segmentTail;
+        segmentTail->next = pointer;
+        pointer->prev = segmentTail;
 
-		this->tail->tail = pointer;
+        this->tail->tail = pointer;
 
-		this->tail->size += 1;
-		size++;
-	}
-	else
-	{
-		Segment<T>* segment = new Segment<T>;
-		this->tail->next = segment;
+        this->tail->size += 1;
+        size++;
+    } else {
+        Segment<T>* segment = new Segment<T>;
+        this->tail->next = segment;
 
-		segment->prev = this->tail;
-		segment->next = nullptr;
+        segment->prev = this->tail;
+        segment->next = nullptr;
 
-		segment->head = pointer;
-		segment->tail = pointer;
+        segment->head = pointer;
+        segment->tail = pointer;
 
-		this->tail->tail->next = pointer;
-		pointer->prev = this->tail->tail;
+        this->tail->tail->next = pointer;
+        pointer->prev = this->tail->tail;
 
-		this->tail = segment;
+        this->tail = segment;
 
-		segment->size = 1;
-		size++;
-	}
+        segment->size = 1;
+        size++;
+    }
 
-	ResizeSegments();
+    ResizeSegments();
 }
 
 template <typename T>
-void SegmentedList<T>::Prepend(const T& data)
-{
-	Node<T>* pointer = new Node<T>;
+void SegmentedList<T>::Prepend(const T& data) {
+    Node<T>* pointer = new Node<T>;
 
-	pointer->data = data;
-	pointer->next = nullptr;
-	pointer->prev = nullptr;
+    pointer->data = data;
+    pointer->next = nullptr;
+    pointer->prev = nullptr;
 
-	if (isEmpty())
-	{
-		Segment<T>* segment = new Segment<T>;
+    if (isEmpty()) {
+        Segment<T>* segment = new Segment<T>;
 
-		segment->prev = nullptr;
-		segment->next = nullptr;
+        segment->prev = nullptr;
+        segment->next = nullptr;
 
-		segment->head = pointer;
-		segment->tail = pointer;
+        segment->head = pointer;
+        segment->tail = pointer;
 
-		this->head = segment;
-		this->tail = segment;
+        this->head = segment;
+        this->tail = segment;
 
-		segment->size = 1;
-		size++;
-	}
-	else if (this->head->size < SEGMENT_NORM_SIZE)
-	{
-		Node<T>* segmentHead = this->head->head;
+        segment->size = 1;
+        size++;
+    } else if (this->head->size < SEGMENT_NORM_SIZE) {
+        Node<T>* segmentHead = this->head->head;
 
-		segmentHead->prev = pointer;
-		pointer->next = segmentHead;
+        segmentHead->prev = pointer;
+        pointer->next = segmentHead;
 
-		this->head->head = pointer;
+        this->head->head = pointer;
 
-		this->head->size += 1;
-		size++;
-	}
-	else
-	{
-		Segment<T>* segment = new Segment<T>;
-		this->head->prev = segment;
+        this->head->size += 1;
+        size++;
+    } else {
+        Segment<T>* segment = new Segment<T>;
+        this->head->prev = segment;
 
-		segment->prev = nullptr;
-		segment->next = this->head;
+        segment->prev = nullptr;
+        segment->next = this->head;
 
-		segment->head = pointer;
-		segment->tail = pointer;
+        segment->head = pointer;
+        segment->tail = pointer;
 
-		this->head->head->prev = pointer;
-		pointer->next = this->head->head;
+        this->head->head->prev = pointer;
+        pointer->next = this->head->head;
 
-		this->head = segment;
+        this->head = segment;
 
-		segment->size = 1;
-		size++;
-	}
+        segment->size = 1;
+        size++;
+    }
 
-	ResizeSegments();
+    ResizeSegments();
 }
 
 template <typename T>
-SegmentedList<T>& SegmentedList<T>::operator=(const SegmentedList<T>& other)
-{
-	Logger::Info("Used copying operator = of SegmentedList<T>");
-	this->Clear();
+SegmentedList<T>& SegmentedList<T>::operator=(const SegmentedList<T>& other) {
+    Logger::Info("Used copying operator = of SegmentedList<T>");
+    this->Clear();
 
-	for (Index i = 0; i < other.GetLength(); i++)
-		Append(other.Get(i));
+    for (Index i = 0; i < other.GetLength(); i++) {
+        Append(other.Get(i));
+    }
 
-	return *this;
+    return *this;
 }
 
 template <typename T>
 
-SegmentedList<T>& SegmentedList<T>::operator=(SegmentedList<T>&& other)
-{
-	Logger::Info("Used moving operator = of SegmentedList<T>");
-	this->Clear();
+SegmentedList<T>& SegmentedList<T>::operator=(SegmentedList<T>&& other) {
+    Logger::Info("Used moving operator = of SegmentedList<T>");
+    this->Clear();
 
-	this->head = other.head;
-	this->tail = other.tail;
-	this->size = other.size;
+    this->head = other.head;
+    this->tail = other.tail;
+    this->size = other.size;
 
-	other.head = nullptr;
-	other.tail = nullptr;
-	other.size = 0;
+    other.head = nullptr;
+    other.tail = nullptr;
+    other.size = 0;
 
-	return *this;
+    return *this;
 }
 
 template <typename T>
-bool SegmentedList<T>::operator==(const SegmentedList<T>& other)
-{
-	if (isEmpty() && other.isEmpty())
-		return true;
+bool SegmentedList<T>::operator==(const SegmentedList<T>& other) {
+    if (isEmpty() && other.isEmpty()) {
+        return true;
+    }
 
-	if (GetLength() != other.GetLength())
-		return false;
+    if (GetLength() != other.GetLength()) {
+        return false;
+    }
 
-	for (Index i = 0; i < GetLength(); i++)
-		if (Get(i) != other.Get(i))
-			return false;
+    for (Index i = 0; i < GetLength(); i++) {
+        if (Get(i) != other.Get(i)) {
+            return false;
+        }
+    }
 
-	return true;
+    return true;
 }
 
 template <typename T>
 typename SegmentedList<T>::template Segment<T>* SegmentedList<T>::maxFrom(SegmentedList<T>::Segment<T>* segmentOne,
-	SegmentedList<T>::Segment<T>* segmentTwo)
-{
-	if (!segmentOne && segmentTwo)
-		return segmentTwo;
-	if (segmentOne && !segmentTwo)
-		return segmentOne;
-	if (!segmentOne && !segmentTwo)
-		throw;
-	return (segmentOne->size > segmentTwo->size) ? segmentOne : segmentTwo;
+                                                                          SegmentedList<T>::Segment<T>* segmentTwo) {
+    if (!segmentOne && segmentTwo) {
+        return segmentTwo;
+    }
+    if (segmentOne && !segmentTwo) {
+        return segmentOne;
+    }
+    if (!segmentOne && !segmentTwo) {
+        throw;
+    }
+    return (segmentOne->size > segmentTwo->size) ? segmentOne : segmentTwo;
 }
 
 template <typename T>
 typename SegmentedList<T>::template Segment<T>* SegmentedList<T>::minFrom(SegmentedList<T>::Segment<T>* segmentOne,
-	SegmentedList<T>::Segment<T>* segmentTwo)
-{
-	if (!segmentOne && segmentTwo)
-		return segmentTwo;
-	if (segmentOne && !segmentTwo)
-		return segmentOne;
-	if (!segmentOne && !segmentTwo)
-		throw;
-	return (segmentOne->size < segmentTwo->size) ? segmentOne : segmentTwo;
+                                                                          SegmentedList<T>::Segment<T>* segmentTwo) {
+    if (!segmentOne && segmentTwo) {
+        return segmentTwo;
+    }
+    if (segmentOne && !segmentTwo) {
+        return segmentOne;
+    }
+    if (!segmentOne && !segmentTwo) {
+        throw;
+    }
+    return (segmentOne->size < segmentTwo->size) ? segmentOne : segmentTwo;
 }
 
 template <typename T>
-void SegmentedList<T>::ResizeSegments()
-{
-	if (isEmpty())
-		return;
+void SegmentedList<T>::ResizeSegments() {
+    if (isEmpty()) {
+        return;
+    }
 
-	Size segmentMeanNormalised = (size / SEGMENT_NORM_SIZE < 2) ? SEGMENT_MIN_SIZE : SEGMENT_NORM_SIZE - SEGMENT_MIN_SIZE;
+    Size segmentMeanNormalised = (size / SEGMENT_NORM_SIZE < 2) ? SEGMENT_MIN_SIZE : SEGMENT_NORM_SIZE - SEGMENT_MIN_SIZE;
 
-	Segment<T>* current = this->head;
-	while (current)
-	{
-		if (current->size < SEGMENT_MIN_SIZE)
-		{
-			Size diffrence = segmentMeanNormalised - current->size;
-			if (current == this->head && current->next)
-			{
-				for (Index i = 0; i < diffrence && !SegmentIsEmpty(current->next); i++)
-				{
-					current->tail = current->next->head;
-					current->next->head = current->tail->next;
-					current->size += 1;
-					current->next->size -= 1;
-				}
-				ResizeSegments();
-			}
-			else if (current == this->tail && current->prev)
-			{
-				for (Index i = 0; i < diffrence && !SegmentIsEmpty(current->prev); i++)
-				{
-					current->head = current->prev->tail;
-					current->prev->tail = current->head->prev;
-					current->size += 1;
-					current->prev->size -= 1;
-				}
-				ResizeSegments();
-			}
-			else if (current->next || current->prev)
-			{
-				for (Index i = 0; i < diffrence && !SegmentIsEmpty(maxFrom(current->prev, current->next)); i++)
-				{
-					Segment<T>* maximum = maxFrom(current->prev, current->next);
-					if (maximum == current->prev)
-					{
-						current->head = maximum->tail;
-						maximum->tail = current->head->prev;
-						current->size += 1;
-						maximum->size -= 1;
-					}
-					else
-					{
-						current->tail = maximum->head;
-						maximum->head = current->tail->next;
-						current->size += 1;
-						maximum->size -= 1;
-					}
-				}
-				ResizeSegments();
-			}
-		}
-		else if (current->size > SEGMENT_MAX_SIZE && current)
-		{
-			Size diffrence = current->size - segmentMeanNormalised;
-			if (current == this->head && current->next)
-			{
-				for (Index i = 0; i < diffrence && !SegmentIsEmpty(current->next); i++)
-				{
-					current->next->head = current->tail;
-					current->tail = current->tail->prev;
-					current->size -= 1;
-					current->next->size += 1;
-				}
-				ResizeSegments();
-			}
-			else if (current == this->tail && current->prev)
-			{
-				for (Index i = 0; i < diffrence && !SegmentIsEmpty(current->prev); i++)
-				{
-					current->prev->tail = current->head;
-					current->head = current->head->next;
-					current->size -= 1;
-					current->prev->size += 1;
-				}
-				ResizeSegments();
-			}
-			else if (current->prev || current->next)
-			{
-				for (Index i = 0; i < diffrence && !SegmentIsEmpty(maxFrom(current->prev, current->next)); i++)
-				{
-					Segment<T>* minimum = minFrom(current->prev, current->next);
-					if (minimum == current->prev)
-					{
-						minimum->tail = current->head;
-						current->head = current->head->next;
-						current->size -= 1;
-						minimum->size += 1;
-					}
-					else
-					{
-						minimum->head = current->tail;
-						current->tail = current->tail->prev;
-						current->size -= 1;
-						minimum->size += 1;
-					}
-				}
-				ResizeSegments();
-			}
-		}
-		current = current->next;
-	}
+    Segment<T>* current = this->head;
+    while (current) {
+        if (current->size < SEGMENT_MIN_SIZE) {
+            Size diffrence = segmentMeanNormalised - current->size;
+            if (current == this->head && current->next) {
+                for (Index i = 0; i < diffrence && !SegmentIsEmpty(current->next); i++) {
+                    current->tail = current->next->head;
+                    current->next->head = current->tail->next;
+                    current->size += 1;
+                    current->next->size -= 1;
+                }
+                ResizeSegments();
+            } else if (current == this->tail && current->prev) {
+                for (Index i = 0; i < diffrence && !SegmentIsEmpty(current->prev); i++) {
+                    current->head = current->prev->tail;
+                    current->prev->tail = current->head->prev;
+                    current->size += 1;
+                    current->prev->size -= 1;
+                }
+                ResizeSegments();
+            } else if (current->next || current->prev) {
+                for (Index i = 0; i < diffrence && !SegmentIsEmpty(maxFrom(current->prev, current->next)); i++) {
+                    Segment<T>* maximum = maxFrom(current->prev, current->next);
+                    if (maximum == current->prev) {
+                        current->head = maximum->tail;
+                        maximum->tail = current->head->prev;
+                        current->size += 1;
+                        maximum->size -= 1;
+                    } else {
+                        current->tail = maximum->head;
+                        maximum->head = current->tail->next;
+                        current->size += 1;
+                        maximum->size -= 1;
+                    }
+                }
+                ResizeSegments();
+            }
+        } else if (current->size > SEGMENT_MAX_SIZE && current) {
+            Size diffrence = current->size - segmentMeanNormalised;
+            if (current == this->head && current->next) {
+                for (Index i = 0; i < diffrence && !SegmentIsEmpty(current->next); i++) {
+                    current->next->head = current->tail;
+                    current->tail = current->tail->prev;
+                    current->size -= 1;
+                    current->next->size += 1;
+                }
+                ResizeSegments();
+            } else if (current == this->tail && current->prev) {
+                for (Index i = 0; i < diffrence && !SegmentIsEmpty(current->prev); i++) {
+                    current->prev->tail = current->head;
+                    current->head = current->head->next;
+                    current->size -= 1;
+                    current->prev->size += 1;
+                }
+                ResizeSegments();
+            } else if (current->prev || current->next) {
+                for (Index i = 0; i < diffrence && !SegmentIsEmpty(maxFrom(current->prev, current->next)); i++) {
+                    Segment<T>* minimum = minFrom(current->prev, current->next);
+                    if (minimum == current->prev) {
+                        minimum->tail = current->head;
+                        current->head = current->head->next;
+                        current->size -= 1;
+                        minimum->size += 1;
+                    } else {
+                        minimum->head = current->tail;
+                        current->tail = current->tail->prev;
+                        current->size -= 1;
+                        minimum->size += 1;
+                    }
+                }
+                ResizeSegments();
+            }
+        }
+        current = current->next;
+    }
 }
 
 template <typename T>
-class SegmentedList<T>::Iterator : public AbstractIterator<T>
-{
+class SegmentedList<T>::Iterator: public AbstractIterator<T> {
 private:
-	Node<T>* current;
+    Node<T>* current;
 
 public:
-	Iterator()
-	    : current(nullptr)
-	{
-	}
+    Iterator()
+        : current(nullptr)
+    {
+    }
 
-	Iterator(Node<T>* first)
-	    : current(first)
-	{
-	}
+    Iterator(Node<T>* first)
+        : current(first)
+    {
+    }
 
-	Iterator(SegmentedList<T>& list)
-	    : current(list.head->head)
-	{
-	}
+    Iterator(SegmentedList<T>& list)
+        : current(list.head->head)
+    {
+    }
 
-	AbstractIterator<T>& operator++() override
-	{
-		current = current->next;
-		return *this;
-	}
+    AbstractIterator<T>& operator++() override {
+        current = current->next;
+        return *this;
+    }
 
-	Iterator operator++(int)
-	{
-		Iterator temp = *this;
-		(*this)++;
-		return temp;
-	}
+    Iterator operator++(int) {
+        Iterator temp = *this;
+        (*this)++;
+        return temp;
+    }
 
-	AbstractIterator<T>& operator--() override
-	{
-		current = current->prev;
-		return *this;
-	}
+    AbstractIterator<T>& operator--() override {
+        current = current->prev;
+        return *this;
+    }
 
-	Iterator operator--(int)
-	{
-		Iterator temp = *this;
-		(*this)--;
-		return temp;
-	}
+    Iterator operator--(int) {
+        Iterator temp = *this;
+        (*this)--;
+        return temp;
+    }
 
-	bool operator!=(const Iterator& other) const
-	{
-		return this->current != other.current;
-	}
+    bool operator!=(const Iterator& other) const {
+        return this->current != other.current;
+    }
 
-	bool operator==(const Iterator& other) const
-	{
-		return this->current == other.current;
-	}
+    bool operator==(const Iterator& other) const {
+        return this->current == other.current;
+    }
 
-	bool equal(const AbstractIterator<T>& other) const override
-	{
-		return &(this->current->data) == &(*other);
-	}
+    bool equal(const AbstractIterator<T>& other) const override {
+        return &(this->current->data) == &(*other);
+    }
 
-	T& operator*() const override
-	{
-		return this->current->data;
-	}
+    T& operator*() const override {
+        return this->current->data;
+    }
 
-	AbstractIterator<T>* copy() const override
-	{
-		return new Iterator(*this);
-	}
+    AbstractIterator<T>* copy() const override {
+        return new Iterator(*this);
+    }
 };

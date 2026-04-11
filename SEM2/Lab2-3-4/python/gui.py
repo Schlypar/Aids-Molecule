@@ -46,9 +46,7 @@ class Ui_MainWindow(object):
 
         self.tableWidget = QtWidgets.QTableWidget(self.horizontalLayoutWidget)
         self.tableWidget.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.tableWidget.setSizeAdjustPolicy(
-            QtWidgets.QAbstractScrollArea.AdjustToContents
-        )
+        self.tableWidget.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)
         self.tableWidget.setObjectName("tableWidget")
         self.tableWidget.setColumnCount(4)
         self.tableWidget.setRowCount(6)
@@ -86,8 +84,7 @@ class Ui_MainWindow(object):
         self.horizontalLayoutWidget_2.setGeometry(QtCore.QRect(10, 0, 771, 31))
         self.horizontalLayoutWidget_2.setObjectName("horizontalLayoutWidget_2")
 
-        self.graph_layout = QtWidgets.QHBoxLayout(
-            self.horizontalLayoutWidget_2)
+        self.graph_layout = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget_2)
         self.graph_layout.setContentsMargins(0, 0, 0, 0)
         self.graph_layout.setObjectName("graph_layout")
 
@@ -116,9 +113,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(
-            _translate("MainWindow", "Smart pointer VS Raw pointer")
-        )
+        MainWindow.setWindowTitle(_translate("MainWindow", "Smart pointer VS Raw pointer"))
         item = self.tableWidget.verticalHeaderItem(0)
         item.setText(_translate("MainWindow", "10"))
         item = self.tableWidget.verticalHeaderItem(1)
@@ -153,16 +148,10 @@ class Ui_MainWindow(object):
         for row_number, raw, smart in zip(range(6), raw_data, smart_data):
             # a: int = 10
             # f"{(a * 100):.2g}"
-            self.tableWidget.setItem(
-                row_number, 0, QTableWidgetItem(f"{raw:.7f}"))
-            self.tableWidget.setItem(
-                row_number, 1, QTableWidgetItem(f"{smart:.7f}"))
-            self.tableWidget.setItem(
-                row_number, 2, QTableWidgetItem(f"{(raw/smart * 100):.2f}")
-            )
-            self.tableWidget.setItem(
-                row_number, 3, QTableWidgetItem(f"{(smart/raw * 100):.2f}")
-            )
+            self.tableWidget.setItem(row_number, 0, QTableWidgetItem(f"{raw:.7f}"))
+            self.tableWidget.setItem(row_number, 1, QTableWidgetItem(f"{smart:.7f}"))
+            self.tableWidget.setItem(row_number, 2, QTableWidgetItem(f"{(raw/smart * 100):.2f}"))
+            self.tableWidget.setItem(row_number, 3, QTableWidgetItem(f"{(smart/raw * 100):.2f}"))
 
     def show_graph_in_another_window(self):
         self.process = QProcess()

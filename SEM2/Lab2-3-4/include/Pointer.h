@@ -534,133 +534,119 @@
 // };
 
 template <class T>
-class SloppyPtr
-{
+class SloppyPtr {
 private:
-	T* ptr;
+    T* ptr;
 
 public:
-	SloppyPtr() noexcept
-	    : ptr()
-	{
-	}
+    SloppyPtr() noexcept
+        : ptr()
+    {
+    }
 
-	SloppyPtr(std::nullptr_t) noexcept
-	    : ptr(nullptr)
-	{
-	}
+    SloppyPtr(std::nullptr_t) noexcept
+        : ptr(nullptr)
+    {
+    }
 
-	SloppyPtr(T* object) noexcept
-	    : ptr(object)
-	{
-	}
+    SloppyPtr(T* object) noexcept
+        : ptr(object)
+    {
+    }
 
-	SloppyPtr(const SloppyPtr<T>& other) noexcept
-	    : ptr(other.ptr)
-	{
-	}
+    SloppyPtr(const SloppyPtr<T>& other) noexcept
+        : ptr(other.ptr)
+    {
+    }
 
-	~SloppyPtr() noexcept
-	{
-		delete ptr;
-	}
+    ~SloppyPtr() noexcept {
+        delete ptr;
+    }
 
-	SloppyPtr<T>& operator=(const SloppyPtr<T>& other) noexcept
-	{
-		this->ptr = other.ptr;
+    SloppyPtr<T>& operator=(const SloppyPtr<T>& other) noexcept {
+        this->ptr = other.ptr;
 
-		return *this;
-	}
+        return *this;
+    }
 
-	SloppyPtr<T>& operator=(std::nullptr_t) noexcept
-	{
-		// reset();
-		ptr = nullptr;
+    SloppyPtr<T>& operator=(std::nullptr_t) noexcept {
+        // reset();
+        ptr = nullptr;
 
-		return *this;
-	}
+        return *this;
+    }
 
-	SloppyPtr(SloppyPtr<T>&& other)
-	{
-		// if (this->ptr)
-		// 	delete ptr;
+    SloppyPtr(SloppyPtr<T>&& other)
+    {
+        // if (this->ptr)
+        // 	delete ptr;
 
-		ptr = other.ptr;
-		other.ptr = nullptr;
-	}
+        ptr = other.ptr;
+        other.ptr = nullptr;
+    }
 
-	SloppyPtr<T>& operator=(SloppyPtr<T>&& other)
-	{
-		// if (this->ptr)
-		// 	delete ptr;
+    SloppyPtr<T>& operator=(SloppyPtr<T>&& other)
+    {
+        // if (this->ptr)
+        // 	delete ptr;
 
-		ptr = other.ptr;
-		other.ptr = nullptr;
+        ptr = other.ptr;
+        other.ptr = nullptr;
 
-		return *this;
-	}
+        return *this;
+    }
 
-	T* operator->() const
-	{
-		return ptr;
-	}
+    T* operator->() const {
+        return ptr;
+    }
 
-	T& operator*() const
-	{
-		return *ptr;
-	}
+    T& operator*() const {
+        return *ptr;
+    }
 
-	operator bool() const
-	{
-		return ptr;
-	}
+    operator bool() const {
+        return ptr;
+    }
 
-	bool operator==(T* other) const
-	{
-		return ptr == other;
-	}
+    bool operator==(T* other) const {
+        return ptr == other;
+    }
 
-	bool operator==(std::nullptr_t) const
-	{
-		return ptr == nullptr;
-	}
+    bool operator==(std::nullptr_t) const {
+        return ptr == nullptr;
+    }
 
-	operator T()
-	{
-		return ptr;
-	}
+    operator T()
+    {
+        return ptr;
+    }
 
-	T* Get() const noexcept
-	{
-		return this->ptr;
-	}
+    T* Get() const noexcept {
+        return this->ptr;
+    }
 
-	T* release() noexcept
-	{
-		T* result = nullptr;
-		std::swap(result, ptr);
-		return result;
-	}
+    T* release() noexcept {
+        T* result = nullptr;
+        std::swap(result, ptr);
+        return result;
+    }
 
-	void swap(SloppyPtr<T>& other) noexcept
-	{
-		std::swap(ptr, other.ptr);
-	}
+    void swap(SloppyPtr<T>& other) noexcept {
+        std::swap(ptr, other.ptr);
+    }
 
-	void reset() noexcept
-	{
-		T* temp = release();
-		delete temp;
-	}
+    void reset() noexcept {
+        T* temp = release();
+        delete temp;
+    }
 
-	bool expired() const
-	{
-		return this->ptr == nullptr;
-	}
+    bool expired() const {
+        return this->ptr == nullptr;
+    }
 };
 
 template <class T>
 void swap(SloppyPtr<T>& left, SloppyPtr<T>& right)
 {
-	left.swap(right);
+    left.swap(right);
 }

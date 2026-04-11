@@ -12,260 +12,220 @@
 #include "functional/mapreduce.h"
 
 template <typename T>
-class Sequence
-{
+class Sequence {
 public:
-	virtual ~Sequence()
-	{
-	}
+    virtual ~Sequence() {
+    }
 
-	class Iterator;
-	virtual Iterator begin() = 0;
-	virtual Iterator end() = 0;
+    class Iterator;
+    virtual Iterator begin() = 0;
+    virtual Iterator end() = 0;
 
-	virtual T& GetFirst() const = 0;
-	virtual T& GetLast() const = 0;
-	virtual T& Get(const Index index) const = 0;
+    virtual T& GetFirst() const = 0;
+    virtual T& GetLast() const = 0;
+    virtual T& Get(const Index index) const = 0;
 
-	Sequence<T>* Map(T (*func)(T&));
-	Sequence<T>* Where(std::function<bool(T&)> condition);
+    Sequence<T>* Map(T (*func)(T&));
+    Sequence<T>* Where(std::function<bool(T&)> condition);
 
-	virtual Sequence<T>* GetSubsequence(const Index start, const Index end);
-	virtual Sequence<T>* Concat(Sequence<T>* other);
-	virtual Sequence<T>* Slice(const Index index, Size size, Sequence<T>* other);
+    virtual Sequence<T>* GetSubsequence(const Index start, const Index end);
+    virtual Sequence<T>* Concat(Sequence<T>* other);
+    virtual Sequence<T>* Slice(const Index index, Size size, Sequence<T>* other);
 
-	T Reduce(T (*reducer)(T, T), T base);
+    T Reduce(T (*reducer)(T, T), T base);
 
-	virtual Size GetLength() const noexcept = 0;
+    virtual Size GetLength() const noexcept = 0;
 
-	virtual Sequence<T>* Append(const T& data) = 0;
-	virtual Sequence<T>* Prepend(const T& data) = 0;
+    virtual Sequence<T>* Append(const T& data) = 0;
+    virtual Sequence<T>* Prepend(const T& data) = 0;
 
-	virtual void InsertAt(const Index index, const T& data) = 0;
-	virtual void Remove(const Index index) = 0;
+    virtual void InsertAt(const Index index, const T& data) = 0;
+    virtual void Remove(const Index index) = 0;
 
-	virtual bool isEmpty() const noexcept
-	{
-		return GetLength() == 0;
-	}
+    virtual bool isEmpty() const noexcept {
+        return GetLength() == 0;
+    }
 
-	virtual Sequence<T>* Create() const = 0;
-	virtual Sequence<T>* Copy() const = 0;
+    virtual Sequence<T>* Create() const = 0;
+    virtual Sequence<T>* Copy() const = 0;
 
-	virtual SeqIter<T>* Iter() = 0;
+    virtual SeqIter<T>* Iter() = 0;
 
-	friend std::ostream& operator<<(std::ostream& stream, Sequence<T>* sequence)
-	{
-		for (Index i = 0; i < sequence->GetLength(); i++)
-		{
-			stream << sequence->Get(i) << " ";
-		}
+    friend std::ostream& operator<<(std::ostream& stream, Sequence<T>* sequence) {
+        for (Index i = 0; i < sequence->GetLength(); i++) {
+            stream << sequence->Get(i) << " ";
+        }
 
-		return stream;
-	}
+        return stream;
+    }
 };
 
 template <typename T>
-Sequence<T>* Sequence<T>::Map(Func<T> func)
-{
-	Sequence<T>* result = this->Create();
+Sequence<T>* Sequence<T>::Map(Func<T> func) {
+    Sequence<T>* result = this->Create();
 
-	for (auto e : *this)
-	{
-		result->Append(func(e));
-	}
+    for (auto e : *this) {
+        result->Append(func(e));
+    }
 
-	return result;
+    return result;
 }
 
 template <typename T>
-Sequence<T>* Sequence<T>::Where(Condition<T> condition)
-{
-	Sequence<T>* result = this->Create();
+Sequence<T>* Sequence<T>::Where(Condition<T> condition) {
+    Sequence<T>* result = this->Create();
 
-	for (auto e : *this)
-	{
-		if (condition(e))
-		{
-			result->Append(e);
-		}
-	}
+    for (auto e : *this) {
+        if (condition(e)) {
+            result->Append(e);
+        }
+    }
 
-	return result;
+    return result;
 }
 
 template <typename T>
-Sequence<T>* Sequence<T>::GetSubsequence(const Index start, const Index end)
-{
-	if (this->isEmpty() || end >= this->GetLength())
-	{
-		Logger::Trace("At GetSubsequence() at Sequence.h");
-		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-		throw(EXCEPTION_INDEX_OUT_OF_RANGE);
-	}
+Sequence<T>* Sequence<T>::GetSubsequence(const Index start, const Index end) {
+    if (this->isEmpty() || end >= this->GetLength()) {
+        Logger::Trace("At GetSubsequence() at Sequence.h");
+        logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+        throw(EXCEPTION_INDEX_OUT_OF_RANGE);
+    }
 
-	Sequence<T>* result = this->Create();
+    Sequence<T>* result = this->Create();
 
-	for (Index i = start; i <= end; i++)
-	{
-		result->Append(this->Get(i));
-	}
+    for (Index i = start; i <= end; i++) {
+        result->Append(this->Get(i));
+    }
 
-	return result;
+    return result;
 }
 
 template <typename T>
-Sequence<T>* Sequence<T>::Concat(Sequence<T>* other)
-{
-	Sequence<T>* result = this->Create();
+Sequence<T>* Sequence<T>::Concat(Sequence<T>* other) {
+    Sequence<T>* result = this->Create();
 
-	if (this->isEmpty() == false)
-	{
-		for (auto e : *this)
-		{
-			result->Append(e);
-		}
-	}
+    if (this->isEmpty() == false) {
+        for (auto e : *this) {
+            result->Append(e);
+        }
+    }
 
-	if (other->isEmpty() == false)
-	{
-		for (auto e : *other)
-		{
-			result->Append(e);
-		}
-	}
+    if (other->isEmpty() == false) {
+        for (auto e : *other) {
+            result->Append(e);
+        }
+    }
 
-	return result;
+    return result;
 }
 
 template <typename T>
-Sequence<T>* Sequence<T>::Slice(const Index index, Size size, Sequence<T>* other)
-{
-	if (this->isEmpty() || index >= this->GetLength())
-	{
-		Logger::Trace("At Slice(1) at Sequence.h");
-		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-		throw(EXCEPTION_INDEX_OUT_OF_RANGE);
-	}
-	if (other != NULL)
-	{
-		if (size > other->GetLength() || index + size > this->GetLength())
-		{
-			Logger::Trace("At Slice(2) at Sequence.h");
-			logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-			throw(EXCEPTION_INDEX_OUT_OF_RANGE);
-		}
-	}
+Sequence<T>* Sequence<T>::Slice(const Index index, Size size, Sequence<T>* other) {
+    if (this->isEmpty() || index >= this->GetLength()) {
+        Logger::Trace("At Slice(1) at Sequence.h");
+        logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+        throw(EXCEPTION_INDEX_OUT_OF_RANGE);
+    }
+    if (other != NULL) {
+        if (size > other->GetLength() || index + size > this->GetLength()) {
+            Logger::Trace("At Slice(2) at Sequence.h");
+            logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+            throw(EXCEPTION_INDEX_OUT_OF_RANGE);
+        }
+    }
 
-	Sequence<T>* result = this->Create();
+    Sequence<T>* result = this->Create();
 
-	if (other != NULL)
-	{
-		for (Index i = 0; i < size; i++)
-		{
-			result->Get(i + index) = other->Get(i);
-		}
-	}
-	else
-	{
-		for (Index i = 0; i < index; i++)
-		{
-			result->Append(this->Get(i));
-		}
+    if (other != NULL) {
+        for (Index i = 0; i < size; i++) {
+            result->Get(i + index) = other->Get(i);
+        }
+    } else {
+        for (Index i = 0; i < index; i++) {
+            result->Append(this->Get(i));
+        }
 
-		for (Index i = index + size; i < this->GetLength(); i++)
-		{
-			result->Append(this->Get(i));
-		}
-	}
-	return result;
+        for (Index i = index + size; i < this->GetLength(); i++) {
+            result->Append(this->Get(i));
+        }
+    }
+    return result;
 }
 
 template <typename T>
-T Sequence<T>::Reduce(Reducer<T> reducer, T base)
-{
-	if (this->isEmpty())
-	{
-		Logger::Trace("At Reduce() at Sequence.h");
-		logException(EXCEPTION_INDEX_OUT_OF_RANGE);
-		throw(EXCEPTION_INDEX_OUT_OF_RANGE);
-	}
+T Sequence<T>::Reduce(Reducer<T> reducer, T base) {
+    if (this->isEmpty()) {
+        Logger::Trace("At Reduce() at Sequence.h");
+        logException(EXCEPTION_INDEX_OUT_OF_RANGE);
+        throw(EXCEPTION_INDEX_OUT_OF_RANGE);
+    }
 
-	for (Index i = this->GetLength() - 1; i > 0; i--)
-	{
-		base = reducer(this->Get(i), base);
-	}
+    for (Index i = this->GetLength() - 1; i > 0; i--) {
+        base = reducer(this->Get(i), base);
+    }
 
-	base = reducer(this->GetFirst(), base);
+    base = reducer(this->GetFirst(), base);
 
-	return base;
+    return base;
 }
 
 template <typename T>
-class Sequence<T>::Iterator
-{
+class Sequence<T>::Iterator {
 private:
-	AbstractIterator<T>* iter;
+    AbstractIterator<T>* iter;
 
 public:
-	Iterator()
-	    : iter(nullptr)
-	{
-	}
+    Iterator()
+        : iter(nullptr)
+    {
+    }
 
-	Iterator(AbstractIterator<T>* iter)
-	    : iter(iter)
-	{
-	}
+    Iterator(AbstractIterator<T>* iter)
+        : iter(iter)
+    {
+    }
 
-	Iterator(const Iterator& other)
-	    : iter(other.iter->copy())
-	{
-	}
+    Iterator(const Iterator& other)
+        : iter(other.iter->copy())
+    {
+    }
 
-	Iterator& operator++()
-	{
-		++(*this->iter);
-		return *this;
-	}
+    Iterator& operator++() {
+        ++(*this->iter);
+        return *this;
+    }
 
-	Iterator operator++(int)
-	{
-		Iterator tmp = *this;
-		++(*iter);
-		return tmp;
-	}
+    Iterator operator++(int) {
+        Iterator tmp = *this;
+        ++(*iter);
+        return tmp;
+    }
 
-	Iterator& operator--()
-	{
-		--(*this->iter);
-		return *this;
-	}
+    Iterator& operator--() {
+        --(*this->iter);
+        return *this;
+    }
 
-	Iterator operator--(int)
-	{
-		Iterator tmp = *this;
-		--(*iter);
-		return tmp;
-	}
+    Iterator operator--(int) {
+        Iterator tmp = *this;
+        --(*iter);
+        return tmp;
+    }
 
-	~Iterator()
-	{
-		delete iter;
-	}
+    ~Iterator() {
+        delete iter;
+    }
 
-	T& operator*()
-	{
-		return *(*this->iter);
-	}
+    T& operator*() {
+        return *(*this->iter);
+    }
 
-	bool operator==(const Iterator& other) const
-	{
-		return this->iter->equal(*other.iter);
-	}
+    bool operator==(const Iterator& other) const {
+        return this->iter->equal(*other.iter);
+    }
 
-	bool operator!=(const Iterator& other) const
-	{
-		return !(this->iter->equal(*other.iter));
-	}
+    bool operator!=(const Iterator& other) const {
+        return !(this->iter->equal(*other.iter));
+    }
 };

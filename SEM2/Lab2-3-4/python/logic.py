@@ -23,9 +23,7 @@ def plot_bars(raw: tuple, smart: tuple) -> None:
 
     width = 0.25  # the width of the bars
 
-    fig, ((ax0, ax1, ax2), (ax3, ax4, ax5)) = plt.subplots(
-        nrows=2, ncols=3, layout="constrained"
-    )
+    fig, ((ax0, ax1, ax2), (ax3, ax4, ax5)) = plt.subplots(nrows=2, ncols=3, layout="constrained")
 
     axs: list = [ax0, ax1, ax2, ax3, ax4, ax5]
     meas: list = []
@@ -47,9 +45,7 @@ def plot_bars(raw: tuple, smart: tuple) -> None:
 
     rad = 1
     for ax, raw_meassure, smart_meassure in zip(axs, raw, smart):
-        ax.bar(
-            rad, raw_meassure, color="blue", width=width, edgecolor="black", label="Raw"
-        )
+        ax.bar(rad, raw_meassure, color="blue", width=width, edgecolor="black", label="Raw")
         ax.bar(
             rad + width,
             smart_meassure,
