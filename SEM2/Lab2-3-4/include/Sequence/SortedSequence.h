@@ -4,7 +4,6 @@
 #include "Sorter/ISorter.h"
 #include <functional>
 #include <ostream>
-#include <pstl/glue_execution_defs.h>
 #include <stdexcept>
 #include <variant>
 

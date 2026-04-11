@@ -6,6 +6,7 @@
 #include "Array.h"
 #include "Iterator.h"
 #include "Logger.h"
+#include "SeqIterBase.h"
 #include "Tuple.h"
 #include "concepts.h"
 #include "functional/mapreduce.h"
@@ -50,6 +51,8 @@ public:
 
 	virtual Sequence<T>* Create() const = 0;
 	virtual Sequence<T>* Copy() const = 0;
+
+	virtual SeqIter<T>* Iter() = 0;
 
 	friend std::ostream& operator<<(std::ostream& stream, Sequence<T>* sequence)
 	{

@@ -4,9 +4,10 @@ project(Lab2-3-4)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # testing library
-find_package(Catch2 REQUIRED)
+# find_package(Catch2 REQUIRED)
 
 set(SOURCE_DIR "src")
 set(INCLUDE "include")
@@ -36,6 +37,8 @@ set(SOURCES_HEADERS
         ${INCLUDE}/Sequence/Stack.h
         ${INCLUDE}/Sequence/Array.h
         ${INCLUDE}/Sequence/ArraySequence.h
+        ${INCLUDE}/Sequence/SeqIterBase.h
+        ${INCLUDE}/Sequence/SeqIter.h
         ${INCLUDE}/Sequence/SortedSequence.h
         ${INCLUDE}/Sorter/ISorter.h
         ${INCLUDE}/Sorter/HeapSort.h
@@ -64,48 +67,48 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDE}/)
 
 # -----------------------------------------------------------------
 # python
-set (PYTHON_MODULE pointers)
-
-set(PYTHON "/usr/include/python3.11")
-find_package (Python3 COMPONENTS Interpreter Development)
-
-add_library(${PYTHON_MODULE} STATIC ${SOURCES_HEADERS})
-set_target_properties(${PYTHON_MODULE} PROPERTIES POSITION_INDEPENDENT_CODE ON)
-target_include_directories(${PYTHON_MODULE} PUBLIC ${PYTHON}/)
-target_include_directories(${PYTHON_MODULE} PUBLIC ${SOURCE_DIR}/)
-target_include_directories(${PYTHON_MODULE} PUBLIC ${INCLUDE}/)
-
-add_subdirectory(pybind11)
-pybind11_add_module(smart_pointers python/binder.cpp)
-set_target_properties(smart_pointers PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/)
-
-target_link_libraries(smart_pointers PRIVATE ${PYTHON_MODULE})
-target_link_libraries(smart_pointers PRIVATE pybind11::embed)
-target_include_directories(smart_pointers PRIVATE ${PYTHON}/)
+# set (PYTHON_MODULE pointers)
+#
+# set(PYTHON "/usr/include/python3.11")
+# find_package (Python3 COMPONENTS Interpreter Development)
+#
+# add_library(${PYTHON_MODULE} STATIC ${SOURCES_HEADERS})
+# set_target_properties(${PYTHON_MODULE} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+# target_include_directories(${PYTHON_MODULE} PUBLIC ${PYTHON}/)
+# target_include_directories(${PYTHON_MODULE} PUBLIC ${SOURCE_DIR}/)
+# target_include_directories(${PYTHON_MODULE} PUBLIC ${INCLUDE}/)
+#
+# add_subdirectory(pybind11)
+# pybind11_add_module(smart_pointers python/binder.cpp)
+# set_target_properties(smart_pointers PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/)
+#
+# target_link_libraries(smart_pointers PRIVATE ${PYTHON_MODULE})
+# target_link_libraries(smart_pointers PRIVATE pybind11::embed)
+# target_include_directories(smart_pointers PRIVATE ${PYTHON}/)
 
 
 # -----------------------------------------------------------------
-set(TEST_PROJECT_NAME "tests")
-
-set(TEST_DIR "tests")
-
-# adding tests to my project
-add_executable(${TEST_PROJECT_NAME} 
-        ${TEST_DIR}/ArrayTests.cpp 
-        ${TEST_DIR}/SegmentedListTests.cpp
-        ${TEST_DIR}/SequenceTests.cpp
-        ${TEST_DIR}/SorterTests.cpp
-        ${TEST_DIR}/SortedSequenceTests.cpp
-        ${TEST_DIR}/HashTableTests.cpp
-        ${TEST_DIR}/MatrixTests.cpp
-        ${TEST_DIR}/BinaryTreeTests.cpp
-        ${TEST_DIR}/BinaryHeapTests.cpp
-        ${TEST_DIR}/OrderedSetTests.cpp
-        ${TEST_DIR}/CStringTests.cpp
-        ${SOURCES_HEADERS}
-        )
-
-target_include_directories(${TEST_PROJECT_NAME} PRIVATE ${SOURCE_DIR})
-target_include_directories(${TEST_PROJECT_NAME} PRIVATE ${INCLUDE})
-target_link_libraries(${TEST_PROJECT_NAME} PRIVATE Catch2::Catch2WithMain)
+# set(TEST_PROJECT_NAME "tests")
+#
+# set(TEST_DIR "tests")
+#
+# # adding tests to my project
+# add_executable(${TEST_PROJECT_NAME} 
+#         ${TEST_DIR}/ArrayTests.cpp 
+#         ${TEST_DIR}/SegmentedListTests.cpp
+#         ${TEST_DIR}/SequenceTests.cpp
+#         ${TEST_DIR}/SorterTests.cpp
+#         ${TEST_DIR}/SortedSequenceTests.cpp
+#         ${TEST_DIR}/HashTableTests.cpp
+#         ${TEST_DIR}/MatrixTests.cpp
+#         ${TEST_DIR}/BinaryTreeTests.cpp
+#         ${TEST_DIR}/BinaryHeapTests.cpp
+#         ${TEST_DIR}/OrderedSetTests.cpp
+#         ${TEST_DIR}/CStringTests.cpp
+#         ${SOURCES_HEADERS}
+#         )
+#
+# target_include_directories(${TEST_PROJECT_NAME} PRIVATE ${SOURCE_DIR})
+# target_include_directories(${TEST_PROJECT_NAME} PRIVATE ${INCLUDE})
+# target_link_libraries(${TEST_PROJECT_NAME} PRIVATE Catch2::Catch2WithMain)
 

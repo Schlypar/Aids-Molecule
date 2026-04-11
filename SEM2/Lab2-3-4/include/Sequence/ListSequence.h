@@ -6,6 +6,42 @@
 #include <cwchar>
 
 template <typename T>
+class ListSequence;
+
+template <typename T>
+class ListSeqIter : public SeqIter<T>
+{
+	ListSequence<T>* seq_;
+	Index            index_;
+
+public:
+	explicit ListSeqIter(ListSequence<T>* seq)
+	    : SeqIter<T>(SequenceKind::List)
+	    , seq_(seq)
+	    , index_(0)
+	{
+	}
+
+	bool hasNext() const override
+	{
+		return index_ < seq_->GetLength();
+	}
+
+	T next() override
+	{
+		return seq_->Get(index_++);
+	}
+
+	Sequence<T>* Collect() override
+	{
+		auto* result = new ListSequence<T>();
+		while (hasNext())
+			result->Append(next());
+		return result;
+	}
+};
+
+template <typename T>
 class ListSequence : public Sequence<T>
 {
 	using ContainerIterator = SegmentedList<T>::Iterator;
@@ -136,6 +172,11 @@ public:
 	bool isEmpty() const noexcept override
 	{
 		return GetLength() == 0;
+	}
+
+	SeqIter<T>* Iter() override
+	{
+		return new ListSeqIter<T>(this);
 	}
 
 	// Returns abstract class Sequence that underhood is ListSequence

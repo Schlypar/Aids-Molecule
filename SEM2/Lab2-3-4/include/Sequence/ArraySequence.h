@@ -6,6 +6,42 @@
 #include <functional>
 
 template <typename T>
+class ArraySequence;
+
+template <typename T>
+class ArraySeqIter : public SeqIter<T>
+{
+	ArraySequence<T>* seq_;
+	Index             index_;
+
+public:
+	explicit ArraySeqIter(ArraySequence<T>* seq)
+	    : SeqIter<T>(SequenceKind::Array)
+	    , seq_(seq)
+	    , index_(0)
+	{
+	}
+
+	bool hasNext() const override
+	{
+		return index_ < seq_->GetLength();
+	}
+
+	T next() override
+	{
+		return seq_->Get(index_++);
+	}
+
+	Sequence<T>* Collect() override
+	{
+		auto* result = new ArraySequence<T>();
+		while (hasNext())
+			result->Append(next());
+		return result;
+	}
+};
+
+template <typename T>
 class ArraySequence : public Sequence<T>
 {
 	using ContainerIterator = Array<T>::Iterator;
@@ -145,6 +181,11 @@ public:
 		}
 
 		return result;
+	}
+
+	SeqIter<T>* Iter() override
+	{
+		return new ArraySeqIter<T>(this);
 	}
 
 	// Returns abstract class Sequence that underhood is ArraySequence
