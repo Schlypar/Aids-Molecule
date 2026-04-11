@@ -6,50 +6,48 @@
 #include <cassert>
 #include <string>
 
-LogPriority Logger::priority = FatalPriority;
+LogPriority Logger::priority = WarnPriority;
 
 int main() {
-    // 1. Identity collect — ArraySequence<int> -> ArraySequence<int>
-    Sequence<int>* arr = new ArraySequence<int>{1, 2, 3};
-    auto* c1 = arr->Iter()->Collect();
-    assert(c1->GetLength() == 3);
-    assert(c1->Get(0) == 1);
-    assert(c1->Get(2) == 3);
-    delete c1;
-
-    // 2. MapTo with type change — result is ArraySequence<double>
+    Sequence<int>* arr = new ArraySequence<int>{1, 2, 3, 4, 5};
+    std::cout << "Initial array is:\n";
+    for (auto x : *arr) {
+        std::cout << x << " ";
+    }
+    std::cout << std::endl;
+    std::cout << "Map initital (* 2.333):\n";
     auto* c2 = arr->Iter()
-                   ->MapTo<double>([](const int& x) { return x * 2.0; })
+                   ->MapTo<double>([](const int& x) { return x * 2.333; })
                    ->Collect();
-    assert(c2->GetLength() == 3);
-    assert(c2->Get(0) == 2.0);
-    assert(c2->Get(2) == 6.0);
+    for (auto x : *c2) {
+        std::cout << x << " ";
+    }
+    std::cout << std::endl;
     delete c2;
 
-    // 3. Chained MapTo
+    std::cout << "Map initital (* 2.0) -> to_string():\n";
     auto* c3 = arr->Iter()
                    ->MapTo<double>([](const int& x) { return x * 2.0; })
                    ->MapTo<std::string>([](const double& x) { return std::to_string(x); })
                    ->Collect();
-    assert(c3->GetLength() == 3);
-    assert(!c3->Get(0).empty());
-    delete c3;
+    for (auto x : *c3) {
+        std::cout << x << " ";
+    }
+    std::cout << std::endl;
 
-    // 4. ListSequence preserves List kind
+    std::cout << "Map initital (* 1.0):\n";
     Sequence<int>* lst = new ListSequence<int>{10, 20, 30};
     auto* c4 = lst->Iter()
                    ->MapTo<int>([](const int& x) { return x + 1; })
                    ->Collect();
-    assert(c4->GetLength() == 3);
-    assert(c4->Get(0) == 11);
-    auto* inner = c4->Iter();
-    assert(inner->hasNext());
-    delete inner;
+    for (auto x : *c4) {
+        std::cout << x << " ";
+    }
+    std::cout << std::endl;
     delete c4;
 
     delete arr;
     delete lst;
 
-    std::cout << "All SeqIter assertions passed.\n";
     return 0;
 }

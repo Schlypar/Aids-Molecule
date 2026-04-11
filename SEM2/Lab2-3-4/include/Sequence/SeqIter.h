@@ -2,6 +2,7 @@
 
 #include "ArraySequence.h"
 #include "ListSequence.h"
+#include "Logger.h"
 
 #include <functional>
 
@@ -19,6 +20,7 @@ public:
     }
 
     ~MapIterator() override {
+        Logger::Info("Deleted source from mapper");
         delete source_;
     }
 
@@ -37,6 +39,7 @@ public:
         while (hasNext()) {
             result->Append(next());
         }
+        delete this;
         return result;
     }
 };

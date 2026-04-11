@@ -34,6 +34,7 @@ public:
         while (hasNext()) {
             result->Append(next());
         }
+        delete this;
         return result;
     }
 };
